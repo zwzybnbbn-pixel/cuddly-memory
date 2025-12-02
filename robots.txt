@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://doctors-shabw5a.netlify.app/sitemap.xml

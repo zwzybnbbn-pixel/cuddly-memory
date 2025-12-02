@@ -1,0 +1,133 @@
+/* -----------------------------------
+   إعدادات عامة للموقع
+----------------------------------- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Tajawal", sans-serif;
+}
+
+html, body {
+    height: 100%;
+    background: #f4f4f4;
+}
+
+/* -----------------------------------
+   الهيدر
+----------------------------------- */
+header {
+    background: #0077b6;
+    color: white;
+    text-align: center;
+    padding: 25px 10px;
+}
+
+header h1 {
+    font-size: 28px;
+    margin-bottom: 6px;
+}
+
+/* -----------------------------------
+   الحاوية الرئيسية
+----------------------------------- */
+.container {
+    width: 100%;
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 10px;
+}
+
+/* -----------------------------------
+   صندوق البحث
+----------------------------------- */
+.search-box {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.search-box input {
+    flex: 1;
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid #999;
+    font-size: 16px;
+}
+
+.search-box button {
+    padding: 12px 20px;
+    background: #0096c7;
+    border: none;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.search-box button:hover {
+    background: #0077b6;
+}
+
+/* -----------------------------------
+   نتائج البحث
+----------------------------------- */
+.result-box {
+    margin-bottom: 30px;
+}
+
+/* -----------------------------------
+   بطاقات الأطباء
+----------------------------------- */
+.cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.doctor-card {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    box-shadow: 0px 2px 4px #00000022;
+}
+
+.doctor-card h3 {
+    font-size: 20px;
+    margin-bottom: 8px;
+    color: #0077b6;
+}
+
+.doctor-card p {
+    margin-bottom: 4px;
+    font-size: 15px;
+}
+
+/* -----------------------------------
+   عناوين الأقسام
+----------------------------------- */
+.section-title {
+    font-size: 22px;
+    margin: 20px 0 10px;
+}
+
+/* -----------------------------------
+   الفوتر
+----------------------------------- */
+footer {
+    background: #023e8a;
+    color: white;
+    text-align: center;
+    padding: 20px 10px;
+    margin-top: 40px;
+}
+
+footer p {
+    margin: 5px 0;
+}
+
+footer .under-supervision {
+    color: #ffea00; /* لون خاص فقط لجملة "تحت إشراف ماجد" */
+    font-weight: bold;
+}

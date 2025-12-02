@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+      <meta name="google-site-verification" content="uY95qqm0KCTiF0PJv-nozw9e7FCVGFCQ5qeKFEjNOJI" />
+    <meta charset="UTF-8">
+  </head>
+<head>
+    <title>دليل أطباء شبوة</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- زر القائمة المنسدلة -->
+<div class="menu-container">
+    <div class="menu-btn" onclick="toggleMenu()">⋮</div>
+
+    <div id="dropdownMenu" class="dropdown-menu">
+      <a href="https://wa.me/967776503890?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D9%8B%20%D8%A3%D8%B1%D9%8A%D8%AF%20%D8%A7%D9%84%D8%AA%D9%88%D8%A7%D8%B5%D9%84" 
+   target="_blank" 
+   style="
+       background:#25d366;
+       color:#fff;
+       padding:12px 20px;
+       border-radius:8px;
+       font-size:18px;
+       text-decoration:none;">
+    تواصل معنا
+</a>
+        <a href="https://wa.me/967776503890?text=مرحبًا%20اريد%20التواصل" target="_blank">
+            تواصل معنا
+        </a>
+<a href="https://api.whatsapp.com/send?phone=967776503890&text=مرحباً%20أريد%20التواصل" target="_blank">
+    تواصل معنا
+</a>
+        <a href="https://wa.me/967776503890?text=لدي%20شكوى%20اريد%20تقديمها" target="_blank">
+            تقديم شكوى
+        </a>
+    </div>
+</div>
+  <!-- زر القائمة (٣ نقاط) -->
+<div class="menu-button" onclick="toggleMenu()">⋮</div>
+
+<!-- القائمة المنسدلة -->
+<div class="menu-popup" id="menuPopup">
+    <a href="contact.html">تواصل معنا</a>
+    <a href="complain.html">تقديم شكوى</a>
+</div>
+
+<header>
+    <h1>دليل أطباء شبوة</h1>
+   <p>
+موقع دليل أطباء شبوة يساعدك في معرفة مواعيد دوام الأطباء في جميع المستشفيات والمراكز الصحية في محافظة شبوة. 
+يمكنك البحث باسم الطبيب أو التخصص أو المستشفى للحصول على معلومات دقيقة وسريعة. 
+نعمل على تحديث المعلومات بشكل مستمر لتقديم أفضل خدمة للمستخدمين في شبوة والمناطق المجاورة.
+</p>
+    <p>اعرف أين يداوم الطبيب اليوم بسرعة وسهولة</p>
+    <section style="padding:15px; font-size:18px; line-height:1.7;">
+
+
+</section>
+</header>
+
+<div class="container">
+
+    <!-- صندوق البحث -->
+    <div class="search-box">
+        <input type="text" id="searchInput" placeholder="اكتب اسم الدكتور...">
+        <button onclick="searchDoctor()">بحث</button>
+    </div>
+
+    <!-- المكان الذي تظهر فيه النتائج -->
+    <div id="result" class="result-box"></div>
+
+    <!-- مكان عرض جميع بطاقات الأطباء -->
+    <h2 class="section-title">جميع الأطباء</h2>
+    <div id="doctors-list" class="cards-container"></div>
+
+</div>
+
+<!-- فوتر الموقع -->
+<footer>
+    <p class="under-supervision">تحت إشراف المهندس ماجد قاسم حسن مبارك<p/>
+    <p>© 2025 — موقع استعلام دوام الأطباء</p>
+    
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
