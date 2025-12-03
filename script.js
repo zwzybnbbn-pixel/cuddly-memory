@@ -11,47 +11,49 @@ const doctors = [
     { name: "د. علي ناصر", spec: "عظام", hospital: "مستشفى العاصمة", time: "4pm - 10pm" }
 ];
 
-// عرض البطاقات
+// عرض كل البطاقات
 function loadCards() {
     let box = document.getElementById("doctorCards");
     box.innerHTML = "";
+
     doctors.forEach(doc => {
-        box.innerHTML += `
-            <div class="card">
-                <h3>${doc.name}</h3>
-                <p>التخصص: ${doc.spec}</p>
-                <p>المستشفى: ${doc.hospital}</p>
-                <p>الدوام: ${doc.time}</p>
-            </div>
-        `;
+        box.innerHTML += createCard(doc);
     });
 }
-loadCards();
+
+// إنشاء بطاقة واحدة
+function createCard(doc) {
+    return `
+        <div class="card">
+            <h3>${doc.name}</h3>
+            <p>التخصص: ${doc.spec}</p>
+            <p>المستشفى: ${doc.hospital}</p>
+            <p>الدوام: ${doc.time}</p>
+        </div>
+    `;
+}
 
 // البحث
 function searchDoctor() {
-    let text = document.getElementById("searchInput").value;
-
-    let result = doctors.filter(d =>
-        d.name.includes(text)
-    );
+    let text = document.getElementById("searchInput").value.trim();
 
     let box = document.getElementById("doctorCards");
     box.innerHTML = "";
 
+    // البحث باستخدام includes مع تجاهل المسافات
+    let result = doctors.filter(d =>
+        d.name.replace(/\s/g, "").includes(text.replace(/\s/g, ""))
+    );
+
     if (result.length === 0) {
-        box.innerHTML = `<h3 style="text-align:center;">لا يوجد دكتور بهذا الاسم</h3>`;
+        box.innerHTML = `<h3 style="text-align:center; color:#555;">لا يوجد دكتور بهذا الاسم</h3>`;
         return;
     }
 
     result.forEach(doc => {
-        box.innerHTML += `
-            <div class="card">
-                <h3>${doc.name}</h3>
-                <p>التخصص: ${doc.spec}</p>
-                <p>المستشفى: ${doc.hospital}</p>
-                <p>الدوام: ${doc.time}</p>
-            </div>
-        `;
+        box.innerHTML += createCard(doc);
     });
 }
+
+// تحميل البطاقات عند فتح الصفحة
+loadCards();
