@@ -1,3 +1,43 @@
+// ====== قائمة النقاط ======
+function toggleMenu() {
+    const menu = document.getElementById("menuBox");
+    menu.style.display = (menu.style.display === "block") ? "none" : "block";
+}
+
+// ====== بيانات الأطباء ======
+const doctors = [
+    { name: "د. أحمد", hospital: "مستشفى شبوة", specialty: "باطنية", today: "صباحي", tomorrow: "مسائي" },
+    { name: "د. خالد", hospital: "مستشفى عتق", specialty: "جراحة", today: "مسائي", tomorrow: "صباحي" },
+    { name: "د. رامي", hospital: "مستوصف الأمل", specialty: "أسنان", today: "صباحي", tomorrow: "مسائي" }
+];
+
+
+// ====== دالة البحث ======
+function searchDoctor() {
+    const input = document.getElementById("searchInput").value.trim();
+    const resultBox = document.getElementById("result");
+
+    if (input === "") {
+        resultBox.innerHTML = `<p>الرجاء كتابة اسم الطبيب</p>`;
+        return;
+    }
+
+    const result = doctors.filter(doc => doc.name.includes(input));
+
+    if (result.length === 0) {
+        resultBox.innerHTML = `<p style="color:red;">لا يوجد طبيب بهذا الاسم</p>`;
+    } else {
+        resultBox.innerHTML = result.map(doc => `
+            <div class="doctor-card">
+                <h3>${doc.name}</h3>
+                <p>المستشفى: ${doc.hospital}</p>
+                <p>التخصص: ${doc.specialty}</p>
+                <p>دوام اليوم: ${doc.today}</p>
+                <p>دوام غداً: ${doc.tomorrow}</p>
+            </div>
+        `).join('');
+    }
+}
 // ===========================
 // قاعدة بيانات الأطباء
 // ===========================
