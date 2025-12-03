@@ -1,3 +1,4 @@
+
 body {
     font-family: "Tajawal", sans-serif;
     background: #f4f4f4;
@@ -91,4 +92,52 @@ header {
 .no-result {
     color: red;
     text-align: center;
+}
+/* تنسيقات الموقع الأساسية */
+/* ... */
+/* ... */
+
+/* ضع كود صفحة التواصل هنا في نهاية الملف */
+
+/* تصميم صفحة التواصل */
+.contact-container {
+    max-width: 500px;
+    margin: 50px auto;
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+    text-align: center;
+}
+
+.contact-container h2 {
+    margin-bottom: 15px;
+    color: #333;
+    font-size: 24px;
+}
+
+.contact-container p {
+    font-size: 18px;
+    color: #555;
+    margin-bottom: 25px;
+}
+
+.whatsapp-btn {
+    display: inline-block;
+    background: #25D366;
+    color: white;
+    padding: 12px 25px;
+    font-size: 18px;
+    border-radius: 8px;
+    text-decoration: none;
+}
+
+.back-btn {
+    display: inline-block;
+    margin: 20px auto;
+    padding: 10px 22px;
+    background: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
 }
