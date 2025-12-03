@@ -1,60 +1,91 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-  <head>
-      <meta name="google-site-verification" content="uY95qqm0KCTiF0PJv-nozw9e7FCVGFCQ5qeKFEjNOJI" />
-    <meta charset="UTF-8">
-  </head>
 <head>
-    <title>دليل أطباء شبوة</title>
-
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
+    <meta charset="UTF-8">
+    <title>دليل دوام الأطباء</title>
     <link rel="stylesheet" href="style.css">
+
+    <!-- كود القائمة (3 نقاط) يوضع هنا داخل <head> -->
+    <style>
+        .menu-container {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            z-index: 99999;
+        }
+
+        .menu-btn {
+            font-size: 28px;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .menu-box {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 35px;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            width: 170px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+        }
+
+        .menu-box a {
+            display: block;
+            padding: 10px;
+            text-decoration: none;
+            color: black;
+            border-bottom: 1px solid #eee;
+            text-align: right;
+        }
+
+        .menu-box a:last-child {
+            border-bottom: none;
+        }
+
+        .menu-box a:hover {
+            background: #f5f5f5;
+        }
+    </style>
 </head>
+
 <body>
 
-    
+<!-- زر 3 النقاط -->
+<div class="menu-container">
+    <button class="menu-btn" onclick="toggleMenu()">⋮</button>
 
+    <div class="menu-box" id="menuBox">
+        <a href="https://wa.me/967776503890?text=مرحباً%20اريد%20التواصل" target="_blank">
+            تواصل معنا
+        </a>
+        <a href="complaint.html">تقديم شكوى</a>
+    </div>
+</div>
 
+<!-- باقي الصفحة هنا -->
 <header>
-    <h1>دليل أطباء شبوة</h1>
-  <p>م<p/>
-   <p>
-موقع دليل أطباء شبوة يساعدك في معرفة مواعيد دوام الأطباء في جميع المستشفيات والمراكز الصحية في محافظة شبوة. 
-يمكنك البحث باسم الطبيب أو التخصص أو المستشفى للحصول على معلومات دقيقة وسريعة. 
-نعمل على تحديث المعلومات بشكل مستمر لتقديم أفضل خدمة للمستخدمين في شبوة والمناطق المجاورة.
-</p>
-    <p>اعرف أين يداوم الطبيب اليوم بسرعة وسهولة</p>
-    <section style="padding:15px; font-size:18px; line-height:1.7;">
-
-
-</section>
+    <h1>دليل دوام الأطباء</h1>
+    <p>اعرف أين يداوم الطبيب اليوم</p>
 </header>
 
 <div class="container">
-
-    <!-- صندوق البحث -->
-    <div class="search-box">
-        <input type="text" id="searchInput" placeholder="اكتب اسم الدكتور...">
-        <button onclick="searchDoctor()">بحث</button>
-    </div>
-
-    <!-- المكان الذي تظهر فيه النتائج -->
-    <div id="result" class="result-box"></div>
-
-    <!-- مكان عرض جميع بطاقات الأطباء -->
-    <h2 class="section-title">جميع الأطباء</h2>
-    <div id="doctors-list" class="cards-container"></div>
-
+    <!-- البحث يظهر هنا -->
 </div>
 
-<!-- فوتر الموقع -->
 <footer>
-    <p class="under-supervision">تحت إشراف المهندس ماجد قاسم حسن مبارك<p/>
-    <p>© 2025 — موقع استعلام دوام الأطباء</p>
-    
+    <p>© 2025 بإشراف ماجد</p>
 </footer>
 
-<script src="script.js"></script>
+<script>
+function toggleMenu() {
+    const menu = document.getElementById("menuBox");
+    menu.style.display = (menu.style.display === "block") ? "none" : "block";
+}
+</script>
+
 </body>
 </html>
