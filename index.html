@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>دليل دوام الأطباء</title>
-    <link rel="stylesheet" href="/style.css?v=1000">
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -32,7 +32,10 @@
 
 <h2 class="section-title">بطاقات الأطباء</h2>
 
+<!-- هنا المكان الصحيح لظهور البطاقات -->
 <div id="doctorCards" class="cards"></div>
+
+<script src="script.js"></script>
 
 <script>
 function toggleMenu() {
@@ -40,8 +43,6 @@ function toggleMenu() {
     menu.style.display = (menu.style.display === "block") ? "none" : "block";
 }
 </script>
-
-<script src="script.js"></script>
 
 </body>
 </html>
