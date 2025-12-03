@@ -4,17 +4,124 @@
     <meta charset="UTF-8">
     <title>الدعم الفني</title>
     <link rel="stylesheet" href="style.css">
+
+    <style>
+        .support-container {
+            max-width: 450px;
+            margin: 40px auto;
+            padding: 25px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .support-container h2 {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 26px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .support-container p {
+            text-align: center;
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 15px;
+        }
+
+        .support-container label {
+            display: block;
+            margin-top: 12px;
+            font-weight: bold;
+            font-size: 15px;
+        }
+
+        .support-container input,
+        .support-container textarea {
+            width: 100%;
+            padding: 12px;
+            margin-top: 6px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            outline: none;
+            font-size: 15px;
+        }
+
+        .support-container textarea {
+            height: 120px;
+            resize: none;
+        }
+
+        .support-container button {
+            width: 100%;
+            padding: 14px;
+            background: #007bff;
+            border: none;
+            border-radius: 8px;
+            margin-top: 18px;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .support-container button:hover {
+            background: #0069d9;
+        }
+    </style>
 </head>
 
 <body>
 
-<h2 class="title">الدعم الفني</h2>
+<!-- القائمة -->
+<div class="menu-container">
+    <button class="menu-btn" onclick="toggleMenu()">☰</button>
+    <div class="menu-box" id="menuBox">
+        <a href="index.html">الصفحة الرئيسية</a>
+        <a href="contact.html">التواصل</a>
+        <a href="complaint.html">الشكاوي</a>
+        <a href="support.html">الدعم</a>
+    </div>
+</div>
 
-<p class="center">لأي مشكلة تقنية تواصل معنا مباشرة:</p>
+<div class="support-container">
+    <h2>الدعم الفني</h2>
+    <p>إذا واجهتك أي مشكلة في الموقع، تواصل معنا وسنساعدك فورًا</p>
 
-<a class="btn" href="https://wa.me/967776503890?text=احتاج%20دعم" target="_blank">
-    تواصل عبر واتساب
-</a>
+    <label>نوع المشكلة:</label>
+    <input type="text" id="sType" placeholder="مثال: مشكلة في البحث، عدم ظهور البيانات...">
+
+    <label>وصف المشكلة:</label>
+    <textarea id="sMsg" placeholder="اشرح مشكلتك بالتفصيل..."></textarea>
+
+    <button onclick="sendSupport()">إرسال للدعم عبر واتساب</button>
+</div>
+
+<script>
+function toggleMenu() {
+    const menu = document.getElementById("menuBox");
+    menu.style.display = (menu.style.display === "block") ? "none" : "block";
+}
+
+function sendSupport() {
+    let type = document.getElementById("sType").value;
+    let msg = document.getElementById("sMsg").value;
+
+    if (!msg.trim()) {
+        alert("يرجى كتابة وصف المشكلة");
+        return;
+    }
+
+    let text =
+        `بلاغ دعم فني:\nنوع المشكلة: ${type}\nالوصف: ${msg}`;
+
+    let url =
+        "https://wa.me/967776503890?text=" + encodeURIComponent(text);
+
+    window.open(url, "_blank");
+}
+</script>
 
 </body>
 </html>
