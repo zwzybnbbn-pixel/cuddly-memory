@@ -1,42 +1,57 @@
-// بحث عن طبيب
+// قائمة 3 خطوط
+function toggleMenu() {
+    let menu = document.getElementById("menuBox");
+    menu.style.display = menu.style.display === "block" ? "none" : "block";
+}
+
+// بيانات الأطباء
+const doctors = [
+    { name: "د. ماجد قاسم", spec: "باطنية", hospital: "مستشفى شبوة", time: "8am - 4pm" },
+    { name: "د. أحمد سالم", spec: "أطفال", hospital: "مستشفى عتق", time: "9am - 3pm" },
+    { name: "د. علي ناصر", spec: "عظام", hospital: "مستشفى العاصمة", time: "4pm - 10pm" }
+];
+
+// عرض البطاقات
+function loadCards() {
+    let box = document.getElementById("doctorCards");
+    box.innerHTML = "";
+    doctors.forEach(doc => {
+        box.innerHTML += `
+            <div class="card">
+                <h3>${doc.name}</h3>
+                <p>التخصص: ${doc.spec}</p>
+                <p>المستشفى: ${doc.hospital}</p>
+                <p>الدوام: ${doc.time}</p>
+            </div>
+        `;
+    });
+}
+loadCards();
+
+// البحث
 function searchDoctor() {
-    const input = document.getElementById("searchInput").value.trim();
-    const resultBox = document.getElementById("result");
+    let text = document.getElementById("searchInput").value;
 
-    resultBox.innerHTML = "";
+    let result = doctors.filter(d =>
+        d.name.includes(text)
+    );
 
-    const found = doctors.filter(doc => doc.name.includes(input));
+    let box = document.getElementById("doctorCards");
+    box.innerHTML = "";
 
-    if (found.length === 0) {
-        resultBox.innerHTML = "<p class='no-result'>❌ لا يوجد طبيب بهذا الاسم</p>";
+    if (result.length === 0) {
+        box.innerHTML = `<h3 style="text-align:center;">لا يوجد دكتور بهذا الاسم</h3>`;
         return;
     }
 
-    found.forEach(doc => {
-        resultBox.innerHTML += `
-        <div class="card">
-            <h3>${doc.name}</h3>
-            <p><strong>التخصص:</strong> ${doc.specialty}</p>
-            <p><strong>المستشفى:</strong> ${doc.hospital}</p>
-            <p><strong>وقت الدوام:</strong> ${doc.time}</p>
-        </div>`;
+    result.forEach(doc => {
+        box.innerHTML += `
+            <div class="card">
+                <h3>${doc.name}</h3>
+                <p>التخصص: ${doc.spec}</p>
+                <p>المستشفى: ${doc.hospital}</p>
+                <p>الدوام: ${doc.time}</p>
+            </div>
+        `;
     });
 }
-
-// توليد بطاقات الأطباء تلقائيًا
-function loadCards() {
-    const container = document.getElementById("cardsContainer");
-    if (!container) return;
-
-    doctors.forEach(doc => {
-        container.innerHTML += `
-        <div class="card">
-            <h3>${doc.name}</h3>
-            <p><strong>التخصص:</strong> ${doc.specialty}</p>
-            <p><strong>المستشفى:</strong> ${doc.hospital}</p>
-            <p><strong>وقت الدوام:</strong> ${doc.time}</p>
-        </div>`;
-    });
-}
-
-loadCards();
