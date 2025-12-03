@@ -4,22 +4,124 @@
     <meta charset="UTF-8">
     <title>التواصل معنا</title>
     <link rel="stylesheet" href="style.css">
+
+    <style>
+        .contact-container {
+            max-width: 450px;
+            margin: 40px auto;
+            padding: 25px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .contact-container h2 {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 26px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .contact-container p {
+            text-align: center;
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 15px;
+        }
+
+        .contact-container label {
+            display: block;
+            margin-top: 12px;
+            font-weight: bold;
+            font-size: 15px;
+        }
+
+        .contact-container input,
+        .contact-container textarea {
+            width: 100%;
+            padding: 12px;
+            margin-top: 6px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            outline: none;
+            font-size: 15px;
+        }
+
+        .contact-container textarea {
+            height: 120px;
+            resize: none;
+        }
+
+        .contact-container button {
+            width: 100%;
+            padding: 14px;
+            background: #28a745;
+            border: none;
+            border-radius: 8px;
+            margin-top: 18px;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .contact-container button:hover {
+            background: #218838;
+        }
+    </style>
 </head>
 
 <body>
 
-<a href="index.html" class="back-btn">رجوع</a>
+<!-- زر القائمة (3 خطوط) -->
+<div class="menu-container">
+    <button class="menu-btn" onclick="toggleMenu()">☰</button>
+    <div class="menu-box" id="menuBox">
+        <a href="index.html">الصفحة الرئيسية</a>
+        <a href="contact.html">التواصل</a>
+        <a href="complaint.html">الشكاوي</a>
+        <a href="support.html">الدعم</a>
+    </div>
+</div>
 
 <div class="contact-container">
-    <h2>التواصل معنا</h2>
-    <p>اضغط على الزر للتواصل مباشرة عبر واتساب</p>
+    <h2>تواصل معنا</h2>
+    <p>املأ الحقول التالية وسيتم إرسال رسالتك مباشرة إلى واتساب</p>
 
-    <a href="https://wa.me/967776503890?text=مرحباً%20اريد%20التواصل"
-       target="_blank"
-       class="whatsapp-btn">
-        تواصل عبر واتساب
-    </a>
+    <label>اسمك:</label>
+    <input type="text" id="cname" placeholder="اكتب اسمك">
+
+    <label>رسالتك:</label>
+    <textarea id="cmsg" placeholder="اكتب رسالتك هنا..."></textarea>
+
+    <button onclick="sendContact()">إرسال عبر واتساب</button>
 </div>
+
+<script>
+function toggleMenu() {
+    const menu = document.getElementById("menuBox");
+    menu.style.display = (menu.style.display === "block") ? "none" : "block";
+}
+
+function sendContact() {
+    let name = document.getElementById("cname").value;
+    let msg = document.getElementById("cmsg").value;
+
+    if (!msg.trim()) {
+        alert("يرجى كتابة الرسالة");
+        return;
+    }
+
+    let text =
+        `رسالة تواصل جديدة:\nالاسم: ${name}\nالرسالة: ${msg}`;
+
+    let url =
+        "https://wa.me/967776503890?text=" + encodeURIComponent(text);
+
+    window.open(url, "_blank");
+}
+</script>
 
 </body>
 </html>
