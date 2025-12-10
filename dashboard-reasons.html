@@ -2,66 +2,87 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>لوحة التحكم — أسباب الانقطاع</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>إدارة أسباب الانقطاع</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
 
 <style>
-body {
-  background:#eef2f7;
-  font-family:'Cairo', sans-serif;
-  padding:20px;
-}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Cairo',sans-serif;}
 
-h2 {
-  text-align:center;
-  margin-bottom:20px;
-}
-
-.card {
-  background:white;
-  padding:20px;
-  border-radius:14px;
-  margin-bottom:15px;
-  box-shadow:0 3px 10px rgba(0,0,0,0.1);
-}
-
-.item {
-  background:#ffe8cc;
+body{
+  background:linear-gradient(to bottom,#0a0a0a,#111,#1a1a1a,#222);
+  min-height:100vh;
+  color:white;
   padding:15px;
+}
+
+/* العنوان */
+h2{
+  text-align:center;
+  font-size:30px;
+  margin-bottom:20px;
+  font-weight:800;
+}
+
+/* الكارت */
+.card{
+  background:rgba(255,255,255,0.07);
+  padding:20px;
+  border-radius:16px;
+  margin-bottom:18px;
+  backdrop-filter:blur(5px);
+  box-shadow:0 6px 18px rgba(0,0,0,0.45);
+  transition:0.25s;
+}
+
+.card:hover{
+  background:rgba(255,255,255,0.12);
+  transform:scale(1.02);
+}
+
+/* العنصر داخل القائمة */
+.item{
+  background:rgba(255,255,255,0.12);
+  padding:15px;
+  border-radius:14px;
+  margin-bottom:14px;
+}
+
+/* مربع الإدخال */
+.input{
+  width:100%;
+  padding:12px;
   border-radius:12px;
-  margin-bottom:12px;
-}
-
-.input {
-  width:100%;
-  padding:8px;
-  border:1px solid #ccc;
-  border-radius:8px;
-  margin-top:6px;
-}
-
-.btn {
-  padding:8px 12px;
   border:none;
-  border-radius:8px;
-  cursor:pointer;
   margin-top:8px;
+  background:#ffffff22;
+  color:white;
+  font-size:18px;
 }
 
-.add {
-  background:#007bff;
-  color:white;
+/* الأزرار */
+.btn{
+  padding:12px;
+  border:none;
+  border-radius:12px;
+  cursor:pointer;
   width:100%;
+  font-size:18px;
+  font-weight:700;
+  margin-top:10px;
+  transition:.2s;
 }
 
-.save {
-  background:#28a745;
-  color:white;
-}
+.add{background:#007bff;}
+.add:hover{background:#3395ff;}
 
-.delete {
-  background:#dc3545;
-  color:white;
-}
+.save{background:#28a745;}
+.save:hover{background:#42c85a;}
+
+.delete{background:#dc3545;}
+.delete:hover{background:#ff5566;}
+
 </style>
 </head>
 
@@ -69,15 +90,16 @@ h2 {
 
 <h2>⚡ إدارة أسباب انقطاع الكهرباء</h2>
 
-<!-- إضافة سبب جديد -->
+<!-- إضافة سبب -->
 <div class="card">
-  <h3>➕ إضافة سبب جديد</h3>
+  <h3 style="margin-bottom:10px;">➕ إضافة سبب جديد</h3>
   <textarea id="new-reason" class="input" placeholder="اكتب سبب الانقطاع..."></textarea>
   <button class="btn add" id="addBtn">إضافة السبب</button>
 </div>
 
 <!-- عرض الأسباب -->
 <div id="list">جارِ التحميل...</div>
+
 
 <script type="module">
 import { db, auth } from "./firebase.js";
@@ -87,17 +109,17 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
 import { 
-  onAuthStateChanged, signOut 
+  onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 
 
-// ========== حماية الصفحة ==========
+// حماية الصفحة
 onAuthStateChanged(auth, user => {
   if (!user) window.location.href = "login.html";
 });
 
 
-// ========== إضافة سبب ==========
+// إضافة سبب جديد
 document.getElementById("addBtn").onclick = async () => {
   const text = document.getElementById("new-reason").value.trim();
   if (!text) return alert("أدخل السبب أولاً!");
@@ -112,14 +134,13 @@ document.getElementById("addBtn").onclick = async () => {
 };
 
 
-// ========== عرض الأسباب ==========
+// عرض الأسباب
 const list = document.getElementById("list");
-
 const q = query(collection(db, "reasons"), orderBy("updated_at", "desc"));
 
 onSnapshot(q, (snap) => {
   if (snap.empty) {
-    list.innerHTML = "<p>لا توجد أسباب مسجلة.</p>";
+    list.innerHTML = "<p style='text-align:center;'>لا توجد أسباب مسجلة.</p>";
     return;
   }
 
@@ -151,7 +172,7 @@ onSnapshot(q, (snap) => {
 });
 
 
-// ========== تعديل السبب ==========
+// التعديل
 window.saveReason = async (id) => {
   const newText = document.getElementById(`edit-${id}`).value.trim();
 
@@ -164,7 +185,7 @@ window.saveReason = async (id) => {
 };
 
 
-// ========== حذف السبب ==========
+// الحذف
 window.removeReason = async (id) => {
   if (confirm("هل تريد حذف السبب؟")) {
     await deleteDoc(doc(db, "reasons", id));
