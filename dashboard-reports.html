@@ -92,17 +92,23 @@ import {
   onSnapshot, query, orderBy
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
-import { onAuthStateChanged } 
-  from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+import { 
+  onAuthStateChanged 
+} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 
-
-// حماية الصفحة
+/* ===============================
+      🔐 حماية لوحة التحكم
+  =============================== */
 onAuthStateChanged(auth, user => {
-  if (!user) window.location.href = "login.html";
+  if (!user) {
+    alert("يجب تسجيل الدخول أولاً");
+    window.location.href = "login.html";
+  }
 });
 
-
-// عرض البلاغات
+/* ===============================
+      📌 عرض البلاغات مباشرة
+  =============================== */
 const list = document.getElementById("list");
 const q = query(collection(db, "reports"), orderBy("created_at", "desc"));
 
@@ -147,8 +153,9 @@ onSnapshot(q, (snap) => {
   list.innerHTML = html;
 });
 
-
-// حفظ الرد + تغيير الحالة
+/* ===============================
+      💾 حفظ التعديل
+  =============================== */
 window.saveUpdate = async (id) => {
   const reply = document.getElementById(`reply-${id}`).value;
   const status = document.getElementById(`status-${id}`).value;
@@ -157,8 +164,9 @@ window.saveUpdate = async (id) => {
   alert("✔ تم تحديث البلاغ");
 };
 
-
-// حذف البلاغ
+/* ===============================
+      🗑 حذف البلاغ
+  =============================== */
 window.removeReport = async (id) => {
   if (confirm("هل أنت متأكد من الحذف؟")) {
     await deleteDoc(doc(db, "reports", id));
