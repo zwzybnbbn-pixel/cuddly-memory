@@ -2,55 +2,81 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>لوحة التحكم — البلاغات</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📋 لوحة التحكم — البلاغات</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
 
 <style>
-body {
-  background:#eef2f7;
-  font-family:'Cairo', sans-serif;
-  padding:20px;
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Cairo',sans-serif;}
+
+body{
+  background:linear-gradient(to bottom,#0a0a0a,#111,#1a1a1a,#222);
+  min-height:100vh;
+  color:white;
+  padding:15px;
 }
 
-h2 {
+/* ===== العنوان ===== */
+h2{
   text-align:center;
   margin-bottom:20px;
+  font-size:28px;
+  font-weight:800;
 }
 
-.card {
-  background:white;
-  padding:18px;
-  border-radius:12px;
-  margin-bottom:15px;
-  box-shadow:0 3px 10px rgba(0,0,0,0.08);
+/* ===== الكروت ===== */
+.card{
+  background:rgba(255,255,255,0.08);
+  padding:20px;
+  border-radius:16px;
+  margin-bottom:18px;
+  box-shadow:0 6px 18px rgba(0,0,0,0.45);
+  backdrop-filter:blur(5px);
+  transition:.25s;
 }
 
-.card strong { color:#007bff; }
+.card:hover{
+  background:rgba(255,255,255,0.12);
+  transform:scale(1.02);
+}
 
-.input {
+.card strong{
+  color:#4db8ff;
+  font-size:17px;
+}
+
+/* ===== الإدخال ===== */
+.input{
   width:100%;
-  padding:8px;
-  border:1px solid #ccc;
-  border-radius:8px;
-  margin-top:6px;
-}
-
-.btn {
-  padding:8px 12px;
+  padding:12px;
+  border-radius:12px;
   border:none;
-  border-radius:8px;
-  cursor:pointer;
+  background:#ffffff22;
+  color:white;
   margin-top:8px;
+  margin-bottom:10px;
+  font-size:16px;
 }
 
-.save { background:#28a745; color:white; }
-.delete { background:#dc3545; color:white; }
-
-.reply-box {
-  background:#eaf4ff;
-  padding:10px;
-  border-radius:10px;
-  
+/* ===== الأزرار ===== */
+.btn{
+  padding:12px;
+  border:none;
+  border-radius:12px;
+  cursor:pointer;
+  width:100%;
+  font-size:17px;
+  font-weight:700;
+  margin-top:4px;
+  transition:.2s;
 }
+
+.save{background:#28a745;}
+.save:hover{background:#42c85a;}
+
+.delete{background:#dc3545;}
+.delete:hover{background:#ff5566;}
 </style>
 </head>
 
@@ -70,23 +96,19 @@ import { onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 
 
-// =========== حماية الداشبورد ================
+// حماية الصفحة
 onAuthStateChanged(auth, user => {
-  if (!user) {
-    console.log("تم طردك لأنه لا يوجد تسجيل دخول");
-    window.location.href = "login.html";
-  }
+  if (!user) window.location.href = "login.html";
 });
 
 
-// =========== عرض البلاغات ================
+// عرض البلاغات
 const list = document.getElementById("list");
-
 const q = query(collection(db, "reports"), orderBy("created_at", "desc"));
 
 onSnapshot(q, (snap) => {
   if (snap.empty) {
-    list.innerHTML = "<p>لا توجد بلاغات.</p>";
+    list.innerHTML = "<p style='text-align:center;'>لا توجد بلاغات.</p>";
     return;
   }
 
@@ -98,17 +120,16 @@ onSnapshot(q, (snap) => {
 
     html += `
       <div class="card">
-
         <strong>نوع البلاغ:</strong> ${r.type ?? ""}<br>
         <strong>الاسم:</strong> ${r.name ?? ""}<br>
         <strong>الحي:</strong> ${r.location ?? ""}<br>
         <strong>التفاصيل:</strong> ${r.details ?? ""}<br>
         <strong>الحالة:</strong> ${r.status ?? "قيد المراجعة"}<br>
 
-        <hr>
+        <hr style="opacity:0.2; margin:10px 0;">
 
         <label>✏ الرد على البلاغ:</label>
-        <textarea id="reply-${id}" class="input">${r.reply ?? ""}</textarea>
+        <textarea id="reply-${id}" class="input" rows="3">${r.reply ?? ""}</textarea>
 
         <label>⚙ تغيير الحالة:</label>
         <select id="status-${id}" class="input">
@@ -119,7 +140,6 @@ onSnapshot(q, (snap) => {
 
         <button class="btn save" onclick="saveUpdate('${id}')">💾 حفظ</button>
         <button class="btn delete" onclick="removeReport('${id}')">🗑 حذف</button>
-
       </div>
     `;
   });
@@ -128,21 +148,17 @@ onSnapshot(q, (snap) => {
 });
 
 
-// =========== حفظ التعديلات ================
+// حفظ الرد + تغيير الحالة
 window.saveUpdate = async (id) => {
   const reply = document.getElementById(`reply-${id}`).value;
   const status = document.getElementById(`status-${id}`).value;
 
-  await updateDoc(doc(db, "reports", id), {
-    reply,
-    status
-  });
-
+  await updateDoc(doc(db, "reports", id), { reply, status });
   alert("✔ تم تحديث البلاغ");
 };
 
 
-// =========== حذف البلاغ ================
+// حذف البلاغ
 window.removeReport = async (id) => {
   if (confirm("هل أنت متأكد من الحذف؟")) {
     await deleteDoc(doc(db, "reports", id));
