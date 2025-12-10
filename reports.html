@@ -2,90 +2,78 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>البلاغات</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📢 البلاغات – كهرباء عتق</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
 
 <style>
-/* ==========================
-   🌙 نفس تصميم الرئيسية
-========================== */
+
+/* ===========================
+   🌙 خلفية + خطوط مثل الرئيسية
+=========================== */
 body {
-  background:#0d1117;
-  margin:0;
-  padding:0;
   font-family:'Cairo',sans-serif;
-  color:#e6edf3;
-}
-
-/* NAV */
-.nav {
-  background:#161b22;
+  margin:0;
   padding:15px;
-  display:flex;
-  justify-content:center;
-  gap:18px;
-  position:sticky;
-  top:0;
-  z-index:1000;
-  border-bottom:1px solid #30363d;
-}
-
-.nav a {
-  color:#e6edf3;
-  text-decoration:none;
-  font-weight:600;
-  padding:8px 14px;
-  border-radius:8px;
-  transition:0.3s;
-}
-
-.nav a:hover {
-  background:#1f6feb;
+  background: linear-gradient(to bottom,#0a0a0a,#111,#1a1a1a,#222);
   color:white;
-  transform:translateY(-2px);
 }
 
-/* MAIN CARD */
-.main-box {
-  background:#161b22;
-  margin:20px auto;
+/* ===========================
+          العنوان
+=========================== */
+header {
+  text-align:center;
+  margin-bottom:25px;
+}
+
+header h1 {
+  font-size:34px;
+  font-weight:800;
+  margin-bottom:8px;
+}
+
+header p {
+  font-size:18px;
+  opacity:.9;
+}
+
+/* ===========================
+   🧊 صندوق البطاقات (Glass)
+=========================== */
+.box {
+  background:rgba(255,255,255,0.07);
   padding:22px;
-  max-width:850px;
-  border-radius:20px;
-  border:1px solid #30363d;
-  box-shadow:0 5px 18px #0008;
+  border-radius:18px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.45);
+  backdrop-filter:blur(6px);
+  max-width:650px;
+  margin:0 auto 25px;
 }
 
-h2 {
-  color:#1f6feb;
-  margin:15px 0;
-  font-size:22px;
-  border-right:5px solid #1f6feb;
-  padding-right:10px;
-}
-
-/* FORM */
+/* ===========================
+        فورم الإدخال
+=========================== */
 .input-group {
   margin-bottom:15px;
 }
 
 .input-group label {
   font-weight:600;
-  margin-bottom:6px;
   display:block;
+  margin-bottom:6px;
 }
 
 .input-group input,
 .input-group textarea {
   width:100%;
-  background:#0d1117;
-  color:#e6edf3;
-  border:1px solid #30363d;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.15);
+  border-radius:14px;
   padding:12px;
-  font-size:15px;
-  border-radius:12px;
-  transition:0.2s;
+  color:white;
+  font-size:16px;
 }
 
 .input-group textarea {
@@ -94,113 +82,117 @@ h2 {
 
 .input-group input:focus,
 .input-group textarea:focus {
-  border-color:#1f6feb;
-  background:#1c2330;
-  box-shadow:0 0 6px #1f6febaa;
+  border-color:#4aa3ff;
+  outline:none;
+  background:rgba(255,255,255,0.10);
 }
 
-/* SUBMIT BUTTON */
+/* ===========================
+        زر الإرسال
+=========================== */
 .btn-submit {
   width:100%;
-  background:#1f6feb;
+  padding:14px;
+  background:#ffffff33;
   border:none;
-  padding:12px;
-  font-size:17px;
-  border-radius:12px;
+  font-size:20px;
   color:white;
-  font-weight:700;
+  font-weight:800;
+  border-radius:14px;
   cursor:pointer;
-  transition:0.2s;
+  transition:0.25s;
 }
 
 .btn-submit:hover {
-  background:#2f7ffd;
+  background:white;
+  color:black;
   transform:scale(1.03);
 }
 
-/* REPORT ITEMS */
+/* ===========================
+        عنصر البلاغ (بطاقة)
+=========================== */
 .item {
-  background:#0d1117;
+  background:rgba(255,255,255,0.07);
   padding:18px;
-  border-radius:14px;
-  margin-bottom:15px;
-  border:1px solid #30363d;
-  box-shadow:0 4px 12px #0007;
+  border-radius:16px;
+  margin-bottom:16px;
+  box-shadow:0 4px 16px rgba(0,0,0,0.35);
+  backdrop-filter:blur(4px);
   transition:0.25s;
 }
 
 .item:hover {
-  transform:translateY(-3px);
-  box-shadow:0 6px 18px #0009;
+  background:rgba(255,255,255,0.12);
+  transform:scale(1.02);
 }
 
 .item strong {
-  color:#1f6feb;
+  color:#4aa3ff;
 }
 
+/* رد الإدارة */
 .reply-box {
   margin-top:12px;
   padding:14px;
   border-radius:12px;
-  background:#112542;
-  border-right:5px solid #1f6feb;
+  background:rgba(74,163,255,0.10);
+  border-right:5px solid #4aa3ff;
 }
 
-/* MOBILE */
-@media(max-width:600px){
-  .main-box { margin:15px; padding:18px; }
+/* ===========================
+      توافق كامل للجوال
+=========================== */
+@media (max-width:600px){
+  header h1 { font-size:28px; }
+  .box { padding:18px; }
 }
 </style>
 </head>
 
 <body>
 
-<!-- NAV -->
-<div class="nav">
-  <a href="index.html">الرئيسية</a>
-  <a href="alerts.html">التنبيهات</a>
-  <a href="reasons.html">الأسباب</a>
-  <a href="schedule.html">الجدول</a>
-  <a href="reports.html">البلاغات</a>
-</div>
+<header>
+  <h1>📢 البلاغات</h1>
+  <p>إرسال بلاغات – متابعة الردود</p>
+</header>
 
-<!-- MAIN CONTENT -->
-<div class="main-box">
+<!-- FORM BOX -->
+<div class="box">
 
-  <h2>📝 إرسال بلاغ</h2>
+  <h2 style="color:#4aa3ff; margin-bottom:15px;">📝 إرسال بلاغ</h2>
 
   <form id="reportForm">
     <div class="input-group">
       <label>نوع البلاغ</label>
-      <input type="text" id="type" required placeholder="مثال: انطفاء كامل">
+      <input type="text" id="type" placeholder="مثال: انطفاء كامل" required>
     </div>
 
     <div class="input-group">
       <label>الاسم</label>
-      <input type="text" id="name" required placeholder="اسم المواطن">
+      <input type="text" id="name" placeholder="اسم المواطن" required>
     </div>
 
     <div class="input-group">
       <label>الحي</label>
-      <input type="text" id="location" required placeholder="مثال: حي الشباب">
+      <input type="text" id="location" placeholder="مثال: حي الشباب" required>
     </div>
 
     <div class="input-group">
       <label>تفاصيل البلاغ</label>
-      <textarea id="details" required placeholder="اكتب تفاصيل المشكلة"></textarea>
+      <textarea id="details" placeholder="اكتب تفاصيل البلاغ" required></textarea>
     </div>
 
     <button class="btn-submit">📨 إرسال البلاغ</button>
   </form>
-
-  <br><hr style="border:1px solid #30363d"><br>
-
-  <h2>📋 جميع البلاغات</h2>
-  <div id="list">جارِ التحميل...</div>
-
 </div>
 
-<!-- FIREBASE JS -->
+<!-- REPORTS BOX -->
+<div class="box">
+  <h2 style="color:#4aa3ff;">📋 جميع البلاغات</h2>
+  <div id="list">جارِ التحميل...</div>
+</div>
+
 <script type="module">
 import { db } from "./firebase.js";
 import { collection, addDoc, onSnapshot, query, orderBy }
@@ -226,13 +218,13 @@ form.addEventListener("submit", async (e) => {
     alert("✔ تم إرسال البلاغ بنجاح");
     form.reset();
   } catch (err) {
-    alert("⚠ حدث خطأ أثناء الإرسال");
+    alert("⚠ خطأ أثناء الإرسال");
   }
 });
 
 const list = document.getElementById("list");
 
-const q = query(collection(db, "reports"), orderBy("created_at", "desc"));
+const q = query(collection(db, "reports"), orderBy("created_at","desc"));
 
 onSnapshot(q, (snap) => {
   if (snap.empty) {
@@ -251,8 +243,8 @@ onSnapshot(q, (snap) => {
         <strong>الاسم:</strong> ${r.name}<br>
         <strong>الحي:</strong> ${r.location}<br>
         <strong>التفاصيل:</strong> ${r.details}<br>
-        <strong>الحالة:</strong>
-        <span style="color:${r.status === 'تم الحل' ? '#2ecc71':'#e0a955'}">
+        <strong>الحالة:</strong> 
+        <span style="color:${r.status==='تم الحل'?'#2ecc71':'#e0a955'}">
           ${r.status}
         </span>
     `;
