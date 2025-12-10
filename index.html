@@ -114,7 +114,87 @@ footer{
 
 <header>
   <h1>⚡ كهرباء عتق</h1>
-  <p>متابعة التنبيهات – أسباب الانقطاع – جدول التشغيل – البلاغات</p>
+<!-- بطاقة الأذكار بثبات الحجم + لون بيج -->
+<div class="card" style="
+    margin-top:20px;
+    padding:25px;
+    position:relative;
+    overflow:hidden;
+    min-height:140px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    border-radius:18px;
+    background: linear-gradient(135deg, #E8DCC3, #D9C7A5);
+    box-shadow:0 6px 15px rgba(0,0,0,0.15);
+">
+
+  <div style="
+    font-size:26px;
+    font-weight:800;
+    color:#5A4A34;
+    margin-bottom:10px;
+  ">
+    ✨ أذكار اليوم ✨
+  </div>
+
+  <p id="zekr" style="
+    font-size:24px;
+    font-weight:700;
+    color:#4B3E2A;
+    opacity:0;
+    transition:opacity 1s ease;
+    margin:0;
+  ">
+    استغفر الله
+  </p>
+
+</div>
+
+<script>
+  const azkar = [
+  "استغفر الله",
+  "سبحان الله وبحمده، سبحان الله العظيم",
+  "اللهم صل وسلم على نبينا محمد",
+  "لا إله إلا الله",
+  "الحمد لله",
+  "الله أكبر",
+  "سبحان الله",
+  "لا حول ولا قوة إلا بالله",
+  "اللهم اغفر لي ولوالدي",
+  "اللهم إني اسألك الجنة وأعوذ بك من النار",
+  "اللهم ارزقني حسن الخاتمة",
+  "اللهم اكفني بحلالك عن حرامك",
+  "أستغفر الله العظيم الذي لا إله إلا هو الحي القيوم وأتوب إليه",
+  "اللهم إني أسألك العفو والعافية",
+  "اللهم اجعل هذا اليوم خيراً وبركة",
+  "اللهم يسر أمري واشرح صدري",
+  "اللهم إني وكلتك أمري فدبره لي",
+  "سبحان الله وبحمده عدد خلقه ورضا نفسه وزنة عرشه ومداد كلماته",
+  "اللهم آتنا في الدنيا حسنة وفي الآخرة حسنة وقنا عذاب النار",
+  "اللهم ثبت قلبي على دينك"
+];
+
+  let index = 0;
+  const zekrEl = document.getElementById("zekr");
+
+  // أول ظهور
+  setTimeout(() => {
+    zekrEl.style.opacity = 1;
+  }, 200);
+
+  setInterval(() => {
+    zekrEl.style.opacity = 0;
+
+    setTimeout(() => {
+      index = (index + 1) % azkar.length;
+      zekrEl.textContent = azkar[index];
+      zekrEl.style.opacity = 1;
+    }, 1000);
+
+  }, 5000);
+        </script>
+  .
 </header>
 
 
@@ -162,4 +242,5 @@ footer{
 
 </body>
 </html>
+
 
