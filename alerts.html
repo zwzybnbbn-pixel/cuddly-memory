@@ -2,58 +2,85 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>التنبيهات</title>
-<link rel="stylesheet" href="style.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>جميع التنبيهات</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
 
 <style>
-body {
-  background:#eef2f7;
-  font-family:'Cairo', sans-serif;
-  padding:20px;
-  margin:0;
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Cairo',sans-serif;}
+
+body{
+  background:linear-gradient(to bottom,#0a0a0a,#111,#1a1a1a,#222);
+  min-height:100vh;
+  padding:15px;
+  color:white;
 }
 
-.nav {
-  background:white;
+/* NAV BAR */
+.nav{
+  background:rgba(255,255,255,0.08);
+  backdrop-filter:blur(6px);
   padding:12px;
-  border-radius:14px;
-  box-shadow:0 3px 10px rgba(0,0,0,0.1);
+  border-radius:16px;
+  box-shadow:0 6px 18px rgba(0,0,0,0.35);
   display:flex;
   justify-content:space-around;
   font-size:15px;
   margin-bottom:20px;
 }
 
-.section {
-  margin-top:10px;
+.nav a{
+  color:white;
+  text-decoration:none;
+  font-weight:700;
 }
 
-h2 {
+/* PAGE TITLE */
+h2{
   text-align:center;
+  font-size:28px;
+  font-weight:800;
   margin-bottom:20px;
 }
 
-.item {
-  background:white;
-  padding:18px;
-  border-radius:14px;
-  box-shadow:0 3px 10px rgba(0,0,0,0.1);
-  margin-bottom:15px;
+/* ALERT BOX */
+.item{
+  background:rgba(255,255,255,0.07);
+  padding:20px;
+  border-radius:16px;
+  backdrop-filter:blur(5px);
+  box-shadow:0 6px 18px rgba(0,0,0,0.45);
+  margin-bottom:18px;
+  transition:0.25s;
 }
 
-.item h3 {
-  margin:0 0 8px 0;
-  font-size:20px;
+.item:hover{
+  transform:scale(1.03);
+  background:rgba(255,255,255,0.12);
 }
 
-.item p {
-  margin:6px 0;
+.item h3{
+  margin:0 0 10px 0;
+  font-size:22px;
+  font-weight:800;
+}
+
+.item p{
+  margin:8px 0;
+  font-size:18px;
+}
+
+.red{
+  background:rgba(255,80,80,0.9);
+  color:white;
 }
 </style>
 </head>
 
 <body>
 
+<!-- NAVIGATION -->
 <div class="nav">
   <a href="index.html">الرئيسية</a>
   <a href="alerts.html">التنبيهات</a>
@@ -62,11 +89,13 @@ h2 {
   <a href="reports.html">البلاغات</a>
 </div>
 
-<div class="section">
-  <h2>جميع التنبيهات</h2>
-  <div id="list">جارِ التحميل...</div>
-</div>
+<!-- TITLE -->
+<h2>🔔 جميع التنبيهات</h2>
 
+<!-- LIST -->
+<div id="list">جاري التحميل...</div>
+
+<!-- FIREBASE SCRIPT -->
 <script type="module">
 import { db } from "./firebase.js";
 import { collection, getDocs } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
@@ -95,19 +124,14 @@ async function loadAlerts() {
       const a = doc.data();
 
       html += `
-        <div class="item" style="background:#ff5252;color:white;">
+        <div class="item red">
           <h3>${a.title}</h3>
           <p>${a.text}</p>
 
-          <hr style="border:0;border-top:1px solid #fff4; margin:10px 0;">
+          <hr style="border:0;border-top:1px solid #ffffff44; margin:12px 0;">
 
-          <p><strong>الحالة:</strong> 
-            ${a.active ? "🔵 نشط" : "⚫ غير نشط"}
-          </p>
-
-          <p><strong>وقت الإضافة:</strong> 
-            ${formatDate(a["وقت الاضافه"])}
-          </p>
+          <p><strong>الحالة:</strong> ${a.active ? "🔵 نشط" : "⚫ غير نشط"}</p>
+          <p><strong>وقت الإضافة:</strong> ${formatDate(a["وقت الاضافه"])}</p>
         </div>
       `;
     });
