@@ -2,141 +2,106 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>جدول التشغيل</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📅 جدول التشغيل – كهرباء عتق</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
 
 <style>
 /* ===========================
-   🌙 Dark Mode (Same Style)
+     خلفية الصفحة مثل الرئيسية
 =========================== */
-body {
-  font-family: 'Cairo', sans-serif;
-  background: #0d1117;
-  margin: 0;
-  padding: 0;
-  color: #e6edf3;
+body{
+  background:linear-gradient(to bottom,#0a0a0a,#111,#1a1a1a,#222);
+  min-height:100vh;
+  margin:0;
+  padding:15px;
+  font-family:'Cairo',sans-serif;
+  color:white;
 }
 
 /* ===========================
-   🔵 NAV (Matches Other Pages)
+         العنوان
 =========================== */
-.nav {
-  background: #161b22;
-  padding: 18px;
-  display: flex;
-  justify-content: center;
-  gap: 22px;
-  position: sticky;
-  top: 0;
-  z-index: 999;
-  border-bottom: 1px solid #30363d;
-  box-shadow: 0 4px 12px #0006;
+header{
+  text-align:center;
+  margin-bottom:25px;
 }
 
-.nav a {
-  color: #e6edf3;
-  font-weight: 600;
-  text-decoration: none;
-  font-size: 16px;
-  transition: 0.3s;
-  padding: 8px 14px;
-  border-radius: 8px;
+header h1{
+  font-size:34px;
+  font-weight:800;
+  margin-bottom:10px;
 }
 
-.nav a:hover {
-  background: #1f6feb;
-  color: white;
-  transform: translateY(-2px);
+header p{
+  font-size:18px;
+  opacity:.9;
 }
 
 /* ===========================
-   📦 Section Box
+         صندوق المحتوى
 =========================== */
-.section {
-  background: #161b22;
-  padding: 25px;
-  border-radius: 20px;
-  max-width: 900px;
-  margin: 25px auto;
-  border: 1px solid #30363d;
-  box-shadow: 0 5px 18px #0008;
-  animation: fadeIn 0.5s ease;
-}
-
-.section h2 {
-  margin-top: 0;
-  font-size: 22px;
-  color: #1f6feb;
-  font-weight: 700;
-  border-right: 5px solid #1f6feb;
-  padding-right: 10px;
+.section{
+  width:100%;
+  max-width:650px;
+  margin:0 auto;
+  background:rgba(255,255,255,0.07);
+  padding:22px;
+  border-radius:18px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.45);
+  backdrop-filter:blur(6px);
 }
 
 /* ===========================
-   📅 Schedule Items
+        عنصر الجدول
 =========================== */
-.item {
-  background: #0d1117;
-  border-radius: 14px;
-  padding: 20px;
-  margin-bottom: 18px;
-  border: 1px solid #30363d;
-  box-shadow: 0 4px 12px #0007;
-  transition: 0.25s;
+.item{
+  background:rgba(255,255,255,0.05);
+  padding:18px;
+  border-radius:14px;
+  margin-bottom:18px;
+  box-shadow:0 4px 14px rgba(0,0,0,0.40);
+  transition:0.25s;
 }
 
-.item:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 18px #0009;
+.item:hover{
+  background:rgba(255,255,255,0.12);
+  transform:scale(1.02);
 }
 
-.item h3 {
-  margin: 0;
-  font-size: 20px;
-  color: #1f6feb;
-  font-weight: 700;
+.item h3{
+  margin:0;
+  font-size:22px;
+  font-weight:800;
+  margin-bottom:6px;
+  color:#4aa3ff;
 }
 
-.item p {
-  margin: 6px 0;
-  font-size: 16px;
-  line-height: 1.7;
+.item p{
+  margin:6px 0;
+  font-size:17px;
 }
 
 /* ===========================
-   📱 Responsive
+         توافق الجوال
 =========================== */
-@media (max-width: 600px) {
-  .nav {
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  .section {
-    margin: 15px;
-  }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
+@media (max-width:600px){
+  .section{ padding:18px; }
+  header h1{ font-size:28px; }
 }
 </style>
 </head>
 
 <body>
 
-<div class="nav">
-  <a href="index.html">الرئيسية</a>
-  <a href="alerts.html">التنبيهات</a>
-  <a href="reasons.html">الأسباب</a>
-  <a href="schedule.html">الجدول</a>
-  <a href="reports.html">البلاغات</a>
-</div>
+<header>
+  <h1>📅 جدول التشغيل</h1>
+  <p>تشغيل – انطفاء – المناطق</p>
+</header>
 
 <div class="section">
-  <h2>📅 جدول التشغيل والانطفاء</h2>
-  <div id="list"></div>
+  <div id="list">جاري التحميل...</div>
 </div>
 
 <script type="module">
@@ -147,8 +112,6 @@ import { collection, getDocs, query, orderBy }
 const list = document.getElementById("list");
 
 async function loadSchedule() {
-  list.innerHTML = "<p>جاري التحميل...</p>";
-
   try {
     const q = query(collection(db, "schedule"), orderBy("area", "asc"));
     const snap = await getDocs(q);
@@ -164,8 +127,8 @@ async function loadSchedule() {
       html += `
         <div class="item">
           <h3>${s.area || "—"}</h3>
-          <p><strong style="color:#e6edf3;">تشغيل:</strong> ${s.on || "—"}</p>
-          <p><strong style="color:#e6edf3;">انطفاء:</strong> ${s.off || "—"}</p>
+          <p><strong>تشغيل:</strong> ${s.on || "—"}</p>
+          <p><strong>انطفاء:</strong> ${s.off || "—"}</p>
         </div>
       `;
     });
@@ -174,7 +137,6 @@ async function loadSchedule() {
 
   } catch (err) {
     list.innerHTML = "<p style='color:red;'>خطأ في الاتصال بقاعدة البيانات.</p>";
-    console.error(err);
   }
 }
 
