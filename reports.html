@@ -7,179 +7,155 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-/* ===========================
-   🌙 Dark Mode
-=========================== */
+/* ==========================
+   🌙 نفس تصميم الرئيسية
+========================== */
 body {
-  background: #0d1117;
-  font-family: 'Cairo', sans-serif;
-  margin: 0;
-  padding: 0;
-  color: #e6edf3;
+  background:#0d1117;
+  margin:0;
+  padding:0;
+  font-family:'Cairo',sans-serif;
+  color:#e6edf3;
 }
 
-/* ===========================
-   🔵 NAV
-=========================== */
+/* NAV */
 .nav {
-  background: #161b22;
-  padding: 18px;
-  display: flex;
-  justify-content: center;
-  gap: 22px;
-  position: sticky;
-  top: 0;
-  z-index: 999;
-  border-bottom: 1px solid #30363d;
-  box-shadow: 0 4px 12px #0006;
+  background:#161b22;
+  padding:15px;
+  display:flex;
+  justify-content:center;
+  gap:18px;
+  position:sticky;
+  top:0;
+  z-index:1000;
+  border-bottom:1px solid #30363d;
 }
 
 .nav a {
-  color: #e6edf3;
-  font-weight: 600;
-  text-decoration: none;
-  font-size: 16px;
-  transition: 0.3s;
-  padding: 8px 14px;
-  border-radius: 8px;
+  color:#e6edf3;
+  text-decoration:none;
+  font-weight:600;
+  padding:8px 14px;
+  border-radius:8px;
+  transition:0.3s;
 }
 
 .nav a:hover {
-  background: #1f6feb;
-  color: white;
-  transform: translateY(-2px);
+  background:#1f6feb;
+  color:white;
+  transform:translateY(-2px);
 }
 
-/* ===========================
-   📦 MAIN BOX
-=========================== */
-.section {
-  background: #161b22;
-  padding: 25px;
-  border-radius: 20px;
-  max-width: 900px;
-  margin: 25px auto;
-  border: 1px solid #30363d;
-  box-shadow: 0 5px 18px #0008;
+/* MAIN CARD */
+.main-box {
+  background:#161b22;
+  margin:20px auto;
+  padding:22px;
+  max-width:850px;
+  border-radius:20px;
+  border:1px solid #30363d;
+  box-shadow:0 5px 18px #0008;
 }
 
-.section h2 {
-  font-size: 22px;
-  color: #1f6feb;
-  font-weight: 700;
-  text-align: center;
-  border-right: 5px solid #1f6feb;
-  padding-right: 10px;
+h2 {
+  color:#1f6feb;
+  margin:15px 0;
+  font-size:22px;
+  border-right:5px solid #1f6feb;
+  padding-right:10px;
 }
 
-/* ===========================
-   📝 FORM
-=========================== */
-.report-form {
-  background: #0d1117;
-  padding: 20px;
-  border-radius: 14px;
-  box-shadow: 0 4px 12px #0007;
-  border: 1px solid #30363d;
+/* FORM */
+.input-group {
+  margin-bottom:15px;
 }
 
 .input-group label {
-  font-weight: 600;
-  margin-bottom: 6px;
-  display: block;
+  font-weight:600;
+  margin-bottom:6px;
+  display:block;
 }
 
 .input-group input,
 .input-group textarea {
-  width: 100%;
-  padding: 12px;
-  font-size: 15px;
-  border-radius: 12px;
-  border: 1px solid #30363d;
-  background: #161b22;
-  color: #e6edf3;
-  transition: 0.2s;
+  width:100%;
+  background:#0d1117;
+  color:#e6edf3;
+  border:1px solid #30363d;
+  padding:12px;
+  font-size:15px;
+  border-radius:12px;
+  transition:0.2s;
 }
 
 .input-group textarea {
-  height: 90px;
+  height:90px;
 }
 
 .input-group input:focus,
 .input-group textarea:focus {
-  border-color: #1f6feb;
-  background: #1c2330;
-  box-shadow: 0 0 6px #1f6febaa;
+  border-color:#1f6feb;
+  background:#1c2330;
+  box-shadow:0 0 6px #1f6febaa;
 }
 
+/* SUBMIT BUTTON */
 .btn-submit {
-  width: 100%;
-  background: #1f6feb;
-  padding: 12px;
-  border-radius: 12px;
-  border: none;
-  color: white;
-  font-size: 17px;
-  cursor: pointer;
-  font-weight: 700;
-  margin-top: 10px;
-  transition: 0.2s;
+  width:100%;
+  background:#1f6feb;
+  border:none;
+  padding:12px;
+  font-size:17px;
+  border-radius:12px;
+  color:white;
+  font-weight:700;
+  cursor:pointer;
+  transition:0.2s;
 }
 
 .btn-submit:hover {
-  background: #2f7ffd;
-  transform: scale(1.03);
+  background:#2f7ffd;
+  transform:scale(1.03);
 }
 
-.separator {
-  margin: 35px 0;
-  border: 0;
-  border-top: 2px solid #30363d;
-}
-
-/* ===========================
-   📋 REPORT BOX
-=========================== */
+/* REPORT ITEMS */
 .item {
-  background: #0d1117;
-  padding: 20px;
-  border-radius: 14px;
-  margin-bottom: 18px;
-  border: 1px solid #30363d;
-  box-shadow: 0 4px 12px #0007;
-  transition: 0.25s;
+  background:#0d1117;
+  padding:18px;
+  border-radius:14px;
+  margin-bottom:15px;
+  border:1px solid #30363d;
+  box-shadow:0 4px 12px #0007;
+  transition:0.25s;
 }
 
 .item:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 18px #0009;
+  transform:translateY(-3px);
+  box-shadow:0 6px 18px #0009;
 }
 
 .item strong {
-  color: #1f6feb;
+  color:#1f6feb;
 }
 
 .reply-box {
-  margin-top: 12px;
-  padding: 14px;
-  border-radius: 12px;
-  background: #112542;
-  border-left: 5px solid #1f6feb;
-  color: #e6edf3;
+  margin-top:12px;
+  padding:14px;
+  border-radius:12px;
+  background:#112542;
+  border-right:5px solid #1f6feb;
 }
 
-/* ===========================
-   📱 Responsive
-=========================== */
-@media (max-width: 600px) {
-  .nav { flex-wrap: wrap; gap: 10px; }
-  .section { margin: 15px; }
+/* MOBILE */
+@media(max-width:600px){
+  .main-box { margin:15px; padding:18px; }
 }
 </style>
 </head>
 
 <body>
 
+<!-- NAV -->
 <div class="nav">
   <a href="index.html">الرئيسية</a>
   <a href="alerts.html">التنبيهات</a>
@@ -188,11 +164,12 @@ body {
   <a href="reports.html">البلاغات</a>
 </div>
 
-<div class="section">
+<!-- MAIN CONTENT -->
+<div class="main-box">
 
   <h2>📝 إرسال بلاغ</h2>
 
-  <form id="reportForm" class="report-form">
+  <form id="reportForm">
     <div class="input-group">
       <label>نوع البلاغ</label>
       <input type="text" id="type" required placeholder="مثال: انطفاء كامل">
@@ -213,20 +190,21 @@ body {
       <textarea id="details" required placeholder="اكتب تفاصيل المشكلة"></textarea>
     </div>
 
-    <button type="submit" class="btn-submit">📨 إرسال البلاغ</button>
+    <button class="btn-submit">📨 إرسال البلاغ</button>
   </form>
 
-  <hr class="separator">
+  <br><hr style="border:1px solid #30363d"><br>
 
   <h2>📋 جميع البلاغات</h2>
   <div id="list">جارِ التحميل...</div>
 
 </div>
 
+<!-- FIREBASE JS -->
 <script type="module">
 import { db } from "./firebase.js";
-import { collection, addDoc, onSnapshot, query, orderBy } 
-  from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+import { collection, addDoc, onSnapshot, query, orderBy }
+from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
 const form = document.getElementById("reportForm");
 
@@ -234,10 +212,10 @@ form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const data = {
-    type: document.getElementById("type").value,
-    name: document.getElementById("name").value,
-    location: document.getElementById("location").value,
-    details: document.getElementById("details").value,
+    type: type.value,
+    name: name.value,
+    location: location.value,
+    details: details.value,
     status: "قيد المراجعة",
     reply: "",
     created_at: new Date()
@@ -248,11 +226,12 @@ form.addEventListener("submit", async (e) => {
     alert("✔ تم إرسال البلاغ بنجاح");
     form.reset();
   } catch (err) {
-    alert("⚠ خطأ أثناء إرسال البلاغ");
+    alert("⚠ حدث خطأ أثناء الإرسال");
   }
 });
 
 const list = document.getElementById("list");
+
 const q = query(collection(db, "reports"), orderBy("created_at", "desc"));
 
 onSnapshot(q, (snap) => {
@@ -271,15 +250,14 @@ onSnapshot(q, (snap) => {
         <strong>نوع البلاغ:</strong> ${r.type}<br>
         <strong>الاسم:</strong> ${r.name}<br>
         <strong>الحي:</strong> ${r.location}<br>
-        <strong>تفاصيل:</strong> ${r.details}<br>
-
+        <strong>التفاصيل:</strong> ${r.details}<br>
         <strong>الحالة:</strong>
-        <span style="color:${r.status === 'تم الحل' ? '#2ecc71' : '#d29922'};">
+        <span style="color:${r.status === 'تم الحل' ? '#2ecc71':'#e0a955'}">
           ${r.status}
         </span>
     `;
 
-    if (r.reply && r.reply.trim() !== "") {
+    if (r.reply.trim() !== "") {
       html += `
         <div class="reply-box">
           <strong>رد الإدارة:</strong><br>
@@ -288,7 +266,7 @@ onSnapshot(q, (snap) => {
       `;
     }
 
-    html += `</div>`;
+    html += "</div>";
   });
 
   list.innerHTML = html;
