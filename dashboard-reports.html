@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>لوحة التحكم — البلاغات</title>
+
+<style>
+body {
+  background:#eef2f7;
+  font-family:'Cairo', sans-serif;
+  padding:20px;
+}
+
+h2 {
+  text-align:center;
+  margin-bottom:20px;
+}
+
+.card {
+  background:white;
+  padding:18px;
+  border-radius:12px;
+  margin-bottom:15px;
+  box-shadow:0 3px 10px rgba(0,0,0,0.08);
+}
+
+.card strong { color:#007bff; }
+
+.input {
+  width:100%;
+  padding:8px;
+  border:1px solid #ccc;
+  border-radius:8px;
+  margin-top:6px;
+}
+
+.btn {
+  padding:8px 12px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  margin-top:8px;
+}
+
+.save { background:#28a745; color:white; }
+.delete { background:#dc3545; color:white; }
+
+.reply-box {
+  background:#eaf4ff;
+  padding:10px;
+  border-radius:10px;
+  
+}
+</style>
+</head>
+
+<body>
+
+<h2>📋 لوحة التحكم — إدارة البلاغات</h2>
+<div id="list">جارِ التحميل...</div>
+
+<script type="module">
+import { db, auth } from "./firebase.js";
+import { 
+  collection, doc, updateDoc, deleteDoc,
+  onSnapshot, query, orderBy
+} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+import { onAuthStateChanged } 
+  from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+
+
+// =========== حماية الداشبورد ================
+onAuthStateChanged(auth, user => {
+  if (!user) {
+    console.log("تم طردك لأنه لا يوجد تسجيل دخول");
+    window.location.href = "login.html";
+  }
+});
+
+
+// =========== عرض البلاغات ================
+const list = document.getElementById("list");
+
+const q = query(collection(db, "reports"), orderBy("created_at", "desc"));
+
+onSnapshot(q, (snap) => {
+  if (snap.empty) {
+    list.innerHTML = "<p>لا توجد بلاغات.</p>";
+    return;
+  }
+
+  let html = "";
+
+  snap.forEach(docSnap => {
+    const r = docSnap.data();
+    const id = docSnap.id;
+
+    html += `
+      <div class="card">
+
+        <strong>نوع البلاغ:</strong> ${r.type ?? ""}<br>
+        <strong>الاسم:</strong> ${r.name ?? ""}<br>
+        <strong>الحي:</strong> ${r.location ?? ""}<br>
+        <strong>التفاصيل:</strong> ${r.details ?? ""}<br>
+        <strong>الحالة:</strong> ${r.status ?? "قيد المراجعة"}<br>
+
+        <hr>
+
+        <label>✏ الرد على البلاغ:</label>
+        <textarea id="reply-${id}" class="input">${r.reply ?? ""}</textarea>
+
+        <label>⚙ تغيير الحالة:</label>
+        <select id="status-${id}" class="input">
+          <option ${r.status=="قيد المراجعة"?"selected":""}>قيد المراجعة</option>
+          <option ${r.status=="جارِ الحل"?"selected":""}>جارِ الحل</option>
+          <option ${r.status=="تم الحل"?"selected":""}>تم الحل</option>
+        </select>
+
+        <button class="btn save" onclick="saveUpdate('${id}')">💾 حفظ</button>
+        <button class="btn delete" onclick="removeReport('${id}')">🗑 حذف</button>
+
+      </div>
+    `;
+  });
+
+  list.innerHTML = html;
+});
+
+
+// =========== حفظ التعديلات ================
+window.saveUpdate = async (id) => {
+  const reply = document.getElementById(`reply-${id}`).value;
+  const status = document.getElementById(`status-${id}`).value;
+
+  await updateDoc(doc(db, "reports", id), {
+    reply,
+    status
+  });
+
+  alert("✔ تم تحديث البلاغ");
+};
+
+
+// =========== حذف البلاغ ================
+window.removeReport = async (id) => {
+  if (confirm("هل أنت متأكد من الحذف؟")) {
+    await deleteDoc(doc(db, "reports", id));
+    alert("✔ تم الحذف");
+  }
+};
+</script>
+
+</body>
+</html>

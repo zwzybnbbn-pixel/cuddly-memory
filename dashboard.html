@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>لوحة التحكم — الرئيسية</title>
+
+<style>
+body {
+  background:#eef2f7;
+  font-family:'Cairo', sans-serif;
+  margin:0;
+  padding:0;
+}
+
+.header {
+  background:#007bff;
+  color:white;
+  padding:15px;
+  text-align:center;
+  font-size:22px;
+  font-weight:bold;
+}
+
+.container {
+  padding:20px;
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap:15px;
+}
+
+.card {
+  background:white;
+  padding:20px;
+  border-radius:14px;
+  box-shadow:0 3px 12px rgba(0,0,0,0.1);
+  text-align:center;
+  transition:0.2s;
+  cursor:pointer;
+}
+
+.card:hover {
+  transform: scale(1.05);
+}
+
+.card h3 {
+  margin:10px 0;
+  color:#007bff;
+}
+
+.card p {
+  font-size:14px;
+  opacity:0.7;
+}
+
+.logout {
+  position:fixed;
+  bottom:15px;
+  left:15px;
+  background:#dc3545;
+  padding:10px 20px;
+  color:white;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">⚙ لوحة التحكم الرئيسية</div>
+
+<div class="container">
+
+  <div class="card" onclick="go('dashboard-alerts.html')">
+    <h3>🔔 إدارة التنبيهات</h3>
+    <p>إضافة – تعديل – حذف التنبيهات</p>
+  </div>
+
+  <div class="card" onclick="go('dashboard-reasons.html')">
+    <h3>⚠ إدارة أسباب الانقطاع</h3>
+    <p>عرض – تحديث – حذف الأسباب</p>
+  </div>
+
+  <div class="card" onclick="go('dashboard-schedule.html')">
+    <h3>⏳ إدارة جدول التشغيل</h3>
+    <p>تشغيل – انطفاء – تعديل – حذف</p>
+  </div>
+
+  <div class="card" onclick="go('dashboard-reports.html')">
+    <h3>📝 إدارة البلاغات</h3>
+    <p>الرد – الحذف – تحديث الحالة</p>
+  </div>
+
+</div>
+
+<button class="logout" id="logoutBtn">تسجيل الخروج</button>
+
+<script type="module">
+import { auth } from "./firebase.js";
+import { onAuthStateChanged, signOut } 
+  from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+
+// ========== حماية الصفحة ==========
+onAuthStateChanged(auth, user => {
+  if (!user) {
+    window.location.href = "login.html";
+  }
+});
+
+// ========== زر تسجيل الخروج ==========
+document.getElementById("logoutBtn").onclick = () => {
+  signOut(auth);
+};
+
+// ========== الانتقال ==========
+window.go = (page) => {
+  window.location.href = page;
+};
+</script>
+
+</body>
+</html>

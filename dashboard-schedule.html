@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>لوحة التحكم — جدول التشغيل</title>
+
+<style>
+body {
+  background:#eef2f7;
+  font-family:'Cairo', sans-serif;
+  padding:20px;
+}
+
+h2 {
+  text-align:center;
+  margin-bottom:20px;
+}
+
+.card {
+  background:white;
+  padding:15px;
+  border-radius:10px;
+  margin-bottom:12px;
+  box-shadow:0 3px 10px rgba(0,0,0,0.08);
+}
+
+.input {
+  width:100%;
+  padding:8px;
+  border:1px solid #ccc;
+  border-radius:8px;
+  margin:6px 0;
+}
+
+.btn {
+  padding:8px 12px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  margin-top:8px;
+}
+
+.addBtn { background:#28a745; color:white; width:100%; }
+.save { background:#007bff; color:white; }
+.delete { background:#dc3545; color:white; }
+</style>
+</head>
+
+<body>
+
+<h2>⚡ لوحة التحكم — جدول التشغيل والانطفاء</h2>
+
+<!-- نموذج الإضافة -->
+<div class="card">
+  <h3>➕ إضافة منطقة جديدة</h3>
+
+  <input id="area" class="input" placeholder="اسم المنطقة">
+
+  <label>وقت التشغيل:</label>
+  <input id="on" class="input" placeholder="مثال: 6 صباحاً">
+
+  <label>وقت الانطفاء:</label>
+  <input id="off" class="input" placeholder="مثال: 12 مساءً">
+
+  <button class="btn addBtn" id="addBtn">إضافة</button>
+</div>
+
+<hr><br>
+
+<!-- عرض القائمة -->
+<div id="list">جاري التحميل...</div>
+
+<script type="module">
+import { db } from "./firebase.js";
+import { 
+  collection, doc, addDoc, getDocs, updateDoc, deleteDoc,
+  query, orderBy
+} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+import { auth } from "./firebase.js";
+import { onAuthStateChanged } 
+  from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+
+
+// =========================
+// 🔐 حماية صفحة لوحة التحكم
+// =========================
+onAuthStateChanged(auth, user => {
+  if (!user) window.location.href = "login.html";
+});
+
+
+// =========================
+// ➕ إضافة منطقة جديدة
+// =========================
+document.getElementById("addBtn").onclick = async () => {
+  const area = document.getElementById("area").value.trim();
+  const on = document.getElementById("on").value.trim();
+  const off = document.getElementById("off").value.trim();
+
+  if (!area || !on || !off) {
+    alert("❗ الرجاء ملء جميع الحقول");
+    return;
+  }
+
+  await addDoc(collection(db, "schedule"), {
+    area,
+    on,
+    off
+  });
+
+  alert("✔ تمت الإضافة بنجاح");
+
+  loadData();
+};
+
+
+// =========================
+// 📌 عرض البيانات
+// =========================
+const list = document.getElementById("list");
+
+async function loadData() {
+  list.innerHTML = "جاري التحميل...";
+
+  const q = query(collection(db, "schedule"), orderBy("area", "asc"));
+  const snap = await getDocs(q);
+
+  if (snap.empty) {
+    list.innerHTML = "<p>لا يوجد جدول تشغيل.</p>";
+    return;
+  }
+
+  let html = "";
+
+  snap.forEach(d => {
+    const s = d.data();
+    const id = d.id;
+
+    html += `
+      <div class="card">
+        <label>المنطقة:</label>
+        <input id="area-${id}" class="input" value="${s.area}">
+
+        <label>وقت التشغيل:</label>
+        <input id="on-${id}" class="input" value="${s.on}">
+
+        <label>وقت الانطفاء:</label>
+        <input id="off-${id}" class="input" value="${s.off}">
+
+        <button class="btn save" onclick="save('${id}')">💾 حفظ</button>
+        <button class="btn delete" onclick="removeItem('${id}')">🗑 حذف</button>
+      </div>
+    `;
+  });
+
+  list.innerHTML = html;
+}
+
+loadData();
+
+
+// =========================
+// 💾 تحديث البيانات
+// =========================
+window.save = async (id) => {
+  const area = document.getElementById(`area-${id}`).value.trim();
+  const on = document.getElementById(`on-${id}`).value.trim();
+  const off = document.getElementById(`off-${id}`).value.trim();
+
+  await updateDoc(doc(db, "schedule", id), {
+    area,
+    on,
+    off
+  });
+
+  alert("✔ تم التحديث");
+};
+
+
+// =========================
+// 🗑 حذف المنطقة
+// =========================
+window.removeItem = async (id) => {
+  if (confirm("هل تريد حذف هذا السجل؟")) {
+    await deleteDoc(doc(db, "schedule", id));
+    alert("✔ تم الحذف");
+    loadData();
+  }
+};
+</script>
+
+</body>
+</html>

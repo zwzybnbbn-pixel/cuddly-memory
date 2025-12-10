@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>كهرباء عتق – الرئيسية</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Cairo',sans-serif;}
+
+/* خلفية سوداء متدرجة */
+body{
+  background:linear-gradient(to bottom,#0a0a0a,#111,#1a1a1a,#222);
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  color:white;
+  padding:10px;
+}
+
+/* MAIN */
+.main-wrapper{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+  padding:30px 10px;
+}
+
+header h1{
+  font-size:38px;
+  font-weight:800;
+  margin-bottom:10px;
+}
+
+header p{
+  font-size:20px;
+  opacity:.9;
+  margin-bottom:25px;
+}
+
+/* Cards */
+.cards{
+  width:100%;
+  max-width:600px;
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
+
+.card{
+  background:rgba(255,255,255,0.07);
+  padding:20px;
+  border-radius:16px;
+  text-align:center;
+  backdrop-filter:blur(5px);
+  box-shadow:0 6px 18px rgba(0,0,0,0.45);
+  transition:0.25s;
+}
+
+.card:hover{
+  background:rgba(255,255,255,0.12);
+  transform:scale(1.03);
+}
+
+.card-title{
+  font-size:24px;
+  font-weight:800;
+  margin-bottom:6px;
+}
+
+.card-value{
+  font-size:18px;
+  margin-bottom:14px;
+  opacity:.95;
+}
+
+/* Button */
+.go-btn{
+  display:block;
+  padding:14px;
+  font-size:20px;
+  border-radius:14px;
+  background:#ffffff33;
+  color:white;
+  font-weight:800;
+  text-decoration:none;
+  transition:0.2s;
+}
+
+.go-btn:hover{
+  background:white;
+  color:#000;
+}
+
+/* Footer */
+footer{
+  text-align:center;
+  opacity:.9;
+  font-size:18px;
+  padding:15px 10px;
+  margin-top:20px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="main-wrapper">
+
+<header>
+  <h1>⚡ كهرباء عتق</h1>
+  <p>متابعة التنبيهات – أسباب الانقطاع – جدول التشغيل – البلاغات</p>
+</header>
+
+<!-- CARDS -->
+<div class="cards">
+
+  <div class="card">
+    <div class="card-title">🔔 آخر تنبيه</div>
+    <div id="alerts" class="card-value">جارِ التحميل...</div>
+    <a href="alerts.html" class="go-btn">فتح</a>
+  </div>
+
+  <div class="card">
+    <div class="card-title">⚡ سبب الانقطاع</div>
+    <div id="reasons" class="card-value">جارِ التحميل...</div>
+    <a href="reasons.html" class="go-btn">فتح</a>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📅 جدول اليوم</div>
+    <div id="schedule-mini" class="card-value">جارِ التحميل...</div>
+    <a href="schedule.html" class="go-btn">فتح</a>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📢 البلاغات</div>
+    <div id="reports" class="card-value">جارِ التحميل...</div>
+    <a href="reports.html" class="go-btn">فتح</a>
+  </div>
+
+</div>
+
+</div>
+
+<footer>
+  <p>م/ماجد قاسم حسن مبارك بن عمرو</p>
+© 2025 – منصة كهرباء عتق
+</footer>
+
+</body>
+</html>

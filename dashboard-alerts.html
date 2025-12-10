@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>لوحة التحكم — التنبيهات</title>
+<link rel="stylesheet" href="style.css">
+<script type="module" src="firebase.js"></script>
+
+<style>
+body { font-family: 'Cairo', sans-serif; background:#f5f5f5; padding:20px; }
+.box {
+  background:white; padding:20px; border-radius:12px;
+  box-shadow:0 4px 12px #0001; margin-bottom:25px; max-width:700px;
+}
+.btn{padding:10px 20px;background:#0066ff;color:white;border-radius:8px;cursor:pointer;}
+.btn.red{background:#d40000}
+.item{background:#fff;padding:15px;margin:12px 0;border-radius:8px;border-left:5px solid #0066ff;}
+</style>
+</head>
+
+<body>
+
+<h2>📢 لوحة التحكم – إدارة التنبيهات</h2>
+<p id="status" style="color:red;font-weight:bold;"></p>
+
+<div class="box">
+  <h3>➕ إضافة تنبيه جديد</h3>
+
+  <label>عنوان التنبيه:</label>
+  <input id="title" style="width:100%;padding:10px;margin:6px 0;border-radius:6px;border:1px solid #ccc">
+
+  <label>النص:</label>
+  <textarea id="text" style="width:100%;padding:10px;height:80px;border-radius:6px;border:1px solid #ccc"></textarea>
+
+  <label>الحالة:</label>
+  <select id="active" style="padding:10px;width:100%;border-radius:6px;">
+    <option value="true">🔵 نشط</option>
+    <option value="false">⚫ غير نشط</option>
+  </select>
+
+  <br><br>
+  <button class="btn" id="addBtn">إضافة</button>
+</div>
+
+<div class="box">
+  <h3>📋 جميع التنبيهات</h3>
+  <div id="alerts-list">جارِ التحميل...</div>
+</div>
+
+<script type="module">
+import { auth } from "./firebase.js";
+import {
+  db,
+} from "./firebase.js";
+import {
+  collection, addDoc, getDocs, deleteDoc,
+  updateDoc, doc, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+// =======================
+// حماية الصفحة
+// =======================
+auth.onAuthStateChanged(user => {
+  if (!user) {
+    alert("يجب تسجيل الدخول للوصول للوحة التحكم");
+    location.href = "login.html";
+  }
+});
+
+// =======================
+// إضافة تنبيه
+// =======================
+document.getElementById("addBtn").onclick = async () => {
+  const title = document.getElementById("title").value.trim();
+  const text  = document.getElementById("text").value.trim();
+  const active = document.getElementById("active").value === "true";
+
+  if (!title || !text) {
+    alert("املأ جميع الحقول");
+    return;
+  }
+
+  await addDoc(collection(db, "alerts"), {
+    title,
+    text,
+    active,
+    "وقت الاضافه": serverTimestamp()
+  });
+
+  alert("تمت الإضافة ✔");
+  loadAlerts();
+};
+
+// =======================
+// تحميل التنبيهات
+// =======================
+async function loadAlerts() {
+  const box = document.getElementById("alerts-list");
+  box.innerHTML = "جار التحميل...";
+
+  const snap = await getDocs(collection(db, "alerts"));
+
+  let html = "";
+  snap.forEach(d => {
+    const a = d.data();
+    html += `
+      <div class="item">
+        <h3>${a.title}</h3>
+        <p>${a.text}</p>
+
+        <p><strong>الحالة:</strong> ${a.active ? "🔵 نشط" : "⚫ غير نشط"}</p>
+
+        <button class="btn" onclick="editAlert('${d.id}','${a.title}','${a.text}',${a.active})">تعديل</button>
+        <button class="btn red" onclick="deleteAlert('${d.id}')">حذف</button>
+      </div>
+    `;
+  });
+
+  box.innerHTML = html || "<p>لا يوجد بيانات</p>";
+}
+
+loadAlerts();
+
+// =======================
+// حذف تنبيه
+// =======================
+window.deleteAlert = async (id) => {
+  if (!confirm("تأكيد الحذف؟")) return;
+  await deleteDoc(doc(db, "alerts", id));
+  loadAlerts();
+};
+
+// =======================
+// تعديل تنبيه
+// =======================
+window.editAlert = async (id, t, c, active) => {
+  const title = prompt("عنوان التنبيه:", t);
+  if (!title) return;
+
+  const text = prompt("النص:", c);
+  if (!text) return;
+
+  const st = confirm("جعل التنبيه نشط؟");
+
+  await updateDoc(doc(db, "alerts", id), {
+    title,
+    text,
+    active: st
+  });
+
+  alert("تم التحديث ✔");
+  loadAlerts();
+};
+</script>
+
+</body>
+</html>
