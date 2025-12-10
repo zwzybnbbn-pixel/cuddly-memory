@@ -22,84 +22,78 @@ body {
   font-weight:bold;
 }
 
-/* ===== الحاوية الرئيسية ===== */
+/* ===== نفس الشبكة الموجودة في الرئيسية ===== */
 .container {
   padding:20px;
-  display:flex;
-  flex-direction:column;
-  gap:20px;
-  max-width:650px;
-  margin:auto;
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap:15px;
 }
 
-/* ===== صندوق (بطاقة) بنفس تصميم الرئيسية ===== */
+/* ===== البطاقة ===== */
 .card {
   background:white;
   padding:20px;
   border-radius:14px;
   box-shadow:0 3px 12px rgba(0,0,0,0.1);
+  transition:0.2s;
 }
 
-/* ===== العناوين ===== */
+.card:hover {
+  transform: scale(1.03);
+}
+
 .card h3 {
-  margin:10px 0;
+  margin:0 0 10px;
   color:#007bff;
   font-size:18px;
 }
 
-/* ===== حقول الإدخال ===== */
+/* الإدخالات */
 .input {
   width:100%;
   padding:10px;
   border:1px solid #ccc;
   border-radius:8px;
-  margin:6px 0 12px;
-  font-size:15px;
+  margin-bottom:10px;
 }
 
-/* ===== الأزرار ===== */
+/* الأزرار */
 .btn {
-  padding:10px 15px;
+  padding:10px;
   border:none;
   border-radius:10px;
   cursor:pointer;
-  font-size:15px;
-  margin-top:8px;
+  width:100%;
+  margin-top:5px;
 }
 
-.addBtn { background:#28a745; color:white; width:100%; }
-.save    { background:#007bff; color:white; width:100%; margin-top:10px; }
-.delete  { background:#dc3545; color:white; width:100%; margin-top:10px; }
-
-/* للجوال */
-@media (max-width:500px){
-  .container { padding:15px; }
-}
+.add { background:#28a745; color:white; }
+.save { background:#007bff; color:white; }
+.delete { background:#dc3545; color:white; }
 </style>
 </head>
 
 <body>
 
-<div class="header">⚡ إدارة جدول التشغيل والانطفاء</div>
+<div class="header">⚡ إدارة جدول التشغيل</div>
 
+<!-- نموذج إضافة منطقة -->
 <div class="container">
-
-  <!-- نموذج الإضافة -->
   <div class="card">
-    <h3>➕ إضافة منطقة جديدة</h3>
+    <h3>➕ إضافة منطقة</h3>
 
     <input id="area" class="input" placeholder="اسم المنطقة">
-    <input id="on" class="input" placeholder="وقت التشغيل (مثال: 6 صباحاً)">
-    <input id="off" class="input" placeholder="وقت الانطفاء (مثال: 12 مساءً)">
+    <input id="on" class="input" placeholder="وقت التشغيل">
+    <input id="off" class="input" placeholder="وقت الانطفاء">
 
-    <button class="btn addBtn" id="addBtn">إضافة</button>
+    <button class="btn add" id="addBtn">إضافة</button>
   </div>
+</div>
 
-  <!-- قائمة البيانات -->
-  <div id="list" class="container" style="padding:0; gap:15px;">
-    جــاري التحميل...
-  </div>
-
+<!-- قائمة المناطق -->
+<div class="container" id="list">
+  جاري التحميل...
 </div>
 
 <script type="module">
@@ -118,7 +112,7 @@ onAuthStateChanged(auth, user => {
   if (!user) window.location.href = "login.html";
 });
 
-/* إضافة منطقة */
+/* إضافة */
 document.getElementById("addBtn").onclick = async () => {
   const area = document.getElementById("area").value.trim();
   const on = document.getElementById("on").value.trim();
@@ -130,8 +124,7 @@ document.getElementById("addBtn").onclick = async () => {
   }
 
   await addDoc(collection(db, "schedule"), { area, on, off });
-
-  alert("✔ تمت الإضافة بنجاح");
+  alert("✔ تمت الإضافة");
   loadData();
 };
 
@@ -139,13 +132,12 @@ document.getElementById("addBtn").onclick = async () => {
 const list = document.getElementById("list");
 
 async function loadData() {
-  list.innerHTML = "جــاري التحميل...";
+  list.innerHTML = "جار التحميل...";
 
-  const q = query(collection(db, "schedule"), orderBy("area", "asc"));
-  const snap = await getDocs(q);
+  const snap = await getDocs(query(collection(db, "schedule"), orderBy("area")));
 
   if (snap.empty) {
-    list.innerHTML = "<p>لا يوجد جدول تشغيل.</p>";
+    list.innerHTML = "<p>لا يوجد جدول</p>";
     return;
   }
 
@@ -159,13 +151,8 @@ async function loadData() {
       <div class="card">
         <h3>📍 ${s.area}</h3>
 
-        <label>اسم المنطقة:</label>
         <input id="area-${id}" class="input" value="${s.area}">
-
-        <label>وقت التشغيل:</label>
         <input id="on-${id}" class="input" value="${s.on}">
-
-        <label>وقت الانطفاء:</label>
         <input id="off-${id}" class="input" value="${s.off}">
 
         <button class="btn save" onclick="save('${id}')">💾 حفظ</button>
@@ -176,9 +163,10 @@ async function loadData() {
 
   list.innerHTML = html;
 }
+
 loadData();
 
-/* حفظ التعديل */
+/* تحديث */
 window.save = async (id) => {
   const area = document.getElementById(`area-${id}`).value.trim();
   const on = document.getElementById(`on-${id}`).value.trim();
@@ -190,7 +178,7 @@ window.save = async (id) => {
 
 /* حذف */
 window.removeItem = async (id) => {
-  if (confirm("هل تريد حذف هذا السجل؟")) {
+  if (confirm("هل أنت متأكد؟")) {
     await deleteDoc(doc(db, "schedule", id));
     alert("✔ تم الحذف");
     loadData();
