@@ -1,48 +1,73 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-// 🔹 إنشاء العميل (بدون auth)
-const supabase = createClient(
-  "https://gxuumjhtutkipvkljjhj.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd4dXVtamh0dXRraXB2a2hqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU1NTM2MzEsImV4cCI6MjA4MTEyOTYzMX0.rmsSRTQ57cAJ3VAiQMe0mdxEYcERh6zQDep7DN_frFI"
-);
+// 1. إعدادات سوبابيس (تأكد من استخدام Anon Key)
+const supabaseUrl = "https://gxuumjhtutkipvkljjhj.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd4dXVtamh0dXRraXB2a2xqamhqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU1NTM2MzEsImV4cCI6MjA4MTEyOTYzMX0.rmsSRTQ57cAJ3VAiQMe0mdxEYcERh6zQDep7DN_frFI";
 
-const list = document.getElementById("list");
-const reportsCount = document.getElementById("reportsCount");
+export const supabase = createClient(supabaseUrl, supabaseKey);
 
-async function loadReports() {
-    list.textContent = "⏳ جاري تحميل البلاغات...";
-
-    const { data, error } = await supabase
-        .from("reports")
-        .select("id, name, details, created_at")
-        .order("created_at", { ascending: false });
-
-    if (error) {
-        console.error(error);
-        list.textContent = "❌ فشل تحميل البلاغات";
-        return;
+/**
+ * دالة جلب الـ IP الحالي للمستخدم (مع محاولة بديلة في حال الفشل)
+ */
+export async function getUserIP() {
+    try {
+        const response = await fetch('https://api.ipify.org?format=json');
+        const data = await response.json();
+        return data.ip;
+    } catch (error) {
+        try {
+            const response = await fetch('https://ipapi.co/json/');
+            const data = await response.json();
+            return data.ip;
+        } catch (e) {
+            console.error("تعذر جلب الـ IP:", e);
+            return 'unknown';
+        }
     }
-
-    if (!data || data.length === 0) {
-        list.textContent = "لا توجد بلاغات";
-        reportsCount.textContent = "0 بلاغ";
-        return;
-    }
-
-    list.innerHTML = "";
-    reportsCount.textContent = `${data.length} بلاغ`;
-
-    data.forEach(report => {
-        const div = document.createElement("div");
-        div.className = "report-item";
-        div.innerHTML = `
-            <strong>${report.name ?? "بدون اسم"}</strong>
-            <p>${report.details ?? ""}</p>
-            <small>${new Date(report.created_at).toLocaleString("ar-EG")}</small>
-            <hr>
-        `;
-        list.appendChild(div);
-    });
 }
 
-loadReports();
+/**
+ * دالة الكاش الذكي: تعرض البيانات من المتحدث فوراً ثم تحدثها من السيرفر في الخلفية
+ */
+export async function fetchWithSmartCache(cacheKey, fetchCallback, onUpdate = null) {
+    const cached = localStorage.getItem(cacheKey);
+    let cachedData = null;
+
+    if (cached) {
+        try {
+            cachedData = JSON.parse(cached);
+        } catch (e) {
+            localStorage.removeItem(cacheKey);
+        }
+    }
+
+    const performFetch = async () => {
+        try {
+            const freshData = await fetchCallback();
+            if (freshData) {
+                const freshDataStr = JSON.stringify(freshData);
+                // تحديث الكاش فقط إذا كانت البيانات الجديدة مختلفة
+                if (freshDataStr !== cached) {
+                    localStorage.setItem(cacheKey, freshDataStr);
+                    // إذا وجدنا تحديثات وكان هناك كاش قديم، نبلغ الواجهة لتتحدث
+                    if (onUpdate && cached) {
+                        onUpdate(freshData);
+                    }
+                }
+            }
+            return freshData;
+        } catch (err) {
+            console.error("خطأ في جلب البيانات من السيرفر:", err.message);
+            return null;
+        }
+    };
+
+    // إذا وجد كاش، نرجعه فوراً ونشغل جلب البيانات في الخلفية
+    if (cachedData) {
+        performFetch(); 
+        return cachedData;
+    }
+
+    // إذا لا يوجد كاش، ننتظر جلب البيانات لأول مرة
+    return await performFetch();
+}
