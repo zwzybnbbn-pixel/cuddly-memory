@@ -11,8 +11,8 @@
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+   
     
     <style>
         * {
@@ -399,11 +399,12 @@
 
         /* ===== الرسوم البيانية ===== */
         .charts-row {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 25px;
-            margin-bottom: 30px;
-        }
+    display: grid;
+    grid-template-columns: 1fr; /* تم تغييرها من 2fr 1fr */
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
 
         .chart-card {
             background: var(--white);
@@ -861,19 +862,7 @@
             </div>
         </div>
         
-        <!-- الرسوم البيانية -->
-        <div class="charts-row">
-            <div class="chart-card">
-                <div class="chart-header">
-                    <h3>إحصائيات النمو الشهري</h3>
-                    <select class="chart-period" id="chartPeriod">
-                        <option value="7">آخر 7 أيام</option>
-                        <option value="30" selected>آخر 30 يوم</option>
-                        <option value="90">آخر 3 شهور</option>
-                    </select>
-                </div>
-                <canvas id="growthChart" style="height: 300px;"></canvas>
-            </div>
+       
             
             <div class="summary-card">
                 <h3 style="margin-bottom: 20px;">إحصائيات اليوم</h3>
@@ -940,226 +929,148 @@
     </div>
 
     <!-- استيراد Supabase -->
-    <script type="module">
-        // =====================================================
-        // استيراد دوال Supabase
-        // =====================================================
-        import supabase, { 
-            requireAuth, 
-            getDashboardStats, 
-            getUsers, 
-            getTrips,
-            formatDate,
-            formatMoney,
-            getStatusText 
-        } from './supabase.js';
+ <script type="module">
+    import supabase, { 
+        requireAuth, 
+        getDashboardStats, 
+        getUsers, 
+        getTrips,
+        formatDate,
+        formatMoney,
+        getStatusText 
+    } from './supabase.js';
 
-        // المتغيرات العامة
-        let currentUser = null;
-        let growthChart = null;
+    let currentUser = null;
 
-        // التحقق من المصادقة
-        async function init() {
-            const session = await requireAuth();
-            if (!session) return;
-            
-            currentUser = session.user;
-            loadAdminInfo();
-            loadDashboardData();
-            loadRecentUsers();
-            loadRecentTrips();
-        }
-
-        // تحميل معلومات المشرف
-        async function loadAdminInfo() {
-            try {
-                const session = JSON.parse(localStorage.getItem('session'));
-                if (session?.admin) {
-                    document.getElementById('adminName').textContent = session.admin.name;
-                    document.getElementById('adminEmail').textContent = session.admin.email;
-                    document.getElementById('adminAvatar').textContent = session.admin.name[0];
-                    
-                    // إحصائيات المشرف
-                    const { data: logs } = await supabase
-                        .from('admin_logs')
-                        .select('*')
-                        .eq('admin_id', session.user.id)
-                        .gte('timestamp', new Date().toISOString().split('T')[0]);
-                    
-                    document.getElementById('adminActions').textContent = logs?.length || 0;
-                    
-                    // أيام في النظام
-                    const { data: adminData } = await supabase
-                        .from('admins')
-                        .select('created_at')
-                        .eq('user_id', session.user.id)
-                        .single();
-                    
-                    if (adminData?.created_at) {
-                        const days = Math.floor((new Date() - new Date(adminData.created_at)) / (1000 * 60 * 60 * 24));
-                        document.getElementById('adminDays').textContent = days;
-                    }
-                }
-            } catch (error) {
-                console.error('Error loading admin info:', error);
-            }
-        }
-
-        // تحميل بيانات لوحة التحكم
-        async function loadDashboardData() {
-            try {
-                const result = await getDashboardStats();
-                
-                if (result.success) {
-                    const stats = result.data;
-                    
-                    document.getElementById('totalUsers').textContent = stats.users.total;
-                    document.getElementById('totalDrivers').textContent = stats.users.drivers;
-                    document.getElementById('totalTrips').textContent = stats.trips.today;
-                    document.getElementById('avgRating').textContent = '4.8';
-                    
-                    document.getElementById('todayCompleted').textContent = stats.trips.today;
-                    document.getElementById('todayCancelled').textContent = '0';
-                    document.getElementById('todayRevenue').textContent = '0 ر.س';
-                    document.getElementById('onlineDrivers').textContent = stats.drivers.online;
-                    
-                    // تحديث الشارات الجانبية
-                    document.getElementById('usersCount').textContent = stats.users.total;
-                    document.getElementById('driversCount').textContent = stats.users.drivers;
-                    document.getElementById('tripsCount').textContent = stats.trips.today;
-                    document.getElementById('pendingCount').textContent = stats.users.pending;
-                    document.getElementById('complaintsCount').textContent = stats.complaints.pending;
-                    document.getElementById('warningsCount').textContent = stats.warnings.active;
-                }
-            } catch (error) {
-                console.error('Error loading dashboard data:', error);
-            }
-        }
-
-        // تحميل آخر المستخدمين
-        async function loadRecentUsers() {
-            try {
-                const result = await getUsers({ limit: 5 });
-                
-                if (result.success) {
-                    const tableBody = document.getElementById('recentUsersTable');
-                    tableBody.innerHTML = '';
-                    
-                    result.data.forEach(user => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${user.type === 'driver' ? '🏍️ سائق' : '👤 مواطن'}</td>
-                            <td>${user.name || 'غير معروف'}</td>
-                            <td>${user.phone || '-'}</td>
-                            <td>${user.rating ? '⭐ ' + user.rating.toFixed(1) : '-'}</td>
-                            <td><span class="status-badge status-${user.status}">${getStatusText(user.status)}</span></td>
-                            <td>${user.created_at ? formatDate(user.created_at) : '-'}</td>
-                        `;
-                        tableBody.appendChild(row);
-                    });
-                }
-            } catch (error) {
-                console.error('Error loading recent users:', error);
-            }
-        }
-
-        // تحميل آخر الرحلات
-        async function loadRecentTrips() {
-            try {
-                const result = await getTrips({ limit: 5 });
-                
-                if (result.success) {
-                    const tableBody = document.getElementById('recentTripsTable');
-                    tableBody.innerHTML = '';
-                    
-                    result.data.forEach((trip, index) => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${index + 1}</td>
-                            <td>${trip.user_name || trip.user_id || '-'}</td>
-                            <td>${trip.driver_name || trip.driver_id || '-'}</td>
-                            <td>${trip.distance || 0} كم</td>
-                            <td>${formatMoney(trip.price)}</td>
-                            <td><span class="status-badge status-${trip.status}">${getStatusText(trip.status)}</span></td>
-                        `;
-                        tableBody.appendChild(row);
-                    });
-                }
-            } catch (error) {
-                console.error('Error loading recent trips:', error);
-            }
-        }
-
-        // تهيئة الرسم البياني
-        function initChart() {
-            const ctx = document.getElementById('growthChart')?.getContext('2d');
-            if (!ctx) return;
-            
-            if (growthChart) {
-                growthChart.destroy();
-            }
-            
-            growthChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'],
-                    datasets: [{
-                        label: 'المستخدمين',
-                        data: [400, 450, 520, 480, 600, 550],
-                        borderColor: '#6B2E82',
-                        backgroundColor: 'rgba(107, 46, 130, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }, {
-                        label: 'الرحلات',
-                        data: [240, 280, 320, 290, 380, 350],
-                        borderColor: '#FF6B35',
-                        backgroundColor: 'rgba(255, 107, 53, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                            rtl: true,
-                            labels: {
-                                font: { family: 'Cairo' }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // تحديث الرسم البياني
-        document.getElementById('chartPeriod')?.addEventListener('change', function(e) {
-            // يمكن إضافة تحديث البيانات هنا
-            console.log('Period changed:', e.target.value);
-        });
-
-        // البحث العام
-        document.getElementById('globalSearch')?.addEventListener('input', function(e) {
-            const query = e.target.value.trim();
-            if (query.length >= 3) {
-                console.log('Searching for:', query);
-                // يمكن إضافة البحث هنا
-            }
-        });
-
-        // تبديل القائمة الجانبية للجوال
-        window.toggleSidebar = function() {
-            document.getElementById('sidebar').classList.toggle('active');
-        };
-
-        // تهيئة الصفحة
-        init();
+    async function init() {
+        const session = await requireAuth();
+        if (!session) return;
         
-        // تهيئة الرسم البياني بعد تحميل الصفحة
-        window.addEventListener('load', initChart);
-    </script>
+        currentUser = session.user;
+        loadAdminInfo();
+        loadDashboardData();
+        loadRecentUsers();
+        loadRecentTrips();
+    }
+
+    async function loadAdminInfo() {
+        try {
+            const session = JSON.parse(localStorage.getItem('session'));
+            if (session?.admin) {
+                document.getElementById('adminName').textContent = session.admin.name;
+                document.getElementById('adminEmail').textContent = session.admin.email;
+                document.getElementById('adminAvatar').textContent = session.admin.name[0];
+                
+                const { data: logs } = await supabase
+                    .from('admin_logs')
+                    .select('*')
+                    .eq('admin_id', session.user.id)
+                    .gte('timestamp', new Date().toISOString().split('T')[0]);
+                
+                document.getElementById('adminActions').textContent = logs?.length || 0;
+                
+                const { data: adminData } = await supabase
+                    .from('admins')
+                    .select('created_at')
+                    .eq('user_id', session.user.id)
+                    .single();
+                
+                if (adminData?.created_at) {
+                    const days = Math.floor((new Date() - new Date(adminData.created_at)) / (1000 * 60 * 60 * 24));
+                    document.getElementById('adminDays').textContent = days;
+                }
+            }
+        } catch (error) {
+            console.error('Error loading admin info:', error);
+        }
+    }
+
+    async function loadDashboardData() {
+        try {
+            const result = await getDashboardStats();
+            if (result.success) {
+                const stats = result.data;
+                document.getElementById('totalUsers').textContent = stats.users.total;
+                document.getElementById('totalDrivers').textContent = stats.users.drivers;
+                document.getElementById('totalTrips').textContent = stats.trips.today;
+                document.getElementById('avgRating').textContent = '4.8';
+                document.getElementById('todayCompleted').textContent = stats.trips.today;
+                document.getElementById('todayCancelled').textContent = '0';
+                document.getElementById('todayRevenue').textContent = '0 ر.س';
+                document.getElementById('onlineDrivers').textContent = stats.drivers.online;
+                
+                document.getElementById('usersCount').textContent = stats.users.total;
+                document.getElementById('driversCount').textContent = stats.users.drivers;
+                document.getElementById('tripsCount').textContent = stats.trips.today;
+                document.getElementById('pendingCount').textContent = stats.users.pending;
+                document.getElementById('complaintsCount').textContent = stats.complaints.pending;
+                document.getElementById('warningsCount').textContent = stats.warnings.active;
+            }
+        } catch (error) {
+            console.error('Error loading dashboard data:', error);
+        }
+    }
+
+    async function loadRecentUsers() {
+        try {
+            const result = await getUsers({ limit: 5 });
+            if (result.success) {
+                const tableBody = document.getElementById('recentUsersTable');
+                tableBody.innerHTML = '';
+                result.data.forEach(user => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${user.type === 'driver' ? '🏍️ سائق' : '👤 مواطن'}</td>
+                        <td>${user.name || 'غير معروف'}</td>
+                        <td>${user.phone || '-'}</td>
+                        <td>${user.rating ? '⭐ ' + user.rating.toFixed(1) : '-'}</td>
+                        <td><span class="status-badge status-${user.status}">${getStatusText(user.status)}</span></td>
+                        <td>${user.created_at ? formatDate(user.created_at) : '-'}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+        } catch (error) {
+            console.error('Error loading recent users:', error);
+        }
+    }
+
+    async function loadRecentTrips() {
+        try {
+            const result = await getTrips({ limit: 5 });
+            if (result.success) {
+                const tableBody = document.getElementById('recentTripsTable');
+                tableBody.innerHTML = '';
+                result.data.forEach((trip, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${trip.user_name || trip.user_id || '-'}</td>
+                        <td>${trip.driver_name || trip.driver_id || '-'}</td>
+                        <td>${trip.distance || 0} كم</td>
+                        <td>${formatMoney(trip.price)}</td>
+                        <td><span class="status-badge status-${trip.status}">${getStatusText(trip.status)}</span></td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+        } catch (error) {
+            console.error('Error loading recent trips:', error);
+        }
+    }
+
+    document.getElementById('globalSearch')?.addEventListener('input', function(e) {
+        const query = e.target.value.trim();
+        if (query.length >= 3) console.log('Searching for:', query);
+    });
+
+    window.toggleSidebar = function() {
+        document.getElementById('sidebar').classList.toggle('active');
+    };
+
+    // البدء
+    init();
+</script>
+
 </body>
-</html>
+                    </html>
