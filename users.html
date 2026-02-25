@@ -1,0 +1,1843 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>توصيلو | المستخدمين</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6B2E82;
+            --primary-light: #8E44AD;
+            --primary-dark: #4A1A5C;
+            --secondary: #FF6B35;
+            --secondary-light: #FF8C5A;
+            --success: #27AE60;
+            --warning: #F39C12;
+            --danger: #E74C3C;
+            --info: #3498DB;
+            --dark: #2C3E50;
+            --light: #ECF0F1;
+            --gray: #95A5A6;
+            --white: #FFFFFF;
+            --gold: #F1C40F;
+            
+            --sidebar-width: 300px;
+            --border-radius: 24px;
+            --card-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            --hover-shadow: 0 30px 60px rgba(107,46,130,0.2);
+            --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9eef5 100%);
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* الخلفية الفاخرة */
+        .bg-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(107, 46, 130, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(255, 107, 53, 0.03) 0%, transparent 50%),
+                linear-gradient(135deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 100%);
+        }
+
+        /* ===== الشريط الجانبي ===== */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: rgba(26, 26, 26, 0.98);
+            backdrop-filter: blur(20px);
+            color: var(--white);
+            z-index: 100;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.3);
+            border-left: 1px solid rgba(255,255,255,0.05);
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 40px 30px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .logo-wrapper {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+        }
+
+        .logo-glow {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            background: radial-gradient(circle at 30% 30%, rgba(107,46,130,0.6), transparent 70%);
+            border-radius: 50%;
+            animation: pulse 3s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.1); }
+        }
+
+        .sidebar-logo {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--white);
+            box-shadow: 0 20px 40px rgba(107,46,130,0.4);
+            position: relative;
+            z-index: 1;
+            transition: var(--transition);
+        }
+
+        .sidebar-logo:hover {
+            transform: rotate(10deg) scale(1.05);
+        }
+
+        .sidebar-header h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            background: linear-gradient(135deg, var(--white), #ddd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .sidebar-header p {
+            color: var(--gray);
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+
+        /* بطاقة المشرف */
+        .admin-card {
+            background: linear-gradient(135deg, rgba(107,46,130,0.2), rgba(255,107,53,0.2));
+            margin: 25px;
+            padding: 25px;
+            border-radius: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .admin-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .admin-avatar-wrapper {
+            position: relative;
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 15px;
+        }
+
+        .admin-avatar {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--white);
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        .admin-status {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            width: 15px;
+            height: 15px;
+            background: var(--success);
+            border-radius: 50%;
+            border: 3px solid var(--dark);
+            z-index: 2;
+        }
+
+        .admin-name {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .admin-email {
+            text-align: center;
+            font-size: 12px;
+            color: var(--gray);
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .admin-stats-grid {
+            display: flex;
+            justify-content: space-around;
+            position: relative;
+            z-index: 1;
+        }
+
+        .admin-stat-item {
+            text-align: center;
+        }
+
+        .admin-stat-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--secondary);
+        }
+
+        .admin-stat-label {
+            font-size: 11px;
+            color: var(--gray);
+        }
+
+        /* القائمة الجانبية */
+        .sidebar-nav {
+            padding: 0 20px;
+            padding-bottom: 30px;
+        }
+
+        .nav-section {
+            margin-bottom: 25px;
+        }
+
+        .nav-section-title {
+            padding: 0 15px;
+            margin-bottom: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--gray);
+            letter-spacing: 1.5px;
+        }
+
+        .nav-item {
+            list-style: none;
+            margin-bottom: 5px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            border-radius: 20px;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 0;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1));
+            transition: var(--transition);
+        }
+
+        .nav-link:hover::before,
+        .nav-link.active::before {
+            width: 100%;
+        }
+
+        .nav-link i {
+            width: 30px;
+            font-size: 20px;
+            margin-left: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .nav-link span {
+            flex: 1;
+            font-size: 15px;
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
+        }
+
+        .nav-badge {
+            background: var(--secondary);
+            color: var(--white);
+            padding: 4px 10px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 5px 10px rgba(255,107,53,0.3);
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(107,46,130,0.3);
+            color: var(--white);
+            transform: translateX(-5px);
+        }
+
+        /* ===== المحتوى الرئيسي ===== */
+        .main-content {
+            margin-right: var(--sidebar-width);
+            min-height: 100vh;
+            padding: 30px;
+        }
+
+        /* الشريط العلوي */
+        .top-bar {
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(10px);
+            padding: 20px 30px;
+            border-radius: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        .page-title-wrapper {
+            position: relative;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--dark);
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-title-decoration {
+            position: absolute;
+            bottom: -5px;
+            right: 0;
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 4px;
+        }
+
+        .top-bar-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        /* شريط البحث */
+        .search-wrapper {
+            position: relative;
+            width: 350px;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+            font-size: 16px;
+            transition: var(--transition);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 50px 15px 25px;
+            border: 2px solid transparent;
+            background: rgba(255,255,255,0.9);
+            border-radius: 40px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 15px;
+            transition: var(--transition);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--white);
+            box-shadow: 0 10px 30px rgba(107,46,130,0.1);
+        }
+
+        .search-input:focus + .search-icon {
+            color: var(--primary);
+        }
+
+        /* زر الإشعارات */
+        .notification-btn {
+            position: relative;
+            width: 55px;
+            height: 55px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        .notification-btn:hover {
+            background: var(--primary);
+            color: var(--white);
+            transform: scale(1.1);
+            box-shadow: 0 15px 30px rgba(107,46,130,0.3);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            background: var(--danger);
+            color: var(--white);
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-weight: 600;
+            box-shadow: 0 5px 10px rgba(231,76,60,0.3);
+        }
+
+        /* ===== أزرار التصفية ===== */
+        .filters-section {
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 40px;
+            margin-bottom: 30px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-tab {
+            padding: 12px 25px;
+            border: 2px solid transparent;
+            background: rgba(107,46,130,0.05);
+            color: var(--dark);
+            border-radius: 40px;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .filter-tab:hover {
+            background: rgba(107,46,130,0.1);
+        }
+
+        .filter-tab.active {
+            background: var(--primary);
+            color: var(--white);
+            box-shadow: 0 10px 20px rgba(107,46,130,0.2);
+        }
+
+        /* ===== الجدول ===== */
+        .table-container {
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 40px;
+            padding: 30px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(255,255,255,0.5);
+            margin-bottom: 30px;
+            overflow-x: auto;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .table-header h3 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .fancy-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+        }
+
+        .fancy-table th {
+            text-align: right;
+            padding: 15px 15px;
+            font-weight: 600;
+            color: var(--gray);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid rgba(107,46,130,0.1);
+        }
+
+        .fancy-table td {
+            padding: 15px 15px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            color: var(--dark);
+            font-size: 14px;
+        }
+
+        .fancy-table tr {
+            transition: var(--transition);
+        }
+
+        .fancy-table tr:hover {
+            background: rgba(107,46,130,0.02);
+        }
+
+        /* شارات الحالة */
+        .status-badge {
+            padding: 6px 15px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.05);
+        }
+
+        .status-active {
+            background: rgba(39, 174, 96, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(39, 174, 96, 0.3);
+        }
+
+        .status-suspended {
+            background: rgba(243, 156, 18, 0.15);
+            color: var(--warning);
+            border: 1px solid rgba(243, 156, 18, 0.3);
+        }
+
+        .status-banned {
+            background: rgba(231, 76, 60, 0.15);
+            color: var(--danger);
+            border: 1px solid rgba(231, 76, 60, 0.3);
+        }
+
+        .status-pending {
+            background: rgba(52, 152, 219, 0.15);
+            color: var(--info);
+            border: 1px solid rgba(52, 152, 219, 0.3);
+        }
+
+        /* أزرار الإجراءات */
+        .action-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 10px;
+            color: var(--white);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 14px;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .btn-view {
+            background: var(--info);
+        }
+
+        .btn-edit {
+            background: var(--warning);
+        }
+
+        .btn-suspend {
+            background: var(--secondary);
+        }
+
+        .btn-ban {
+            background: var(--danger);
+        }
+
+        .btn-warn {
+            background: var(--gray);
+        }
+
+        /* ===== الترقيم ===== */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .page-btn {
+            width: 45px;
+            height: 45px;
+            border: 2px solid var(--primary);
+            background: transparent;
+            color: var(--primary);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 16px;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            background: var(--primary);
+            color: var(--white);
+            transform: scale(1.1);
+        }
+
+        .page-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .page-info {
+            color: var(--dark);
+            font-weight: 600;
+        }
+
+        /* ===== النوافذ المنبثقة ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--white);
+            width: 90%;
+            max-width: 500px;
+            border-radius: 40px;
+            padding: 30px;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .close-modal {
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--gray);
+            transition: var(--transition);
+        }
+
+        .close-modal:hover {
+            color: var(--danger);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--dark);
+            font-weight: 600;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: left 15px center;
+            padding-left: 40px;
+        }
+
+        textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 15px;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        /* شاشة التحميل */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(5px);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--primary);
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        .loading-text {
+            color: var(--primary);
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* رسائل الخطأ */
+        .error-message {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--danger);
+            padding: 15px 25px;
+            border-radius: 40px;
+            margin-bottom: 20px;
+            border: 1px solid var(--danger);
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .error-message i {
+            font-size: 20px;
+        }
+
+        /* زر القائمة للجوال */
+        .menu-toggle {
+            display: none;
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--white);
+            border-radius: 50%;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(107,46,130,0.4);
+            z-index: 101;
+            font-size: 24px;
+            transition: var(--transition);
+            border: 3px solid rgba(255,255,255,0.2);
+        }
+
+        .menu-toggle:hover {
+            transform: scale(1.1) rotate(90deg);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                right: -100%;
+                transition: var(--transition);
+            }
+            
+            .sidebar.active {
+                right: 0;
+            }
+            
+            .main-content {
+                margin-right: 0;
+            }
+            
+            .top-bar {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .search-wrapper {
+                width: 100%;
+            }
+            
+            .menu-toggle {
+                display: flex;
+            }
+            
+            .filter-tabs {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- شاشة التحميل -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">جاري تحميل البيانات...</div>
+    </div>
+
+    <!-- خلفية -->
+    <div class="bg-pattern"></div>
+
+    <!-- زر القائمة للجوال -->
+    <div class="menu-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </div>
+
+    <!-- الشريط الجانبي -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-wrapper">
+                <div class="logo-glow"></div>
+                <div class="sidebar-logo">ت</div>
+            </div>
+            <h2>توصيلو</h2>
+            <p>بوابة الإدارة الذكية</p>
+        </div>
+        
+        <div class="admin-card">
+            <div class="admin-avatar-wrapper">
+                <div class="admin-avatar" id="adminAvatar">م</div>
+                <div class="admin-status"></div>
+            </div>
+            <div class="admin-name" id="adminName">مدير النظام</div>
+            <div class="admin-email" id="adminEmail">admin@tawseelo.com</div>
+            <div class="admin-stats-grid">
+                <div class="admin-stat-item">
+                    <div class="admin-stat-value" id="adminActions">0</div>
+                    <div class="admin-stat-label">إجراء</div>
+                </div>
+                <div class="admin-stat-item">
+                    <div class="admin-stat-value" id="adminDays">0</div>
+                    <div class="admin-stat-label">يوم</div>
+                </div>
+                <div class="admin-stat-item">
+                    <div class="admin-stat-value" id="adminRating">0</div>
+                    <div class="admin-stat-label">تقييم</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">الرئيسية</div>
+                <ul>
+                    <li class="nav-item">
+                        <a href="dashboard.html" class="nav-link">
+                            <i class="fas fa-home"></i>
+                            <span>لوحة التحكم</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="users.html" class="nav-link active">
+                            <i class="fas fa-users"></i>
+                            <span>المستخدمين</span>
+                            <span class="nav-badge" id="usersCount">0</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="drivers.html" class="nav-link">
+                            <i class="fas fa-motorcycle"></i>
+                            <span>السائقين</span>
+                            <span class="nav-badge" id="driversCount">0</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="trips.html" class="nav-link">
+                            <i class="fas fa-route"></i>
+                            <span>الرحلات</span>
+                            <span class="nav-badge" id="tripsCount">0</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-section-title">الإدارة</div>
+                <ul>
+                    <li class="nav-item">
+                        <a href="pending.html" class="nav-link">
+                            <i class="fas fa-hourglass-half"></i>
+                            <span>طلبات التسجيل</span>
+                            <span class="nav-badge" id="pendingCount">0</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="complaints.html" class="nav-link">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span>الشكاوى</span>
+                            <span class="nav-badge" id="complaintsCount">0</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="warnings.html" class="nav-link">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span>الإنذارات</span>
+                            <span class="nav-badge" id="warningsCount">0</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="reports.html" class="nav-link">
+                            <i class="fas fa-chart-pie"></i>
+                            <span>التقارير</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-section-title">النظام</div>
+                <ul>
+                    <li class="nav-item">
+                        <a href="admins.html" class="nav-link">
+                            <i class="fas fa-user-shield"></i>
+                            <span>المشرفين</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="logs.html" class="nav-link">
+                            <i class="fas fa-history"></i>
+                            <span>سجل الإجراءات</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="settings.html" class="nav-link">
+                            <i class="fas fa-cog"></i>
+                            <span>الإعدادات</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- المحتوى الرئيسي -->
+    <div class="main-content">
+        <!-- رسالة الخطأ -->
+        <div class="error-message" id="errorMessage">
+            <i class="fas fa-exclamation-circle"></i>
+            <span id="errorText"></span>
+        </div>
+
+        <!-- الشريط العلوي -->
+        <div class="top-bar">
+            <div class="page-title-wrapper">
+                <h1 class="page-title">إدارة المستخدمين</h1>
+                <div class="page-title-decoration"></div>
+            </div>
+            <div class="top-bar-actions">
+                <div class="search-wrapper">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-input" id="searchInput" placeholder="بحث عن مستخدم...">
+                </div>
+                <div class="notification-btn" onclick="loadNotifications()">
+                    <i class="far fa-bell"></i>
+                    <span class="notification-badge" id="notifBadge">0</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- أزرار التصفية -->
+        <div class="filters-section">
+            <div class="filter-tabs">
+                <button class="filter-tab active" onclick="filterUsers('all')">الكل</button>
+                <button class="filter-tab" onclick="filterUsers('active')">نشط</button>
+                <button class="filter-tab" onclick="filterUsers('suspended')">موقوف</button>
+                <button class="filter-tab" onclick="filterUsers('banned')">محظور</button>
+                <button class="filter-tab" onclick="filterUsers('pending')">قيد المراجعة</button>
+            </div>
+        </div>
+        
+        <!-- جدول المستخدمين -->
+        <div class="table-container">
+            <div class="table-header">
+                <h3><i class="fas fa-users" style="color: var(--primary); margin-left: 10px;"></i>قائمة المستخدمين</h3>
+            </div>
+            <div class="table-wrapper">
+                <table class="fancy-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>الاسم</th>
+                            <th>رقم الجوال</th>
+                            <th>البريد الإلكتروني</th>
+                            <th>التقييم</th>
+                            <th>الحالة</th>
+                            <th>تاريخ التسجيل</th>
+                            <th>آخر ظهور</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <!-- سيتم تعبئتها ديناميكياً -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- الترقيم -->
+            <div class="pagination">
+                <button class="page-btn" onclick="prevPage()" id="prevBtn"><i class="fas fa-chevron-right"></i></button>
+                <span class="page-info" id="pageInfo">صفحة 1 من 1</span>
+                <button class="page-btn" onclick="nextPage()" id="nextBtn"><i class="fas fa-chevron-left"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة الإجراءات -->
+    <div class="modal" id="actionModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">تغيير حالة المستخدم</h3>
+                <span class="close-modal" onclick="closeModal('actionModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="actionForm">
+                    <input type="hidden" id="actionUserId">
+                    <input type="hidden" id="actionType">
+                    
+                    <div class="form-group">
+                        <label>سبب الإجراء</label>
+                        <select id="actionReason" class="form-control">
+                            <option value="مخالفة الشروط">مخالفة الشروط</option>
+                            <option value="شكاوى متكررة">شكاوى متكررة</option>
+                            <option value="احتيال">احتيال</option>
+                            <option value="مستندات منتهية">مستندات منتهية</option>
+                            <option value="سلوك غير لائق">سلوك غير لائق</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>تفاصيل إضافية</label>
+                        <textarea id="actionDetails" class="form-control" rows="4" placeholder="أدخل تفاصيل إضافية..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-block">تأكيد الإجراء</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة تفاصيل المستخدم -->
+    <div class="modal" id="userDetailsModal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3>تفاصيل المستخدم</h3>
+                <span class="close-modal" onclick="closeModal('userDetailsModal')">&times;</span>
+            </div>
+            <div class="modal-body" id="userDetailsContent">
+                <!-- سيتم تعبئتها ديناميكياً -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // =====================================================
+        // تهيئة Supabase
+        // =====================================================
+        const SUPABASE_URL = 'https://nqothizwtmvbvyrxoguz.supabase.co'; // ضع رابط مشروعك هنا
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5xb3RoaXp3dG12YnZ5cnhvZ3V6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwMjc2ODEsImV4cCI6MjA4MjYwMzY4MX0.Hah1FyYJT-dQI0byUO7pNKB3NZqzkyICPh_0D_zdzis'; // ضع المفتاح هنا
+        
+        const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // =====================================================
+        // المتغيرات العامة
+        // =====================================================
+        let currentUser = null;
+        let currentFilter = 'all';
+        let currentPage = 1;
+        const pageSize = 20;
+        let totalCount = 0;
+
+        // =====================================================
+        // دوال مساعدة
+        // =====================================================
+        function showLoading() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            document.getElementById('errorText').textContent = message;
+            errorDiv.style.display = 'flex';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function formatDate(timestamp) {
+            if (!timestamp) return '-';
+            const date = new Date(timestamp);
+            return date.toLocaleDateString('ar-SA', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+
+        function formatDateTime(timestamp) {
+            if (!timestamp) return '-';
+            const date = new Date(timestamp);
+            return date.toLocaleDateString('ar-SA', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function getStatusText(status) {
+            const map = {
+                'active': 'نشط',
+                'suspended': 'موقوف',
+                'banned': 'محظور',
+                'pending': 'قيد المراجعة'
+            };
+            return map[status] || status;
+        }
+
+        // =====================================================
+        // التحقق من المصادقة
+        // =====================================================
+        async function checkAuth() {
+            try {
+                const { data: { user }, error } = await supabase.auth.getUser();
+                
+                if (error || !user) {
+                    window.location.href = 'index.html';
+                    return null;
+                }
+
+                const { data: admin, error: adminError } = await supabase
+                    .from('admins')
+                    .select('*')
+                    .eq('user_id', user.id)
+                    .single();
+
+                if (adminError || !admin) {
+                    window.location.href = 'index.html';
+                    return null;
+                }
+
+                currentUser = { ...user, admin };
+                
+                document.getElementById('adminName').textContent = admin.name;
+                document.getElementById('adminEmail').textContent = admin.email;
+                document.getElementById('adminAvatar').textContent = admin.name[0];
+                document.getElementById('adminRating').textContent = admin.stats?.actionsToday || 0;
+
+                if (admin.created_at) {
+                    const days = Math.floor((new Date() - new Date(admin.created_at)) / (1000 * 60 * 60 * 24));
+                    document.getElementById('adminDays').textContent = days;
+                }
+
+                return user;
+            } catch (error) {
+                console.error('Auth error:', error);
+                window.location.href = 'index.html';
+                return null;
+            }
+        }
+
+        // =====================================================
+        // تحميل الإحصائيات الجانبية
+        // =====================================================
+        async function loadSidebarStats() {
+            try {
+                const { count: usersCount } = await supabase
+                    .from('users')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('type', 'user');
+
+                const { count: driversCount } = await supabase
+                    .from('users')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('type', 'driver');
+
+                const { count: tripsCount } = await supabase
+                    .from('trips')
+                    .select('*', { count: 'exact', head: true });
+
+                const { count: pendingCount } = await supabase
+                    .from('registration_requests')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('status', 'pending');
+
+                const { count: complaintsCount } = await supabase
+                    .from('complaints')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('status', 'pending');
+
+                const { count: warningsCount } = await supabase
+                    .from('warnings')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('is_active', true);
+
+                if (currentUser) {
+                    const { count: notifCount } = await supabase
+                        .from('notifications')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('user_id', currentUser.id)
+                        .eq('is_read', false);
+
+                    document.getElementById('notifBadge').textContent = notifCount || 0;
+                }
+
+                document.getElementById('usersCount').textContent = usersCount || 0;
+                document.getElementById('driversCount').textContent = driversCount || 0;
+                document.getElementById('tripsCount').textContent = tripsCount || 0;
+                document.getElementById('pendingCount').textContent = pendingCount || 0;
+                document.getElementById('complaintsCount').textContent = complaintsCount || 0;
+                document.getElementById('warningsCount').textContent = warningsCount || 0;
+
+            } catch (error) {
+                console.error('Error loading sidebar stats:', error);
+            }
+        }
+
+        // =====================================================
+        // تحميل المستخدمين
+        // =====================================================
+        async function loadUsers() {
+            showLoading();
+            try {
+                let query = supabase
+                    .from('users')
+                    .select('*', { count: 'exact' })
+                    .eq('type', 'user')
+                    .order('created_at', { ascending: false })
+                    .range((currentPage - 1) * pageSize, currentPage * pageSize - 1);
+
+                if (currentFilter !== 'all') {
+                    query = query.eq('status', currentFilter);
+                }
+
+                const { data: users, error, count } = await query;
+
+                if (error) throw error;
+
+                totalCount = count || 0;
+                const totalPages = Math.ceil(totalCount / pageSize);
+
+                const tableBody = document.getElementById('usersTableBody');
+                tableBody.innerHTML = '';
+
+                users.forEach((user, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${(currentPage - 1) * pageSize + index + 1}</td>
+                        <td>${user.name || 'غير معروف'}</td>
+                        <td>${user.phone || '-'}</td>
+                        <td>${user.email || '-'}</td>
+                        <td>${user.rating ? '⭐ ' + user.rating.toFixed(1) : '-'}</td>
+                        <td><span class="status-badge status-${user.status}">${getStatusText(user.status)}</span></td>
+                        <td>${formatDate(user.created_at)}</td>
+                        <td>${formatDateTime(user.last_login)}</td>
+                        <td>
+                            <div class="action-group">
+                                <button class="action-btn btn-view" onclick="viewUserDetails('${user.id}')"><i class="fas fa-eye"></i></button>
+                                <button class="action-btn btn-edit" onclick="editUser('${user.id}')"><i class="fas fa-edit"></i></button>
+                                <button class="action-btn btn-suspend" onclick="showActionModal('${user.id}', 'suspend')"><i class="fas fa-pause"></i></button>
+                                <button class="action-btn btn-ban" onclick="showActionModal('${user.id}', 'ban')"><i class="fas fa-ban"></i></button>
+                                <button class="action-btn btn-warn" onclick="sendWarning('${user.id}')"><i class="fas fa-exclamation-triangle"></i></button>
+                            </div>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+
+                document.getElementById('pageInfo').textContent = `صفحة ${currentPage} من ${totalPages}`;
+                document.getElementById('prevBtn').disabled = currentPage === 1;
+                document.getElementById('nextBtn').disabled = currentPage === totalPages;
+
+            } catch (error) {
+                console.error('Error loading users:', error);
+                showError('حدث خطأ في تحميل البيانات');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // =====================================================
+        // تصفية المستخدمين
+        // =====================================================
+        function filterUsers(filter) {
+            currentFilter = filter;
+            currentPage = 1;
+            
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+            
+            loadUsers();
+        }
+
+        // =====================================================
+        // التنقل بين الصفحات
+        // =====================================================
+        function nextPage() {
+            currentPage++;
+            loadUsers();
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                loadUsers();
+            }
+        }
+
+        // =====================================================
+        // عرض تفاصيل المستخدم
+        // =====================================================
+        async function viewUserDetails(userId) {
+            showLoading();
+            try {
+                const { data: user, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('id', userId)
+                    .single();
+
+                if (error) throw error;
+
+                // إحصائيات الرحلات
+                const { data: trips, error: tripsError } = await supabase
+                    .from('trips')
+                    .select('*')
+                    .eq('user_id', userId);
+
+                const completedTrips = trips?.filter(t => t.status === 'completed').length || 0;
+                const totalSpent = trips?.reduce((sum, t) => sum + (t.price || 0), 0) || 0;
+
+                const content = `
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <div style="width: 80px; height: 80px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 32px; color: white;">
+                            ${user.name ? user.name[0] : '?'}
+                        </div>
+                        <h3 style="margin-bottom: 5px;">${user.name || 'غير معروف'}</h3>
+                        <p style="color: var(--gray);">${user.type === 'driver' ? '🏍️ سائق' : '👤 مواطن'}</p>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px;">
+                        <div style="background: #f5f5f5; padding: 15px; border-radius: 15px;">
+                            <label style="display: block; color: var(--gray); font-size: 12px;">رقم الجوال</label>
+                            <span style="font-weight: 600;">${user.phone || '-'}</span>
+                        </div>
+                        <div style="background: #f5f5f5; padding: 15px; border-radius: 15px;">
+                            <label style="display: block; color: var(--gray); font-size: 12px;">البريد الإلكتروني</label>
+                            <span style="font-weight: 600;">${user.email || '-'}</span>
+                        </div>
+                        <div style="background: #f5f5f5; padding: 15px; border-radius: 15px;">
+                            <label style="display: block; color: var(--gray); font-size: 12px;">تاريخ التسجيل</label>
+                            <span style="font-weight: 600;">${formatDate(user.created_at)}</span>
+                        </div>
+                        <div style="background: #f5f5f5; padding: 15px; border-radius: 15px;">
+                            <label style="display: block; color: var(--gray); font-size: 12px;">آخر ظهور</label>
+                            <span style="font-weight: 600;">${formatDateTime(user.last_login)}</span>
+                        </div>
+                        <div style="background: #f5f5f5; padding: 15px; border-radius: 15px;">
+                            <label style="display: block; color: var(--gray); font-size: 12px;">الحالة</label>
+                            <span class="status-badge status-${user.status}">${getStatusText(user.status)}</span>
+                        </div>
+                        <div style="background: #f5f5f5; padding: 15px; border-radius: 15px;">
+                            <label style="display: block; color: var(--gray); font-size: 12px;">التقييم</label>
+                            <span style="font-weight: 600;">${user.rating ? '⭐ ' + user.rating.toFixed(1) : 'جديد'}</span>
+                        </div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                        <div style="background: linear-gradient(135deg, var(--success), #2ecc71); padding: 20px; border-radius: 15px; color: white;">
+                            <div style="font-size: 28px; font-weight: bold;">${completedTrips}</div>
+                            <div style="font-size: 13px; opacity: 0.9;">الرحلات المكتملة</div>
+                        </div>
+                        <div style="background: linear-gradient(135deg, var(--primary), var(--primary-light)); padding: 20px; border-radius: 15px; color: white;">
+                            <div style="font-size: 28px; font-weight: bold;">${totalSpent} ر.س</div>
+                            <div style="font-size: 13px; opacity: 0.9;">إجمالي المنصرف</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 20px;">
+                        <label style="display: block; margin-bottom: 8px; color: var(--dark); font-weight: 600;">ملاحظات الإدارة</label>
+                        <textarea id="adminNotes" class="form-control" rows="3">${user.admin_notes || ''}</textarea>
+                        <button class="btn btn-primary" style="margin-top: 10px;" onclick="saveAdminNotes('${user.id}')">حفظ الملاحظات</button>
+                    </div>
+                `;
+
+                document.getElementById('userDetailsContent').innerHTML = content;
+                openModal('userDetailsModal');
+
+            } catch (error) {
+                console.error('Error loading user details:', error);
+                showError('حدث خطأ في تحميل التفاصيل');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // =====================================================
+        // حفظ ملاحظات الإدارة
+        // =====================================================
+        async function saveAdminNotes(userId) {
+            const notes = document.getElementById('adminNotes').value;
+            
+            try {
+                const { error } = await supabase
+                    .from('users')
+                    .update({
+                        admin_notes: notes,
+                        notes_updated_at: new Date(),
+                        notes_updated_by: currentUser.id
+                    })
+                    .eq('id', userId);
+
+                if (error) throw error;
+
+                // تسجيل الإجراء
+                await supabase
+                    .from('admin_logs')
+                    .insert({
+                        admin_id: currentUser.id,
+                        admin_name: currentUser.admin.name,
+                        action: 'update_notes',
+                        target_type: 'user',
+                        target_id: userId,
+                        details: { notes }
+                    });
+
+                alert('تم حفظ الملاحظات بنجاح');
+                closeModal('userDetailsModal');
+
+            } catch (error) {
+                console.error('Error saving notes:', error);
+                showError('حدث خطأ في حفظ الملاحظات');
+            }
+        }
+
+        // =====================================================
+        // إظهار نافذة الإجراءات
+        // =====================================================
+        function showActionModal(userId, action) {
+            document.getElementById('actionUserId').value = userId;
+            document.getElementById('actionType').value = action;
+            document.getElementById('modalTitle').textContent = 
+                action === 'suspend' ? 'إيقاف المستخدم' : 'حظر المستخدم';
+            openModal('actionModal');
+        }
+
+        // =====================================================
+        // إرسال إنذار
+        // =====================================================
+        async function sendWarning(userId) {
+            const reason = prompt('أدخل سبب الإنذار:');
+            if (!reason) return;
+
+            showLoading();
+            try {
+                // إنشاء الإنذار
+                const { data: warning, error } = await supabase
+                    .from('warnings')
+                    .insert({
+                        user_id: userId,
+                        reason: reason,
+                        issued_by: currentUser.id,
+                        issued_by_name: currentUser.admin.name,
+                        warning_number_in_sequence: 1
+                    })
+                    .select()
+                    .single();
+
+                if (error) throw error;
+
+                // تحديث عدد الإنذارات
+                await supabase
+                    .from('users')
+                    .update({ 
+                        warnings_count: supabase.raw('warnings_count + 1')
+                    })
+                    .eq('id', userId);
+
+                // إنشاء إشعار
+                await supabase
+                    .from('notifications')
+                    .insert({
+                        user_id: userId,
+                        type: 'warning',
+                        title: 'إنذار من الإدارة',
+                        body: `تم إصدار إنذار بحقك بسبب: ${reason}`,
+                        data: { warning_id: warning.id }
+                    });
+
+                // تسجيل الإجراء
+                await supabase
+                    .from('admin_logs')
+                    .insert({
+                        admin_id: currentUser.id,
+                        admin_name: currentUser.admin.name,
+                        action: 'send_warning',
+                        target_type: 'user',
+                        target_id: userId,
+                        details: { reason }
+                    });
+
+                alert('تم إرسال الإنذار بنجاح');
+
+            } catch (error) {
+                console.error('Error sending warning:', error);
+                showError('حدث خطأ في إرسال الإنذار');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // =====================================================
+        // معالجة نموذج الإجراءات
+        // =====================================================
+        document.getElementById('actionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const userId = document.getElementById('actionUserId').value;
+            const action = document.getElementById('actionType').value;
+            const reason = document.getElementById('actionReason').value;
+            const details = document.getElementById('actionDetails').value;
+            
+            showLoading();
+            try {
+                const newStatus = action === 'suspend' ? 'suspended' : 'banned';
+                
+                const { error } = await supabase
+                    .from('users')
+                    .update({
+                        status: newStatus,
+                        status_reason: reason,
+                        status_details: details,
+                        status_updated_at: new Date(),
+                        status_updated_by: currentUser.id
+                    })
+                    .eq('id', userId);
+
+                if (error) throw error;
+
+                // إنشاء إشعار
+                await supabase
+                    .from('notifications')
+                    .insert({
+                        user_id: userId,
+                        type: 'admin',
+                        title: action === 'suspend' ? 'إيقاف حساب' : 'حظر حساب',
+                        body: `تم ${action === 'suspend' ? 'إيقاف' : 'حظر'} حسابك بسبب: ${reason}`,
+                        data: { action, reason, details }
+                    });
+
+                // تسجيل الإجراء
+                await supabase
+                    .from('admin_logs')
+                    .insert({
+                        admin_id: currentUser.id,
+                        admin_name: currentUser.admin.name,
+                        action: action === 'suspend' ? 'suspend_user' : 'ban_user',
+                        target_type: 'user',
+                        target_id: userId,
+                        details: { reason, details }
+                    });
+
+                closeModal('actionModal');
+                loadUsers();
+                alert(`تم ${action === 'suspend' ? 'إيقاف' : 'حظر'} المستخدم بنجاح`);
+
+            } catch (error) {
+                console.error('Error updating user:', error);
+                showError('حدث خطأ في تنفيذ الإجراء');
+            } finally {
+                hideLoading();
+            }
+        });
+
+        // =====================================================
+        // البحث
+        // =====================================================
+        let searchTimeout;
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            clearTimeout(searchTimeout);
+            const query = e.target.value.trim();
+            
+            if (query.length < 3) {
+                if (query.length === 0) {
+                    loadUsers();
+                }
+                return;
+            }
+            
+            searchTimeout = setTimeout(() => searchUsers(query), 500);
+        });
+
+        async function searchUsers(query) {
+            showLoading();
+            try {
+                const { data: users, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('type', 'user')
+                    .or(`name.ilike.%${query}%,phone.ilike.%${query}%,email.ilike.%${query}%`)
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                const tableBody = document.getElementById('usersTableBody');
+                tableBody.innerHTML = '';
+
+                users.forEach((user, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${user.name || 'غير معروف'}</td>
+                        <td>${user.phone || '-'}</td>
+                        <td>${user.email || '-'}</td>
+                        <td>${user.rating ? '⭐ ' + user.rating.toFixed(1) : '-'}</td>
+                        <td><span class="status-badge status-${user.status}">${getStatusText(user.status)}</span></td>
+                        <td>${formatDate(user.created_at)}</td>
+                        <td>${formatDateTime(user.last_login)}</td>
+                        <td>
+                            <div class="action-group">
+                                <button class="action-btn btn-view" onclick="viewUserDetails('${user.id}')"><i class="fas fa-eye"></i></button>
+                                <button class="action-btn btn-edit" onclick="editUser('${user.id}')"><i class="fas fa-edit"></i></button>
+                                <button class="action-btn btn-suspend" onclick="showActionModal('${user.id}', 'suspend')"><i class="fas fa-pause"></i></button>
+                                <button class="action-btn btn-ban" onclick="showActionModal('${user.id}', 'ban')"><i class="fas fa-ban"></i></button>
+                                <button class="action-btn btn-warn" onclick="sendWarning('${user.id}')"><i class="fas fa-exclamation-triangle"></i></button>
+                            </div>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+
+            } catch (error) {
+                console.error('Error searching users:', error);
+                showError('حدث خطأ في البحث');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // =====================================================
+        // تحميل الإشعارات
+        // =====================================================
+        async function loadNotifications() {
+            if (!currentUser) return;
+            
+            try {
+                const { data: notifications, error } = await supabase
+                    .from('notifications')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .order('created_at', { ascending: false })
+                    .limit(10);
+
+                if (error) throw error;
+
+                let notifHtml = notifications.map(n => `
+                    <div style="padding: 15px; border-bottom: 1px solid #eee;">
+                        <strong>${n.title}</strong>
+                        <p style="margin: 5px 0;">${n.body}</p>
+                        <small style="color: var(--gray);">${formatDateTime(n.created_at)}</small>
+                    </div>
+                `).join('');
+
+                alert(notifHtml || 'لا توجد إشعارات');
+
+            } catch (error) {
+                console.error('Error loading notifications:', error);
+            }
+        }
+
+        // =====================================================
+        // إدارة النوافذ
+        // =====================================================
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // =====================================================
+        // تبديل القائمة الجانبية
+        // =====================================================
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+
+        // =====================================================
+        // تهيئة الصفحة
+        // =====================================================
+        window.addEventListener('load', async function() {
+            showLoading();
+            
+            const user = await checkAuth();
+            if (!user) return;
+
+            await loadSidebarStats();
+            await loadUsers();
+
+            hideLoading();
+
+            document.addEventListener('click', function(event) {
+                const sidebar = document.getElementById('sidebar');
+                const menuToggle = document.querySelector('.menu-toggle');
+                
+                if (window.innerWidth <= 768) {
+                    if (!sidebar.contains(event.target) && !menuToggle.contains(event.target)) {
+                        sidebar.classList.remove('active');
+                    }
+                }
+            });
+        });
+
+        // دالة editUser مؤقتة
+        function editUser(userId) {
+            alert('سيتم إضافة تعديل المستخدم قريباً');
+        }
+    </script>
+</body>
+      </html>
