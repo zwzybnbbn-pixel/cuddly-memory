@@ -88,6 +88,30 @@
                 document.getElementById('loader').innerText = "خطأ في الاتصال بالسيرفر";
             }
         }
+        // داخل دالة startPresence(driver)
+function startPresence(driver) {
+    const channel = _supabase.channel('online-drivers', {
+        config: { presence: { key: driver.id } }
+    });
+
+    channel.subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+            // تتبع الموقع الجغرافي وإرساله رقمياً
+            if ("geolocation" in navigator) {
+                navigator.geolocation.watchPosition(async (position) => {
+                    await channel.track({
+                        id: driver.id,
+                        name: driver.name,
+                        lat: position.coords.latitude.toFixed(6), // خط العرض
+                        lng: position.coords.longitude.toFixed(6), // خط الطول
+                        online_at: new Date().toISOString()
+                    });
+                }, (err) => console.error("إذن الموقع مرفوض"), { enableHighAccuracy: true });
+            }
+        }
+    });
+}
+
 
         window.onload = startDriverSession;
     </script>
