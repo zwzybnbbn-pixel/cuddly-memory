@@ -2,109 +2,196 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=1200"> 
-    <title>توصيلو PRO | عرض الشاشة الكاملة</title>
-    
+    <meta name="viewport" content="width=1200">
+    <title>توصيلو PRO | الشكاوى والاقتراحات</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <style>
-        :root { --primary: #6B2E82; --secondary: #FF6B35; --bg: #f4f7f6; }
-        
-        /* إجبار الجسم على عرض واسع جداً */
+        :root { 
+            --primary: #6B2E82; 
+            --secondary: #FF6B35; 
+            --danger: #e74c3c; 
+            --success: #2ecc71; 
+            --dark: #1a1a1a; 
+            --bg: #f8f9fa;
+        }
+
         body { 
             font-family: 'Cairo', sans-serif; 
             background: var(--bg); 
             margin: 0; 
             display: flex; 
-            min-width: 1200px; /* يمنع الصفحة من الانضغاط في الجوال */
+            min-width: 1200px; /* ضمان عدم انكماش الصفحة */
         }
 
-        /* السايدبار يبقى ثابتاً كما في اللابتوب */
+        /* Sidebar Styling */
         .sidebar { 
             width: 280px; 
-            background: #1a1a1a; 
+            background: var(--dark); 
             height: 100vh; 
-            position: sticky; /* التغيير هنا ليتحرك مع العرض الواسع */
+            position: sticky; 
             top: 0;
+            padding: 20px 0; 
             color: white; 
-            padding: 20px 0;
+            overflow-y: auto; 
             flex-shrink: 0;
+            z-index: 1000; 
         }
+        
+        .sidebar-header { text-align: center; padding-bottom: 20px; border-bottom: 1px solid #333; margin-bottom: 20px; }
+        .nav-item { display: flex; align-items: center; padding: 12px 25px; color: #bbb; text-decoration: none; transition: 0.3s; border-right: 4px solid transparent; }
+        .nav-item i { margin-left: 15px; width: 20px; text-align: center; }
+        .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.05); color: var(--secondary); border-right-color: var(--secondary); }
 
+        /* Main Content */
         .main-content { 
             flex-grow: 1;
             padding: 40px; 
-            min-width: 920px; /* عرض المحتوى لضمان ظهور البطاقات بجانب بعضها */
+            min-height: 100vh; 
+            box-sizing: border-box; 
+            min-width: 920px;
         }
+        
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .filter-bar { display: flex; gap: 10px; margin-bottom: 25px; }
+        .filter-btn { padding: 10px 25px; border-radius: 25px; border: 1px solid #ddd; background: white; cursor: pointer; font-family: 'Cairo'; font-weight: 600; transition: 0.3s; }
+        .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
 
-        /* نظام الشبكة (Grid) يعرض 2 أو 3 بطاقات في السطر الواحد دائماً */
-        #complaintsList { 
-            display: grid; 
-            grid-template-columns: repeat(2, 1fr); /* بطاقتين جنباً إلى جنب دائماً */
-            gap: 20px; 
+        /* نظام عرض البطاقات عريض جداً مثل اللابتوب */
+        #complaintsList {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
         .complaint-card { 
-            background: white; 
-            border-radius: 15px; 
-            padding: 20px; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            border-right: 5px solid var(--secondary);
+            background: white; border-radius: 16px; padding: 25px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-right: 6px solid #ddd;
+            animation: fadeIn 0.5s ease forwards;
         }
 
-        .nav-item { display: flex; align-items: center; padding: 12px 25px; color: #bbb; text-decoration: none; }
-        .nav-item.active { background: var(--primary); color: white; }
-
-        /* تنسيق المحتوى داخل البطاقة */
-        .content-box { background: #f9f9f9; padding: 15px; border-radius: 10px; margin: 10px 0; height: 80px; overflow-y: auto; }
+        .complaint-card.pending { border-right-color: var(--secondary); }
+        .complaint-card.resolved { border-right-color: var(--success); }
         
-        .actions { display: flex; gap: 5px; }
-        .btn { padding: 8px 12px; border-radius: 8px; border: none; font-family: 'Cairo'; cursor: pointer; font-size: 12px; }
+        .header-info { display: flex; justify-content: space-between; align-items: center; }
+        .user-info-row { display: flex; align-items: center; gap: 20px; }
+        
+        .user-tag { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; }
+        .tag-driver { background: #e3f2fd; color: #1976d2; }
+        .tag-client { background: #f3e5f5; color: var(--primary); }
+        
+        .sender-name { font-weight: 800; color: var(--dark); font-size: 18px; }
+        
+        .content-box { background: #fcfaff; padding: 20px; border-radius: 12px; margin: 15px 0; font-size: 15px; border: 1px dashed #e0d0e6; color: #444; }
+        
+        .actions { display: flex; gap: 10px; }
+        .btn { padding: 8px 18px; border-radius: 10px; border: none; cursor: pointer; font-family: 'Cairo'; font-weight: 700; display: flex; align-items: center; gap: 8px; font-size: 14px; transition: 0.2s; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-phone { background: #f0f0f0; color: #333; }
+        .btn-whatsapp { background: #25D366; color: white; }
     </style>
 </head>
 <body>
 
     <aside class="sidebar">
-        <div style="text-align: center; padding-bottom: 20px;">
-            <h2 style="color: var(--secondary);">توصيلو 🛵</h2>
+        <div class="sidebar-header">
+            <h2 style="color: var(--secondary); margin:0;">توصيلو 🛵</h2>
+            <small style="color: #666;">إدارة الدعم الفني</small>
         </div>
         <nav>
             <a href="index.html" class="nav-item"><i class="fas fa-chart-pie"></i> الإحصائيات العامة</a>
             <a href="users_admin.html" class="nav-item"><i class="fas fa-users"></i> إدارة المواطنين</a>
             <a href="drivers_admin.html" class="nav-item"><i class="fas fa-motorcycle"></i> إدارة السائقين</a>
-            <a href="complaints.html" class="nav-item active"><i class="fas fa-exclamation-circle"></i> الشكاوى</a>
-            <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i> الإعدادات</a>
+            <a href="trips.html" class="nav-item"><i class="fas fa-route"></i> سجل الرحلات</a>
+            <a href="audit.html" class="nav-item"><i class="fas fa-wallet"></i> الجرد المالي</a>
+            <a href="complaints.html" class="nav-item active"><i class="fas fa-exclamation-circle"></i> الشكاوى والاقتراحات</a>
+            <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i> إعدادات النظام</a>
         </nav>
     </aside>
 
     <main class="main-content">
-        <h1>صندوق الشكاوى (عرض الكمبيوتر) 🖥️</h1>
-        
-        <div id="complaintsList">
+        <div class="page-header">
+            <div>
+                <h1>صندوق الشكاوى 📬</h1>
+                <p id="totalPending" style="color: var(--secondary); font-weight: bold;"></p>
             </div>
+            <button onclick="loadComplaints()" class="btn btn-phone" style="background: white; border: 1px solid #ddd;">تحديث البيانات <i class="fas fa-sync"></i></button>
+        </div>
+
+        <div class="filter-bar">
+            <button class="filter-btn active" onclick="filterComplaints('all', this)">الكل</button>
+            <button class="filter-btn" onclick="filterComplaints('pending', this)">بانتظار الحل ⚠️</button>
+            <button class="filter-btn" onclick="filterComplaints('resolved', this)">تم الحل ✅</button>
+        </div>
+
+        <div id="complaintsList"></div>
     </main>
 
     <script>
-        // كود الجلب من سوبابيس (نفس الكود السابق)
+        let allComplaints = [];
+
         async function loadComplaints() {
-            const { data, error } = await _supabase.from('complaints').select('*, users!user_id(*)').order('created_at', { ascending: false });
-            if (!error) {
-                const list = document.getElementById('complaintsList');
-                list.innerHTML = data.map(c => `
-                    <div class="complaint-card">
-                        <div style="font-weight:bold;">${c.users?.name || 'مستخدم'}</div>
-                        <div class="content-box">${c.content}</div>
-                        <div class="actions">
-                            <button class="btn" style="background:#25D366; color:white;">واتساب</button>
-                            <button class="btn" style="background:var(--primary); color:white;">حل الشكوى</button>
-                        </div>
-                    </div>
-                `).join('');
-            }
+            const { data: complaints, error } = await _supabase
+                .from('complaints')
+                .select('*, users!user_id ( name, phone, type )')
+                .order('created_at', { ascending: false });
+
+            if (error) { alert("خطأ في جلب البيانات"); return; }
+            allComplaints = complaints;
+            renderComplaints(allComplaints);
+            const pendingCount = complaints.filter(c => c.status !== 'resolved').length;
+            document.getElementById('totalPending').innerText = `لديك ${pendingCount} شكوى تحتاج لتدخل حالياً`;
         }
+
+        function renderComplaints(data) {
+            const list = document.getElementById('complaintsList');
+            list.innerHTML = data.length === 0 ? '<p>لا توجد رسائل.</p>' : '';
+
+            data.forEach(c => {
+                const user = c.users || { name: 'مستخدم محذوف', phone: '', type: 'unknown' };
+                const date = new Date(c.created_at).toLocaleString('ar-EG');
+                const isResolved = c.status === 'resolved';
+
+                list.innerHTML += `
+                    <div class="complaint-card ${isResolved ? 'resolved' : 'pending'}">
+                        <div class="header-info">
+                            <div class="user-info-row">
+                                <span class="user-tag ${user.type === 'driver' ? 'tag-driver' : 'tag-client'}">
+                                    ${user.type === 'driver' ? 'سائق' : 'عميل'}
+                                </span>
+                                <span class="sender-name">${user.name}</span>
+                                <span style="color:#999; font-size:13px;"><i class="far fa-clock"></i> ${date}</span>
+                            </div>
+                            <div class="actions">
+                                <a href="https://wa.me/${user.phone}" target="_blank" class="btn btn-whatsapp"><i class="fab fa-whatsapp"></i> واتساب</a>
+                                <a href="tel:${user.phone}" class="btn btn-phone"><i class="fas fa-phone-alt"></i> اتصال</a>
+                                ${!isResolved ? `<button class="btn btn-success" onclick="resolveComplaint('${c.id}')">إغلاق الشكوى ✅</button>` : 
+                                '<span style="color:var(--success); font-weight:bold;">تم المعالجة</span>'}
+                            </div>
+                        </div>
+                        <h3 style="margin: 15px 0 5px 0; font-size: 16px;">الموضوع: ${c.title || 'بدون عنوان'}</h3>
+                        <div class="content-box">${c.content}</div>
+                    </div>
+                `;
+            });
+        }
+
+        function filterComplaints(status, btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            if(status === 'all') renderComplaints(allComplaints);
+            else if(status === 'pending') renderComplaints(allComplaints.filter(c => c.status !== 'resolved'));
+            else renderComplaints(allComplaints.filter(c => c.status === 'resolved'));
+        }
+
+        async function resolveComplaint(id) {
+            if(!confirm("تم الحل؟")) return;
+            const { error } = await _supabase.from('complaints').update({ status: 'resolved' }).eq('id', id);
+            if (!error) loadComplaints();
+        }
+
         window.onload = loadComplaints;
     </script>
 </body>
