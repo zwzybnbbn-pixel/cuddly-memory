@@ -11,92 +11,130 @@
         :root { --primary: #6B2E82; --secondary: #FF6B35; --success: #2ecc71; --danger: #e74c3c; --dark: #1a1a1a; }
         body { font-family: 'Cairo', sans-serif; background: #f4f7f6; margin: 0; display: flex; }
         
-        .sidebar { width: 260px; background: var(--dark); height: 100vh; position: fixed; padding: 20px; color: white; }
-        .main-content { margin-right: 260px; width: calc(100% - 260px); padding: 40px; }
+        /* Sidebar */
+        .sidebar { 
+            width: 260px; background: var(--dark); height: 100vh; position: fixed; 
+            padding: 20px; color: white; box-sizing: border-box; z-index: 1000; 
+        }
         
-        .request-card { background: white; border-radius: 20px; padding: 25px; margin-bottom: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border-right: 6px solid var(--secondary); }
+        .nav-item { 
+            padding: 12px 15px; border-radius: 12px; cursor: pointer; display: flex; 
+            align-items: center; gap: 12px; color: #ccc; text-decoration: none; 
+            margin-bottom: 8px; transition: 0.3s; font-size: 14px; font-weight: 600;
+        }
+        .nav-item i { width: 20px; text-align: center; }
+        .nav-item:hover { background: rgba(255, 255, 255, 0.05); color: white; }
+        .nav-item.active { background: var(--primary); color: white; }
+
+        /* Main Content */
+        .main-content { margin-right: 260px; width: calc(100% - 260px); padding: 40px; box-sizing: border-box; }
+        
+        .request-card { 
+            background: white; border-radius: 20px; padding: 25px; margin-bottom: 25px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); border-right: 6px solid var(--secondary); 
+        }
         .driver-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         
         /* تصميم عرض الصور */
-        .documents-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 20px 0; }
+        .documents-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
         .doc-item { text-align: center; }
-        .doc-item img { width: 100%; height: 150px; object-fit: cover; border-radius: 12px; border: 2px solid #eee; cursor: pointer; transition: 0.3s; }
-        .doc-item img:hover { transform: scale(1.05); border-color: var(--primary); }
-        .doc-label { font-size: 12px; font-weight: bold; margin-top: 5px; color: #555; }
+        .doc-item img { width: 100%; height: 180px; object-fit: cover; border-radius: 12px; border: 2px solid #eee; cursor: pointer; transition: 0.3s; }
+        .doc-item img:hover { transform: scale(1.03); border-color: var(--primary); }
+        .doc-label { font-size: 13px; font-weight: bold; margin-top: 8px; color: #555; }
 
-        .btn { border: none; padding: 12px 25px; border-radius: 10px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; font-size: 14px; }
+        .btn { border: none; padding: 12px 25px; border-radius: 10px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; font-size: 14px; transition: 0.2s; }
         .btn-approve { background: var(--success); color: white; }
-        .btn-reject { background: var(--danger); color: white; }
+        .btn-approve:hover { background: #27ae60; }
+        .btn-reject { background: var(--danger); color: white; margin-right: 10px; }
+        .btn-reject:hover { background: #c0392b; }
 
         /* Modal للتكبير */
-        #imgModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; }
-        #imgModal img { max-width: 90%; max-height: 90%; border-radius: 10px; }
+        #imgModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; cursor: zoom-out; }
+        #imgModal img { max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <h2 style="color: var(--secondary); text-align: center;">توصيلو 🛵</h2>
+        <h2 style="color: var(--secondary); text-align: center; margin-bottom: 30px; font-weight: 800;">توصيلو 🛵</h2>
 
-        <a href="index.html" class="nav-item active"><i class="fas fa-chart-line"></i> الإحصائيات العامة</a>
+        <a href="index.html" class="nav-item"><i class="fas fa-chart-line"></i> الإحصائيات العامة</a>
         <a href="users_admin.html" class="nav-item"><i class="fas fa-user-friends"></i> عرض المواطنين</a>
         <a href="drivers_admin.html" class="nav-item"><i class="fas fa-id-card"></i> إدارة السائقين</a>
         <a href="users.html" class="nav-item"><i class="fas fa-users-cog"></i> الكل (سائقين ومواطنين)</a>
-                <a href="report.html" class="nav-item"><i class="fas fa-route"></i> التقارير</a>
+        <a href="requests.html" class="nav-item active"><i class="fas fa-file-signature"></i> طلبات التسجيل</a>
         <a href="trips.html" class="nav-item"><i class="fas fa-route"></i> سجل الرحلات</a>
         <a href="audit.html" class="nav-item"><i class="fas fa-file-invoice-dollar"></i> الجرد المالي</a>
+        <a href="report.html" class="nav-item"><i class="fas fa-file-alt"></i> التقارير</a>
         <a href="complaints.html" class="nav-item"><i class="fas fa-exclamation-triangle"></i> الشكاوى والاقتراحات</a>
         <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i> إعدادات النظام</a>
     </div>
 
     <div class="main-content">
-        <h1>مراجعة طلبات السائقين والمستندات 📄</h1>
+        <header style="margin-bottom: 30px;">
+            <h1 style="margin:0; color: var(--dark);">مراجعة طلبات السائقين 📄</h1>
+            <p style="color: #777;">تحقق من هوية الكباتن الجدد والمستندات المرفقة قبل التفعيل</p>
+        </header>
+
         <div id="requestsList">
-            </div>
+            <p style="text-align: center; padding: 50px; color: #999;">جاري تحميل الطلبات...</p>
+        </div>
     </div>
 
     <div id="imgModal" onclick="this.style.display='none'"><img id="modalImg"></div>
 
     <script>
         async function loadRequests() {
+            // جلب البيانات مع التأكد من ترتيبها (الأحدث أولاً)
             const { data: drivers, error } = await _supabase
                 .from('users')
                 .select('*')
                 .eq('type', 'driver')
-                .eq('account_status', 'pending');
+                .eq('account_status', 'pending')
+                .order('created_at', { ascending: false });
 
             const list = document.getElementById('requestsList');
-            list.innerHTML = (drivers && drivers.length > 0) ? '' : '<p>لا توجد طلبات معلقة حالياً.</p>';
+            
+            if (error) {
+                list.innerHTML = `<p style="color:red">خطأ في تحميل البيانات: ${error.message}</p>`;
+                return;
+            }
+
+            list.innerHTML = (drivers && drivers.length > 0) ? '' : `
+                <div style="text-align:center; padding:100px; background:white; border-radius:20px;">
+                    <i class="fas fa-check-circle" style="font-size:50px; color:var(--success); margin-bottom:15px;"></i>
+                    <p style="font-weight:bold; color:#555;">لا توجد طلبات معلقة حالياً. العمل نظيف!</p>
+                </div>`;
 
             drivers.forEach(driver => {
-                // ملاحظة: نفترض أن أسماء الصور مخزنة في الحقول أدناه في جدول users
-                // أو نستخدم رابط سوبابيس المباشر إذا كان التخزين عاماً (Public)
-                const storageURL = "https://[YOUR_PROJECT_ID].supabase.co/storage/v1/object/public/documents/";
-
                 list.innerHTML += `
                     <div class="request-card">
                         <div class="driver-header">
                             <div>
-                                <h2 style="margin:0">${driver.name}</h2>
-                                <p style="color:#666"><i class="fas fa-phone"></i> ${driver.phone} | <i class="fas fa-car"></i> ${driver.car_type || 'نوع السيارة غير محدد'}</p>
+                                <h2 style="margin:0; color:var(--primary);">${driver.name}</h2>
+                                <p style="color:#666; margin-top:5px;">
+                                    <i class="fas fa-phone"></i> ${driver.phone} | 
+                                    <i class="fas fa-car"></i> ${driver.car_type || 'نوع السيارة غير محدد'} |
+                                    <i class="fas fa-calendar-alt"></i> ${new Date(driver.created_at).toLocaleDateString('ar-YE')}
+                                </p>
                             </div>
                             <div class="actions">
-                                <button class="btn btn-approve" onclick="updateStatus('${driver.id}', 'active')">قبول السائق ✅</button>
-                                <button class="btn btn-reject" onclick="rejectPrompt('${driver.id}')">رفض الطلب ❌</button>
+                                <button class="btn btn-approve" onclick="updateStatus('${driver.id}', 'active')">قبول وتفعيل ✅</button>
+                                <button class="btn btn-reject" onclick="rejectPrompt('${driver.id}')">رفض ❌</button>
                             </div>
                         </div>
 
                         <div class="documents-grid">
                             <div class="doc-item">
-                                <img src="${driver.id_card_url || 'https://via.placeholder.com/150'}" onclick="viewImg(this.src)">
+                                <img src="${driver.id_card_url || 'https://via.placeholder.com/300x200?text=No+Image'}" onclick="viewImg(this.src)">
                                 <div class="doc-label">صورة الهوية / الإقامة</div>
                             </div>
                             <div class="doc-item">
-                                <img src="${driver.license_url || 'https://via.placeholder.com/150'}" onclick="viewImg(this.src)">
+                                <img src="${driver.license_url || 'https://via.placeholder.com/300x200?text=No+Image'}" onclick="viewImg(this.src)">
                                 <div class="doc-label">رخصة القيادة</div>
                             </div>
                             <div class="doc-item">
-                                <img src="${driver.car_img_url || 'https://via.placeholder.com/150'}" onclick="viewImg(this.src)">
+                                <img src="${driver.car_img_url || 'https://via.placeholder.com/300x200?text=No+Image'}" onclick="viewImg(this.src)">
                                 <div class="doc-label">صورة السيارة</div>
                             </div>
                         </div>
@@ -116,14 +154,18 @@
 
             const { error } = await _supabase.from('users').update(updates).eq('id', id);
             if (!error) {
-                alert(status === 'active' ? "تم تفعيل الحساب بنجاح" : "تم رفض الطلب");
+                alert(status === 'active' ? "تم تفعيل حساب الكابتن بنجاح" : "تم إرسال سبب الرفض للسائق");
                 loadRequests();
+            } else {
+                alert("حدث خطأ: " + error.message);
             }
         }
 
         function rejectPrompt(id) {
-            const reason = prompt("يرجى كتابة سبب الرفض (سيظهر للسائق):", "الصور غير واضحة");
-            if (reason) updateStatus(id, 'rejected', reason);
+            const reason = prompt("يرجى كتابة سبب الرفض بوضوح (سيظهر للسائق في التطبيق):", "الصور المرفقة غير واضحة، يرجى إعادة التصوير");
+            if (reason !== null) { // إذا لم يضغط إلغاء
+                updateStatus(id, 'rejected', reason);
+            }
         }
 
         window.onload = loadRequests;
