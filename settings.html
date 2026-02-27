@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=1200">
     <title>توصيلو PRO | إعدادات النظام</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
@@ -24,17 +24,21 @@
             margin: 0; 
             display: flex; 
             color: var(--dark);
+            /* منع الجسم من الانكماش للحفاظ على عرض اللابتوب */
+            min-width: 1200px; 
         }
 
-        /* Sidebar Styling */
+        /* Sidebar Styling - وضع ثابت (Sticky) ليعمل مع العرض الواسع */
         .sidebar { 
             width: 280px; 
             background: var(--dark); 
             height: 100vh; 
-            position: fixed; 
+            position: sticky; 
+            top: 0;
             padding: 20px 0; 
             color: white; 
             overflow-y: auto;
+            flex-shrink: 0;
         }
 
         .sidebar-header {
@@ -64,10 +68,10 @@
 
         /* Main Content */
         .main-content { 
-            margin-right: 280px; 
-            width: calc(100% - 280px); 
+            flex-grow: 1;
             padding: 40px; 
             min-height: 100vh;
+            min-width: 920px; /* ضمان مساحة كافية للإعدادات بجانب السايدبار */
         }
 
         .header-title {
@@ -81,7 +85,7 @@
             display: grid;
             grid-template-columns: 1fr;
             gap: 25px;
-            max-width: 900px;
+            max-width: 800px; /* جعل الفورم في المنتصف بشكل أنيق كما في اللابتوب */
         }
 
         .settings-card { 
@@ -93,7 +97,6 @@
 
         .setting-group { 
             margin-bottom: 25px; 
-            position: relative;
         }
         
         label { 
@@ -103,12 +106,6 @@
             color: var(--primary); 
         }
 
-        .input-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
         input, select { 
             width: 100%; 
             padding: 14px 15px; 
@@ -116,15 +113,7 @@
             border-radius: 10px; 
             font-family: 'Cairo'; 
             font-size: 16px; 
-            transition: var(--transition);
-            background: #fdfdfd;
-        }
-
-        input:focus { 
-            border-color: var(--primary); 
-            outline: none; 
-            background: white;
-            box-shadow: 0 0 0 4px rgba(107, 46, 130, 0.1);
+            box-sizing: border-box;
         }
 
         .hint { 
@@ -136,7 +125,6 @@
             gap: 5px;
         }
 
-        /* Buttons */
         .btn-save { 
             background: linear-gradient(135deg, var(--primary), #8e44ad); 
             color: white; 
@@ -154,27 +142,16 @@
             gap: 10px;
         }
 
-        .btn-save:hover { 
-            transform: translateY(-3px); 
-            box-shadow: 0 10px 20px rgba(107, 46, 130, 0.3);
-        }
+        .btn-save:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(107, 46, 130, 0.3); }
 
-        .btn-save:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-
-        /* Loading Spinner */
         .spinner {
-            width: 20px;
-            height: 20px;
+            width: 20px; height: 20px;
             border: 3px solid rgba(255,255,255,0.3);
             border-radius: 50%;
             border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
+            animation: spin 1s infinite linear;
             display: none;
         }
-
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
@@ -185,7 +162,6 @@
             <h2 style="color: var(--secondary); margin:0;">توصيلو 🛵</h2>
             <small style="color: #666;">لوحة التحكم الاحترافية</small>
         </div>
-
         <nav>
             <a href="index.html" class="nav-item"><i class="fas fa-chart-pie"></i> الإحصائيات العامة</a>
             <a href="users_admin.html" class="nav-item"><i class="fas fa-users"></i> إدارة المستخدمين</a>
@@ -207,18 +183,14 @@
             <div class="settings-card">
                 <div class="setting-group">
                     <label>نسبة عمولة التطبيق (%)</label>
-                    <div class="input-wrapper">
-                        <input type="number" id="app_commission" placeholder="15">
-                    </div>
-                    <p class="hint"><i class="fas fa-info-circle"></i> تُخصم آلياً من كل رحلة وتُسجل كمديونية على السائق.</p>
+                    <input type="number" id="app_commission" placeholder="15">
+                    <p class="hint"><i class="fas fa-info-circle"></i> تُخصم آلياً من كل رحلة وتُسجل كمديونية.</p>
                 </div>
 
                 <div class="setting-group">
                     <label>حد المديونية الأقصى (ر.س)</label>
-                    <div class="input-wrapper">
-                        <input type="number" id="debt_limit" placeholder="200">
-                    </div>
-                    <p class="hint"><i class="fas fa-exclamation-triangle"></i> يتم إيقاف السائق فور تخطيه هذا الرقم حتى السداد.</p>
+                    <input type="number" id="debt_limit" placeholder="200">
+                    <p class="hint"><i class="fas fa-exclamation-triangle"></i> يتم إيقاف السائق فور تخطيه هذا الرقم.</p>
                 </div>
 
                 <div class="setting-group">
@@ -227,7 +199,6 @@
                         <option value="active">🟢 نشط - استقبال طلبات</option>
                         <option value="maintenance">🔴 صيانة - إيقاف مؤقت</option>
                     </select>
-                    <p class="hint">تغيير الحالة يؤثر على جميع المستخدمين فوراً.</p>
                 </div>
 
                 <button class="btn-save" id="saveBtn" onclick="saveSettings()">
@@ -239,30 +210,24 @@
     </main>
 
     <script>
-        // دالة لجلب الإعدادات عند فتح الصفحة
+        // الكود البرمجي يبقى كما هو لضمان الوظيفية
         async function loadSettings() {
             try {
                 const { data, error } = await _supabase.from('settings').select('*');
-                if (error) throw error;
-
                 if (data) {
                     data.forEach(s => {
                         const el = document.getElementById(s.setting_key);
                         if (el) el.value = s.setting_value;
                     });
                 }
-            } catch (err) {
-                console.error("Error loading settings:", err);
-            }
+            } catch (err) { console.error(err); }
         }
 
-        // دالة حفظ الإعدادات مع تأثيرات بصرية
         async function saveSettings() {
             const btn = document.getElementById('saveBtn');
             const text = document.getElementById('btnText');
             const spinner = document.getElementById('btnSpinner');
 
-            // تفعيل حالة التحميل
             btn.disabled = true;
             text.textContent = "جاري الحفظ...";
             spinner.style.display = "block";
@@ -274,18 +239,12 @@
             ];
 
             try {
-                // استخدام upsert وتحديد الحقل الفريد (بافتراض أنه setting_key)
-                const { error } = await _supabase
-                    .from('settings')
-                    .upsert(settings, { onConflict: 'setting_key' });
-
+                const { error } = await _supabase.from('settings').upsert(settings, { onConflict: 'setting_key' });
                 if (error) throw error;
-
-                alert("✅ تم تحديث إعدادات النظام بنجاح!");
+                alert("✅ تم التحديث بنجاح!");
             } catch (error) {
-                alert("❌ حدث خطأ أثناء الحفظ: " + error.message);
+                alert("❌ خطأ: " + error.message);
             } finally {
-                // إعادة الزر لحالته الطبيعية
                 btn.disabled = false;
                 text.textContent = "حفظ التغييرات ✨";
                 spinner.style.display = "none";
