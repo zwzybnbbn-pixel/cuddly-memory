@@ -11,26 +11,70 @@
     
     <style>
         :root { --primary: #6B2E82; --secondary: #FF6B35; --success: #27AE60; --danger: #EB5757; --bg: #f4f7f6; }
-        body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; display: flex; }
+        body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; display: flex; overflow-x: hidden; }
         
+        /* شاشة الترحيب (Welcome Overlay) */
+        #welcome-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(26, 26, 26, 0.98); /* لون داكن فخم */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+        .welcome-card {
+            background: white;
+            padding: 40px;
+            border-radius: 30px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            max-width: 450px;
+            width: 90%;
+            border-top: 8px solid var(--secondary);
+            animation: slideUp 0.6s ease-out;
+        }
+        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .welcome-card i { font-size: 60px; color: var(--primary); margin-bottom: 20px; }
+        .welcome-card h2 { color: #1a1a1a; margin-bottom: 10px; font-weight: 800; }
+        .welcome-card p { color: #666; margin-bottom: 30px; line-height: 1.6; }
+        
+        .btn-enter {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px 50px;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Cairo';
+            transition: 0.3s;
+            box-shadow: 0 10px 20px rgba(107, 46, 130, 0.3);
+        }
+        .btn-enter:hover { background: var(--secondary); transform: scale(1.05); }
+
         /* Sidebar */
-        .sidebar { width: 260px; background: #1a1a1a; color: white; height: 100vh; position: fixed; padding: 20px; box-sizing: border-box; z-index: 1000; overflow-y: auto; }
+        .sidebar { width: 260px; background: #1a1a1a; color: white; height: 100vh; position: fixed; padding: 20px; box-sizing: border-box; z-index: 1000; }
         .nav-item { padding: 12px 15px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; color: #ccc; text-decoration: none; margin-bottom: 5px; transition: 0.3s; font-size: 14px; }
         .nav-item:hover, .nav-item.active { background: var(--primary); color: white; }
-        .nav-item i { width: 20px; text-align: center; }
 
         .main { margin-right: 260px; width: calc(100% - 260px); padding: 40px; box-sizing: border-box; }
         
-        /* Stats Grid */
+        /* Stats & Grid */
         .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 25px; }
         .stat-card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-right: 5px solid transparent; }
         .stat-card h2 { margin: 10px 0 0 0; font-size: 24px; font-weight: 800; }
         .stat-card small { color: #888; font-weight: 600; display: flex; align-items: center; gap: 8px; }
         
-        /* Table Style */
         .table-card { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th { text-align: right; color: #666; border-bottom: 2px solid #eee; padding: 12px; font-size: 13px; }
+        th { text-align: right; color: #666; border-bottom: 2px solid #eee; padding: 12px; }
         td { padding: 15px; border-bottom: 1px solid #f9f9f9; font-size: 14px; }
         
         .badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
@@ -43,9 +87,17 @@
 </head>
 <body>
 
+    <div id="welcome-screen">
+        <div class="welcome-card">
+            <i class="fas fa-user-shield"></i>
+            <h2>مرحباً بك أيها المدير</h2>
+            <p>أهلاً بك في لوحة تحكم تطبيق <b>توصيلو PRO</b>. يمكنك الآن متابعة الإحصائيات، إدارة الرحلات، ومراقبة أداء النظام بالكامل.</p>
+            <button class="btn-enter" onclick="hideWelcome()">دخول النظام</button>
+        </div>
+    </div>
+
     <div class="sidebar">
         <h2 style="color: var(--secondary); text-align: center; margin-bottom: 30px;">توصيلو 🛵</h2>
-        
         <a href="index.html" class="nav-item active"><i class="fas fa-chart-line"></i> الإحصائيات العامة</a>
         <a href="users_admin.html" class="nav-item"><i class="fas fa-user-friends"></i> عرض المواطنين</a>
         <a href="drivers_admin.html" class="nav-item"><i class="fas fa-id-card"></i> إدارة السائقين</a>
@@ -53,7 +105,7 @@
         <a href="requests.html" class="nav-item"><i class="fas fa-user-plus"></i> طلبات التسجيل</a>
         <a href="trips.html" class="nav-item"><i class="fas fa-route"></i> سجل الرحلات</a>
         <a href="audit.html" class="nav-item"><i class="fas fa-file-invoice-dollar"></i> الجرد المالي</a>
-                        <a href="report.html" class="nav-item"><i class="fas fa-route"></i> التقارير </a>
+        <a href="report.html" class="nav-item"><i class="fas fa-route"></i> التقارير </a>
         <a href="complaints.html" class="nav-item"><i class="fas fa-exclamation-triangle"></i> الشكاوى والاقتراحات</a>
         <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i> إعدادات النظام</a>
     </div>
@@ -113,13 +165,22 @@
                     </tr>
                 </thead>
                 <tbody id="activity-table">
-                    <tr><td colspan="6" style="text-align:center;">اضغط على تحديث لجلب البيانات...</td></tr>
+                    <tr><td colspan="6" style="text-align:center;">جاري جلب البيانات...</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 
     <script>
+        // دالة إخفاء شاشة الترحيب
+        function hideWelcome() {
+            const welcomeScreen = document.getElementById('welcome-screen');
+            welcomeScreen.style.opacity = '0';
+            setTimeout(() => {
+                welcomeScreen.style.display = 'none';
+            }, 500);
+        }
+
         async function fetchAnalytics() {
             try {
                 const { data: trips } = await _supabase.from('trips').select('*, passenger:user_id(name), driver:driver_id(name)');
@@ -153,7 +214,6 @@
 
             } catch (err) {
                 console.error(err);
-                alert("خطأ في جلب البيانات");
             }
         }
 
