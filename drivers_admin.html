@@ -98,8 +98,9 @@
 
     <div class="sidebar">
         <h2 style="color: var(--secondary); text-align: center; margin-bottom: 40px;">توصيلو 🛵</h2>
-        <a href="index.html" class="nav-item active"><i class="fas fa-chart-line"></i> الإحصائيات العامة</a>
+        <a href="index.html" class="nav-item"><i class="fas fa-chart-line"></i> الإحصائيات العامة</a>
         <a href="users_admin.html" class="nav-item"><i class="fas fa-user-friends"></i> عرض المواطنين</a>
+        <a href="drivers_admin.html" class="nav-item active"><i class="fas fa-id-card"></i> إدارة السائقين</a>
         <a href="users.html" class="nav-item"><i class="fas fa-users-cog"></i> الكل (سائقين ومواطنين)</a>
         <a href="requests.html" class="nav-item"><i class="fas fa-user-plus"></i> طلبات التسجيل</a>
         <a href="trips.html" class="nav-item"><i class="fas fa-route"></i> سجل الرحلات</a>
@@ -112,7 +113,7 @@
     <div class="main">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
             <div>
-                <h1 style="margin:0">إدارة الأسطول 🚛</h1>
+                <h1 style="margin:0">إدارة الأسطول - عتق 🚛</h1>
                 <p style="color:#777; margin:5px 0 0">مراقبة التقييمات والحالة التشغيلية</p>
             </div>
             <button onclick="openAddModal()" style="background:var(--primary); color:white; padding:12px 25px; border-radius:15px; font-weight:bold;">
@@ -152,7 +153,8 @@
     </div>
 
     <script>
-        let map = L.map('map').setView([24.7136, 46.6753], 12);
+        // تم التعديل هنا ليفتح على عتق، شبوة مباشرة
+        let map = L.map('map').setView([14.5377, 46.8319], 14);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
         let markers = {};
         let allDrivers = [];
