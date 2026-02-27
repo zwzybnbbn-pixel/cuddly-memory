@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>توصيلو - المستخدمين</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Same sidebar as dashboard.html -->
+        <div class="sidebar">
+            <!-- ... sidebar content ... -->
+        </div>
+        
+        <div class="main-content">
+            <header class="header">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="ابحث عن مستخدم...">
+                </div>
+                <div class="header-actions">
+                    <div class="notifications">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge">3</span>
+                    </div>
+                </div>
+            </header>
+            
+            <div class="content">
+                <div class="page-header">
+                    <h2 class="page-title">المستخدمين</h2>
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" data-filter="all">الكل</button>
+                        <button class="filter-btn" data-filter="active">نشط</button>
+                        <button class="filter-btn" data-filter="suspended">موقوف</button>
+                        <button class="filter-btn" data-filter="banned">محظور</button>
+                    </div>
+                </div>
+                
+                <table class="table" id="usersTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>الاسم</th>
+                            <th>رقم الجوال</th>
+                            <th>البريد الإلكتروني</th>
+                            <th>تاريخ التسجيل</th>
+                            <th>الحالة</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <!-- Dynamic content -->
+                    </tbody>
+                </table>
+                
+                <div class="pagination">
+                    <button class="page-btn" id="prevPage"><i class="fas fa-chevron-right"></i></button>
+                    <span id="pageInfo">صفحة 1 من 10</span>
+                    <button class="page-btn" id="nextPage"><i class="fas fa-chevron-left"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="../js/firebase-config.js"></script>
+    <script src="../js/users.js"></script>
+</body>
+</html>

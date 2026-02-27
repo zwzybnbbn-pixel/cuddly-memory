@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>توصيلو | إدارة المستخدمين</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --primary: #6B2E82; --secondary: #FF6B35; --danger: #e74c3c; --success: #2ecc71; --bg: #f8f9fa; }
+        body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; display: flex; }
+        
+        /* Sidebar */
+        .sidebar { width: 280px; background: #1a1a1a; color: white; height: 100vh; position: fixed; padding: 20px; }
+        .sidebar h2 { color: var(--secondary); text-align: center; margin-bottom: 40px; }
+        .nav-item { padding: 15px; border-radius: 12px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 10px; color: #ccc; text-decoration: none; }
+        .nav-item:hover, .nav-item.active { background: var(--primary); color: white; }
+
+        /* Main Content */
+        .main { margin-right: 280px; width: calc(100% - 280px); padding: 30px; }
+        
+        /* Table Style */
+        .table-container { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-top: 20px; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: right; }
+        th { padding: 15px; border-bottom: 2px solid #eee; color: #666; }
+        td { padding: 15px; border-bottom: 1px solid #eee; font-size: 14px; }
+        
+        /* Badges */
+        .badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; color: white; }
+        .status-active { background: var(--success); }
+        .status-suspended { background: #f1c40f; }
+        .status-banned { background: var(--danger); }
+
+        /* Actions Buttons */
+        .btn-action { border: none; background: none; cursor: pointer; margin: 0 3px; font-size: 16px; transition: 0.2s; }
+        .btn-edit { color: var(--primary); }
+        .btn-ban { color: var(--danger); }
+        .btn-add { background: var(--primary); color: white; padding: 10px 20px; border-radius: 10px; border: none; cursor: pointer; float: left; }
+
+        /* Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; }
+        .modal-content { background: white; padding: 30px; border-radius: 20px; width: 450px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; }
+        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>توصيلو 🛵</h2>
+
+        <a href="index.html" class="nav-item active"><i class="fas fa-chart-line"></i> الإحصائيات العامة</a>
+        <a href="users_admin.html" class="nav-item"><i class="fas fa-user-friends"></i> عرض المواطنين</a>
+        <a href="drivers_admin.html" class="nav-item"><i class="fas fa-id-card"></i> إدارة السائقين</a>
+</a>
+                <a href="report.html" class="nav-item"><i class="fas fa-route"></i> التقارير<
+        <a href="requests.html" class="nav-item"><i class="fas fa-user-plus"></i> طلبات التسجيل</a>
+        <a href="trips.html" class="nav-item"><i class="fas fa-route"></i> سجل الرحلات</a>
+        <a href="audit.html" class="nav-item"><i class="fas fa-file-invoice-dollar"></i> الجرد المالي</a>
+        <a href="complaints.html" class="nav-item"><i class="fas fa-exclamation-triangle"></i> الشكاوى والاقتراحات</a>
+        <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i> إعدادات النظام
+    </div>
+
+    <div class="main">
+        <header style="display: flex; justify-content: space-between; align-items: center;">
+            <h1>إدارة المستخدمين 👥</h1>
+            <button class="btn-add" onclick="showAddModal()"><i class="fas fa-plus"></i> إضافة مستخدم جديد</button>
+        </header>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>الاسم</th>
+                        <th>الجوال</th>
+                        <th>النوع</th>
+                        <th>الحالة</th>
+                        <th>تاريخ التسجيل</th>
+                        <th>آخر ظهور</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="addModal" class="modal">
+        <div class="modal-content">
+            <h3>إضافة مستخدم جديد</h3>
+            <div class="form-group">
+                <label>الاسم الكامل</label>
+                <input type="text" id="newName">
+            </div>
+            <div class="form-group">
+                <label>رقم الجوال</label>
+                <input type="text" id="newPhone">
+            </div>
+            <div class="form-group">
+                <label>النوع</label>
+                <select id="newType">
+                    <option value="user">مواطن (User)</option>
+                    <option value="driver">سائق (Driver)</option>
+                </select>
+            </div>
+            <button class="btn-add" style="float: none; width: 100%;" onclick="saveUser()">حفظ البيانات</button>
+            <button onclick="closeModal()" style="width: 100%; background: none; border: none; margin-top: 10px; cursor: pointer;">إلغاء</button>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://nqothizwtmvbvyrxoguz.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5xb3RoaXp3dG12YnZ5cnhvZ3V6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwMjc2ODEsImV4cCI6MjA4MjYwMzY4MX0.Hah1FyYJT-dQI0byUO7pNKB3NZqzkyICPh_0D_zdzis';
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function loadUsers() {
+    const tbody = document.getElementById('usersTableBody');
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">جاري التحميل...</td></tr>';
+
+    const { data: users, error } = await _supabase
+        .from('users')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:red;">خطأ: ${error.message}</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = ''; // مسح رسالة التحميل
+
+    users.forEach(user => {
+        // التأكد من أن القيم نصية وليست كائنات
+        const userName = typeof user.name === 'object' ? 'غير محدد' : (user.name || 'بدون اسم');
+        const userPhone = user.phone || '---';
+        const regDate = new Date(user.created_at).toLocaleDateString('ar-SA');
+        
+        // معالجة آخر ظهور
+        let lastSeen = 'غير متوفر';
+        if (user.last_login) {
+            lastSeen = timeSince(new Date(user.last_login));
+        }
+
+        tbody.innerHTML += `
+            <tr>
+                <td><b>${userName}</b></td>
+                <td>${userPhone}</td>
+                <td>${user.type === 'driver' ? 'سائق' : 'مواطن'}</td>
+                <td><span class="badge status-${user.status || 'active'}">${translateStatus(user.status)}</span></td>
+                <td>${regDate}</td>
+                <td style="color: #666; font-size: 12px;">${lastSeen}</td>
+                <td>
+                    <button class="btn-action btn-edit" onclick="editUser('${user.id}')"><i class="fas fa-edit"></i></button>
+                    <button class="btn-action btn-ban" onclick="updateStatus('${user.id}', 'banned')"><i class="fas fa-user-slash"></i></button>
+                    <button class="btn-action" style="color: var(--danger);" onclick="deleteUser('${user.id}')"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>
+        `;
+    });
+}
+
+
+        // دالة تغيير الحالة (حظر/تعطيل)
+        async function updateStatus(id, newStatus) {
+            if(!confirm('هل أنت متأكد من تغيير حالة هذا المستخدم؟')) return;
+            await _supabase.from('users').update({ status: newStatus }).eq('id', id);
+            loadUsers();
+        }
+
+        // دالة الحذف
+        async function deleteUser(id) {
+            if(!confirm('تحذير: سيتم حذف المستخدم نهائياً! هل تريد الاستمرار؟')) return;
+            await _supabase.from('users').delete().eq('id', id);
+            loadUsers();
+        }
+
+        // دالة إضافة مستخدم جديد
+        async function saveUser() {
+            const name = document.getElementById('newName').value;
+            const phone = document.getElementById('newPhone').value;
+            const type = document.getElementById('newType').value;
+
+            const { error } = await _supabase.from('users').insert([{ name, phone, type, status: 'active' }]);
+            if (error) alert("خطأ: " + error.message);
+            else {
+                closeModal();
+                loadUsers();
+            }
+        }
+
+        // أدوات مساعدة
+        function translateStatus(s) {
+            const map = { 'active': 'نشط', 'suspended': 'معطل', 'banned': 'محظور' };
+            return map[s] || s;
+        }
+
+        function timeSince(date) {
+            const seconds = Math.floor((new Date() - date) / 1000);
+            let interval = seconds / 31536000;
+            if (interval > 1) return "منذ سنة";
+            interval = seconds / 2592000;
+            if (interval > 1) return "منذ شهور";
+            interval = seconds / 86400;
+            if (interval > 1) return "منذ " + Math.floor(interval) + " يوم";
+            interval = seconds / 3600;
+            if (interval > 1) return "منذ " + Math.floor(interval) + " ساعة";
+            return "الآن";
+        }
+
+        function showAddModal() { document.getElementById('addModal').style.display = 'flex'; }
+        function closeModal() { document.getElementById('addModal').style.display = 'none'; }
+
+        window.onload = loadUsers;
+    </script>
+</body>
+</html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تفاصيل الطالب - مسجد الفاروق</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <i class="fas fa-mosque"></i>
+                <h1>مسجد الفاروق</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">الرئيسية</a></li>
+                <li><a href="halaqat.html">الحلقات</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="back-link">
+            <a href="javascript:history.back()"><i class="fas fa-arrow-right"></i> العودة</a>
+        </div>
+
+        <div id="studentDetails" class="student-details-container">
+            <!-- سيتم إضافة تفاصيل الطالب هنا -->
+        </div>
+    </main>
+
+    <footer>
+        <p>جميع الحقوق محفوظة &copy; 2024 - مسجد الفاروق</p>
+    </footer>
+
+    <script src="supabase-config.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const studentId = urlParams.get('id');
+            
+            if (studentId) {
+                loadStudentDetails(studentId);
+            } else {
+                window.location.href = 'halaqat.html';
+            }
+        });
+
+        async function loadStudentDetails(studentId) {
+            const container = document.getElementById('studentDetails');
+            
+            try {
+                // جلب معلومات الطالب
+                const student = await Database.getStudentById(studentId);
+                
+                // جلب الحضور والغياب
+                const attendance = await Database.getAttendance(studentId);
+                
+                // جلب تقدم الحفظ
+                const progress = await Database.getProgress(studentId);
+                
+                // جلب السماع اليومي
+                const todayListening = await Database.getTodayListening(studentId);
+
+                // حساب الإحصائيات
+                const presentDays = attendance?.filter(a => a.status === 'present')?.length || 0;
+                const absentDays = attendance?.filter(a => a.status === 'absent')?.length || 0;
+                const lateDays = attendance?.filter(a => a.status === 'late')?.length || 0;
+                
+                const completedJuz = progress?.filter(p => p.completed)?.length || 0;
+                const totalJuz = progress?.length || 0;
+
+                // عرض التفاصيل
+                container.innerHTML = `
+                    <div class="student-header">
+                        <div class="student-avatar-large">
+                            ${student.name.charAt(0)}
+                        </div>
+                        <h1>${student.name}</h1>
+                        <p class="student-halqa">${student.halqa_name || 'حلقة تحفيظ'}</p>
+                    </div>
+
+                    <div class="student-stats-grid">
+                        <div class="stat-card">
+                            <i class="fas fa-calendar-check"></i>
+                            <div class="stat-info">
+                                <span class="stat-value">${presentDays}</span>
+                                <span class="stat-label">يوم حضور</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-calendar-times"></i>
+                            <div class="stat-info">
+                                <span class="stat-value">${absentDays}</span>
+                                <span class="stat-label">يوم غياب</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-clock"></i>
+                            <div class="stat-info">
+                                <span class="stat-value">${lateDays}</span>
+                                <span class="stat-label">تأخير</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-quran"></i>
+                            <div class="stat-info">
+                                <span class="stat-value">${completedJuz}</span>
+                                <span class="stat-label">جزء محفوظ</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="details-section">
+                        <h2>معلومات الطالب</h2>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="label">العمر:</span>
+                                <span class="value">${student.age} سنة</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">رقم الجوال:</span>
+                                <span class="value">${student.phone}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">المستوى:</span>
+                                <span class="value">${
+                                    student.level === 'beginner' ? 'مبتدئ' : 
+                                    student.level === 'intermediate' ? 'متوسط' : 'متقدم'
+                                }</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">تاريخ التسجيل:</span>
+                                <span class="value">${new Date(student.created_at).toLocaleDateString('ar-SA')}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="details-section">
+                        <h2>تقدم الحفظ</h2>
+                        <div class="progress-list">
+                            ${progress?.length > 0 ? progress.map(p => `
+                                <div class="progress-item ${p.completed ? 'completed' : ''}">
+                                    <span class="juz-number">الجزء ${p.juz_number}</span>
+                                    <span class="progress-date">${new Date(p.date).toLocaleDateString('ar-SA')}</span>
+                                    ${p.completed ? 
+                                        '<span class="status completed"><i class="fas fa-check"></i> مكتمل</span>' : 
+                                        '<span class="status in-progress"><i class="fas fa-spinner"></i> جارٍ</span>'
+                                    }
+                                </div>
+                            `).join('') : '<p class="no-data">لا يوجد تقدم في الحفظ</p>'}
+                        </div>
+                    </div>
+
+                    <div class="details-section">
+                        <h2>السماع اليومي</h2>
+                        <div class="listening-info">
+                            <div class="today-listening">
+                                <span class="label">سماع اليوم:</span>
+                                <span class="value">${todayListening} آية</span>
+                            </div>
+                            <!-- يمكن إضافة رسم بياني للسماع اليومي هنا -->
+                        </div>
+                    </div>
+                `;
+
+            } catch (error) {
+                console.error('Error loading student details:', error);
+                container.innerHTML = '<p class="error">حدث خطأ في تحميل بيانات الطالب</p>';
+            }
+        }
+    </script>
+</body>
+</html>

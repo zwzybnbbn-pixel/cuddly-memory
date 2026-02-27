@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>توصيلو PRO | التحكم المطلق 🛡️</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root { --primary: #6B2E82; --secondary: #FF6B35; --danger: #e74c3c; --success: #27ae60; --dark: #1a1a1a; }
+        body { font-family: 'Cairo', sans-serif; background: #f4f7f6; margin: 0; display: flex; }
+        
+        /* Sidebar */
+        .sidebar { width: 260px; background: var(--dark); color: white; height: 100vh; position: fixed; padding: 20px; box-sizing: border-box; }
+        .nav-item { padding: 15px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; color: #ccc; text-decoration: none; margin-bottom: 5px; }
+        .nav-item.active { background: var(--primary); color: white; }
+
+        .main-content { margin-right: 260px; width: calc(100% - 260px); padding: 40px; box-sizing: border-box; }
+
+        /* Power Cards */
+        .power-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px; }
+        .card { background: white; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); overflow: hidden; }
+        .card-header { padding: 20px; font-weight: 800; display: flex; justify-content: space-between; align-items: center; background: #fcfcfc; border-bottom: 1px solid #eee; }
+        .card-body { padding: 25px; }
+
+        /* Emergency Switch */
+        .emergency-box { border: 2px solid var(--danger); border-radius: 15px; padding: 20px; background: #fff5f5; }
+        textarea { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ddd; font-family: 'Cairo'; margin-bottom: 15px; resize: none; }
+        
+        .btn { border: none; padding: 12px 25px; border-radius: 12px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; transition: 0.3s; width: 100%; }
+        .btn-stop { background: var(--danger); color: white; }
+        .btn-start { background: var(--success); color: white; }
+        .btn-settle { background: var(--primary); color: white; }
+
+        /* Log Console */
+        .console { background: #1a1a1a; color: #00ff00; padding: 15px; border-radius: 12px; font-family: monospace; font-size: 13px; height: 150px; overflow-y: auto; margin-top: 20px; border: 3px solid #333; }
+        
+        .status-banner { padding: 10px; border-radius: 10px; text-align: center; margin-bottom: 15px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2 style="color: var(--secondary); text-align: center;">توصيلو 🛵</h2>
+        <a href="dashboard.html" class="nav-item"><i class="fas fa-home"></i> الرئيسية</a>
+        <a href="trips.html" class="nav-item"><i class="fas fa-route"></i> الرحلات</a>
+        <a href="admin_control.html" class="nav-item active"><i class="fas fa-user-shield"></i> التحكم المطلق</a>
+    </div>
+
+    <div class="main-content">
+        <h1>التحكم المركزي بالمنصة 🛡️</h1>
+
+        <div class="power-grid">
+            <div class="card" style="grid-column: span 2;">
+                <div class="card-header" style="color: var(--danger);">تحكم الطوارئ (Kill Switch) <i class="fas fa-power-off"></i></div>
+                <div class="card-body">
+                    <div id="statusBanner" class="status-banner">جاري فحص حالة النظام...</div>
+                    <label>سبب الإغلاق (سيظهر للعملاء والسائقين فوراً):</label>
+                    <textarea id="closure_reason" placeholder="مثلاً: نعتذر، النظام متوقف للصيانة الطارئة حتى الساعة 6 مساءً..."></textarea>
+                    
+                    <div style="display: flex; gap: 15px;">
+                        <button class="btn btn-stop" onclick="updateSystemStatus('closed')">إيقاف النظام الآن 🛑</button>
+                        <button class="btn btn-start" onclick="updateSystemStatus('open')">تشغيل النظام 🚀</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">تحصيل مديونية السائقين (كاش) <i class="fas fa-hand-holding-usd"></i></div>
+                <div class="card-body">
+                    <p style="font-size: 13px; color: #666;">عند استلام العمولة كاش من السائق، أدخل بياناته هنا لتصفير دينه.</p>
+                    <input type="text" id="driver_phone" placeholder="رقم هاتف السائق" style="width:100%; padding:12px; margin-bottom:10px; border-radius:10px; border:1px solid #ddd;">
+                    <input type="number" id="paid_amount" placeholder="المبلغ المستلم (ريال)" style="width:100%; padding:12px; margin-bottom:15px; border-radius:10px; border:1px solid #ddd;">
+                    <button class="btn btn-settle" onclick="settleDebt()">تسوية الحساب وتصفير الدين</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">سجل الرقابة المباشر (Logs) <i class="fas fa-terminal"></i></div>
+                <div class="card-body">
+                    <div class="console" id="logConsole">
+                        [النظام] بانتظار الأوامر...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // تحميل الحالة عند البدء
+        window.onload = async () => {
+            const { data } = await _supabase.from('settings').select('*');
+            const status = data.find(i => i.setting_key === 'app_status')?.setting_value;
+            const reason = data.find(i => i.setting_key === 'closure_reason')?.setting_value;
+            
+            const banner = document.getElementById('statusBanner');
+            if(status === 'open') {
+                banner.innerText = "النظام يعمل حالياً بصورة طبيعية ✅";
+                banner.style.background = "#e8f5e9";
+                banner.style.color = "#2e7d32";
+            } else {
+                banner.innerText = "النظام متوقف حالياً ❌";
+                banner.style.background = "#ffebee";
+                banner.style.color = "#c62828";
+            }
+            document.getElementById('closure_reason').value = reason || "";
+        };
+
+        async function updateSystemStatus(newStatus) {
+            const reason = document.getElementById('closure_reason').value;
+            if(newStatus === 'closed' && !reason) return alert("يرجى كتابة سبب الإيقاف");
+
+            const { error } = await _supabase.from('settings').upsert([
+                { setting_key: 'app_status', setting_value: newStatus },
+                { setting_key: 'closure_reason', setting_value: reason }
+            ]);
+
+            if(!error) {
+                alert("تم تحديث حالة النظام");
+                addLog(`تم تغيير الحالة إلى ${newStatus}. السبب: ${reason}`);
+                location.reload();
+            }
+        }
+
+        async function settleDebt() {
+            const phone = document.getElementById('driver_phone').value;
+            const amount = parseFloat(document.getElementById('paid_amount').value);
+
+            const { data: driver } = await _supabase.from('users').select('id, debt, name').eq('phone', phone).single();
+
+            if(driver) {
+                const currentDebt = driver.debt || 0;
+                const newDebt = currentDebt - amount;
+                
+                await _supabase.from('users').update({ debt: newDebt }).eq('id', driver.id);
+                addLog(`تم تحصيل ${amount} ريال من السائق ${driver.name}. المديونية المتبقية: ${newDebt}`);
+                alert("تمت تسوية الحساب بنجاح");
+            } else {
+                alert("السائق غير موجود برقم الهاتف هذا");
+            }
+        }
+
+        function addLog(msg) {
+            const console = document.getElementById('logConsole');
+            const time = new Date().toLocaleTimeString();
+            console.innerHTML += `<br>[${time}] ${msg}`;
+            console.scrollTop = console.scrollHeight;
+        }
+    </script>
+</body>
+</html>

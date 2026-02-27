@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>توصيلو PRO | الجرد والتحصيل المالي</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root { --primary: #6B2E82; --secondary: #FF6B35; --danger: #e74c3c; --success: #27ae60; --dark: #2c3e50; }
+        body { font-family: 'Cairo', sans-serif; background: #f4f7f6; margin: 0; display: flex; }
+        
+        /* Sidebar */
+        .sidebar { width: 260px; background: #1a1a1a; height: 100vh; position: fixed; padding: 20px; color: white; box-sizing: border-box; }
+        .nav-item { padding: 15px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; color: #ccc; text-decoration: none; margin-bottom: 5px; }
+        .nav-item.active { background: var(--primary); color: white; }
+
+        .main-content { margin-right: 260px; width: calc(100% - 260px); padding: 40px; box-sizing: border-box; }
+
+        /* شريط التحكم العلوي */
+        .control-panel { 
+            background: white; padding: 20px; border-radius: 20px; 
+            margin-bottom: 30px; display: flex; align-items: center; 
+            gap: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-right: 6px solid var(--secondary);
+        }
+        .control-panel input#commissionInput { width: 80px; padding: 10px; border: 2px solid #eee; border-radius: 10px; text-align: center; font-weight: 800; font-size: 18px; }
+        
+        .btn-update { background: var(--dark); color: white; border: none; padding: 12px 25px; border-radius: 12px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; transition: 0.3s; }
+        .btn-update:hover { background: #000; }
+
+        /* الإحصائيات */
+        .summary-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
+        .stat-box { background: white; padding: 20px; border-radius: 20px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
+        .stat-box h3 { font-size: 14px; color: #777; margin: 0; }
+        .stat-box div { font-size: 24px; font-weight: 800; margin-top: 10px; }
+
+        /* الجدول */
+        .audit-card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: right; padding: 15px; border-bottom: 2px solid #eee; color: var(--dark); }
+        td { padding: 15px; border-bottom: 1px solid #eee; font-size: 14px; }
+
+        /* خانة التسديد */
+        .pay-box { display: flex; align-items: center; gap: 8px; }
+        .pay-box input { width: 90px; padding: 8px; border: 1px solid #ddd; border-radius: 8px; font-family: 'Cairo'; }
+        .btn-pay { background: var(--success); color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; font-family: 'Cairo'; font-size: 12px; }
+        .btn-pay:hover { opacity: 0.8; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2 style="color: var(--secondary); text-align: center;">توصيلو 🛵</h2>
+        
+        <a href="index.html" class="nav-item active"><i class="fas fa-chart-line"></i> الإحصائيات العامة</a>
+        <a href="users_admin.html" class="nav-item"><i class="fas fa-user-friends"></i> عرض المواطنين</a>
+        <a href="drivers_admin.html" class="nav-item"><i class="fas fa-id-card"></i> إدارة السائقين</a>
+        <a href="users.html" class="nav-item"><i class="fas fa-users-cog"></i> الكل (سائقين ومواطنين)</a>
+        <a href="requests.html" class="nav-item"><i class="fas fa-user-plus"></i> طلبات التسجيل</a>
+        <a href="trips.html" class="nav-item"><i class="fas fa-route"></i> سجل الرحلات</a>
+
+                        <a href="report.html" class="nav-item"><i class="fas fa-route"></i> التقارير<
+        <a href="complaints.html" class="nav-item"><i class="fas fa-exclamation-triangle"></i> الشكاوى والاقتراحات</a>
+        <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i> إعدادات النظام>
+    </div>
+
+    <div class="main-content">
+        <h1>الجرد المالي المتقدم 🧾</h1>
+
+        <div class="control-panel">
+            <label><i class="fas fa-percentage"></i> عمولة المنصة الحالية:</label>
+            <input type="number" id="commissionInput" value="15">
+            <span>%</span>
+            <button class="btn-update" onclick="performAudit()">تحديث الحسابات</button>
+            <div style="margin-right: auto; color: #888; font-size: 12px;">تغيير النسبة هنا سيقوم بحساب "المستهدف" فوراً وحفظها للنظام.</div>
+        </div>
+
+        <div class="summary-bar">
+            <div class="stat-box" style="border-top: 4px solid var(--success);">
+                <h3>إجمالي الكاش (عند السائقين)</h3>
+                <div id="totalCash" style="color: var(--success);">0 ر.س</div>
+            </div>
+            <div class="stat-box" style="border-top: 4px solid var(--primary);">
+                <h3>الأرباح المستهدفة (حسب النسبة)</h3>
+                <div id="targetComm" style="color: var(--primary);">0 ر.س</div>
+            </div>
+            <div class="stat-box" style="border-top: 4px solid var(--danger);">
+                <h3>إجمالي الديون المسجلة حالياً</h3>
+                <div id="actualDebt" style="color: var(--danger);">0 ر.س</div>
+            </div>
+        </div>
+
+        <div class="audit-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>اسم السائق</th>
+                        <th>الكاش المستلم</th>
+                        <th>المستهدف</th>
+                        <th>الدين الفعلي</th>
+                        <th>تسديد مبلع كاش</th>
+                    </tr>
+                </thead>
+                <tbody id="auditBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        async function performAudit() {
+            const commissionRate = parseFloat(document.getElementById('commissionInput').value) / 100;
+            
+            // جلب البيانات
+            const { data: drivers } = await _supabase.from('users').select('*').eq('type', 'driver');
+            const { data: trips } = await _supabase.from('trips').select('*').eq('status', 'completed');
+
+            let tCash = 0, tTarget = 0, tActual = 0;
+            const tbody = document.getElementById('auditBody');
+            tbody.innerHTML = '';
+
+            drivers.forEach(d => {
+                const driverTrips = trips.filter(t => t.driver_id === d.id);
+                const sumCash = driverTrips.reduce((acc, curr) => acc + (curr.price || 0), 0);
+                const target = sumCash * commissionRate;
+                const actual = d.debt || 0;
+
+                tCash += sumCash;
+                tTarget += target;
+                tActual += actual;
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${d.name}</strong></td>
+                        <td>${sumCash.toFixed(2)} ر.س</td>
+                        <td style="color:var(--primary)">${target.toFixed(2)} ر.س</td>
+                        <td style="color:var(--danger); font-weight:bold;">${actual.toFixed(2)} ر.س</td>
+                        <td>
+                            <div class="pay-box">
+                                <input type="number" id="pay-${d.id}" placeholder="المبلغ">
+                                <button class="btn-pay" onclick="payDebt('${d.id}', '${d.name}')">تسديد ✅</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('totalCash').innerText = tCash.toFixed(2) + " ر.س";
+            document.getElementById('targetComm').innerText = tTarget.toFixed(2) + " ر.س";
+            document.getElementById('actualDebt').innerText = tActual.toFixed(2) + " ر.س";
+
+            // حفظ النسبة في الإعدادات
+            await _supabase.from('settings').upsert({ setting_key: 'app_commission', setting_value: (commissionRate * 100).toString() });
+        }
+
+        async function payDebt(driverId, driverName) {
+            const amount = parseFloat(document.getElementById(`pay-${driverId}`).value);
+            if (!amount || amount <= 0) return alert("يرجى إدخال مبلغ صحيح");
+
+            if (confirm(`هل استلمت ${amount} ريال من السائق ${driverName}؟ سيتم خصمها من دينه.`)) {
+                // جلب المديونية الحالية
+                const { data } = await _supabase.from('users').select('debt').eq('id', driverId).single();
+                const newDebt = (data.debt || 0) - amount;
+
+                // تحديث قاعدة البيانات
+                const { error } = await _supabase.from('users').update({ debt: newDebt }).eq('id', driverId);
+
+                if (!error) {
+                    alert("تم التسديد وتحديث المديونية بنجاح");
+                    performAudit(); // تحديث الجدول
+                } else {
+                    alert("خطأ في عملية التسديد");
+                }
+            }
+        }
+
+        window.onload = performAudit;
+    </script>
+</body>
+</html>

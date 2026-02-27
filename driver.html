@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>توصيلو PRO | إدارة السائقين</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --primary: #6B2E82; --bg: #f4f7f6; }
+        body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; display: flex; }
+        .sidebar { width: 260px; background: #1a1a1a; color: white; height: 100vh; position: fixed; padding: 20px; box-sizing: border-box; }
+        .nav-item { padding: 15px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; color: #ccc; text-decoration: none; margin-bottom: 5px; }
+        .nav-item.active { background: var(--primary); color: white; }
+        .main { margin-right: 260px; width: calc(100% - 260px); padding: 40px; box-sizing: border-box; }
+        
+        .driver-container { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; }
+        .driver-list { background: white; border-radius: 20px; padding: 20px; height: 500px; overflow-y: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .driver-item { display: flex; align-items: center; gap: 15px; padding: 15px; border-bottom: 1px solid #eee; cursor: pointer; transition: 0.2s; }
+        .driver-item:hover { background: #f8f0fc; }
+        .status-dot { width: 10px; height: 10px; border-radius: 50%; background: #27ae60; }
+        
+        #map { height: 500px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); z-index: 1; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2 style="color: #FF6B35; text-align: center; margin-bottom: 40px;">توصيلو 🛵</h2>
+        <a href="dashboard.html" class="nav-item"><i class="fas fa-chart-line"></i> الإحصائيات العامة</a>
+        <a href="drivers_admin.html" class="nav-item active"><i class="fas fa-car"></i> إدارة السائقين</a>
+        <a href="trips.html" class="nav-item"><i class="fas fa-route"></i> الرحلات</a>
+    </div>
+
+    <div class="main">
+        <header style="margin-bottom: 30px;">
+            <h1>مراقبة السائقين (الخريطة الحية) 📍</h1>
+        </header>
+
+        <div class="driver-container">
+            <div class="driver-list">
+                <h3>السائقين النشطين</h3>
+                <div id="drivers-status-list">
+                    </div>
+            </div>
+            <div id="map"></div>
+        </div>
+    </div>
+
+    <script>
+        let map = L.map('map').setView([24.7136, 46.6753], 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        let markers = {};
+
+        const channel = _supabase.channel('online-drivers');
+
+        channel.on('presence', { event: 'sync' }, () => {
+            const state = channel.presenceState();
+            updateMapAndList(state);
+        }).subscribe();
+
+        function updateMapAndList(state) {
+            const listContainer = document.getElementById('drivers-status-list');
+            listContainer.innerHTML = '';
+
+            Object.values(state).forEach(presences => {
+                const p = presences[0];
+                if (p.lat && p.lng) {
+                    const pos = [p.lat, p.lng];
+                    
+                    // تحديث الخريطة
+                    if (markers[p.id]) {
+                        markers[p.id].setLatLng(pos);
+                    } else {
+                        markers[p.id] = L.marker(pos).addTo(map).bindPopup(`الكابتن: ${p.name}`);
+                    }
+
+                    // تحديث القائمة الجانبية
+                    listContainer.innerHTML += `
+                        <div class="driver-item" onclick="focusOnDriver(${p.lat}, ${p.lng})">
+                            <div class="status-dot"></div>
+                            <div>
+                                <b>${p.name}</b><br>
+                                <small style="color:#888">إحداثيات: ${p.lat.toString().slice(0,6)}</small>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        function focusOnDriver(lat, lng) {
+            map.flyTo([lat, lng], 15);
+        }
+    </script>
+</body>
+</html>

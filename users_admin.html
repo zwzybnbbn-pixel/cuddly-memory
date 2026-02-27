@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>إدارة المواطنين | توصيلو PRO</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root { --primary: #2D3436; --secondary: #FF6B35; --success: #27AE60; --danger: #EB5757; --info: #0984e3; --warning: #f1c40f; --bg: #f4f7f6; }
+        body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; display: flex; }
+        
+        /* القائمة الجانبية */
+        .sidebar { width: 260px; background: #1a1a1a; color: white; height: 100vh; position: fixed; padding: 20px; box-sizing: border-box; z-index: 1000; }
+        .nav-item { padding: 15px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; color: #ccc; text-decoration: none; margin-bottom: 5px; transition: 0.3s; }
+        .nav-item.active { background: var(--info); color: white; }
+
+        .main { margin-right: 260px; width: calc(100% - 260px); padding: 30px; box-sizing: border-box; }
+
+        /* شريط الإحصائيات */
+        .stats-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 25px; }
+        .stat-card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; border-bottom: 4px solid transparent; }
+        .stat-card.total { border-color: var(--info); }
+        .stat-card.active { border-color: var(--success); }
+        .stat-card.blocked { border-color: var(--danger); }
+        .stat-card h3 { margin: 10px 0 0; font-size: 32px; font-weight: 800; color: #333; }
+
+        /* لوحة التحكم والبحث */
+        .control-panel { background: white; padding: 25px; border-radius: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); min-height: 600px; }
+        .search-box { position: relative; margin-bottom: 20px; max-width: 500px; }
+        .search-box input { width: 100%; padding: 12px 45px 12px 15px; border-radius: 12px; border: 1.5px solid #eee; font-family: 'Cairo'; outline: none; transition: 0.3s; box-sizing: border-box; }
+        .search-box i { position: absolute; right: 15px; top: 15px; color: #aaa; }
+
+        /* الجدول */
+        .users-table { width: 100%; border-collapse: collapse; }
+        .users-table th { text-align: right; padding: 15px; color: #777; border-bottom: 2px solid #f4f7f6; }
+        .users-table td { padding: 15px; border-bottom: 1px solid #f4f7f6; vertical-align: middle; }
+        
+        /* التقييم */
+        .rating-stars { font-size: 12px; color: var(--warning); margin-top: 4px; }
+        .gray-stars { opacity: 0.15; filter: grayscale(100%); }
+
+        .badge { padding: 5px 12px; border-radius: 8px; font-size: 12px; font-weight: bold; }
+        .status-active { background: #e8f5e9; color: var(--success); }
+        .status-blocked { background: #ffebee; color: var(--danger); }
+        
+        /* الأزرار الذكية */
+        .btn-action { cursor: pointer; border: none; padding: 8px 15px; border-radius: 10px; font-family: 'Cairo'; font-weight: 600; font-size: 13px; transition: 0.2s; margin-left: 5px; }
+        .btn-block { background: #fff1f1; color: var(--danger); border: 1px solid #ffcccc; }
+        .btn-activate { background: #eefdf5; color: var(--success); border: 1px solid #ccffdd; }
+        .btn-edit { background: #f0f7ff; color: var(--info); }
+        .btn-delete { background: #eee; color: #666; }
+
+        /* المودال */
+        .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2000; align-items:center; justify-content:center; backdrop-filter: blur(5px); }
+        .modal-content { background:white; padding:40px; border-radius:30px; width:400px; box-shadow: 0 20px 50px rgba(0,0,0,0.2); }
+        .modal-content input { width:100%; margin-bottom:15px; padding:15px; border-radius:12px; border:1.5px solid #eee; font-family: 'Cairo'; outline: none; box-sizing: border-box; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2 style="color: var(--secondary); text-align: center; margin-bottom: 40px;">توصيلو 🛵</h2>
+
+        <a href="index.html" class="nav-item active"><i class="fas fa-chart-line"></i> الإحصائيات العامة</a>
+
+        <a href="drivers_admin.html" class="nav-item"><i class="fas fa-id-card"></i> إدارة السائقين</a>
+        <a href="users.html" class="nav-item"><i class="fas fa-users-cog"></i> الكل (سائقين ومواطنين)</a>
+        <a href="requests.html" class="nav-item"><i class="fas fa-user-plus"></i> طلبات التسجيل</a>
+        <a href="trips.html" class="nav-item"><i class="fas fa-route"></i> سجل الرحلات</a>
+                <a href="report.html" class="nav-item"><i class="fas fa-route"></i> التقارير</a
+        <a href="audit.html" class="nav-item"><i class="fas fa-file-invoice-dollar"></i> الجرد المالي</a>
+        <a href="complaints.html" class="nav-item"><i class="fas fa-exclamation-triangle"></i> الشكاوى والاقتراحات</a>
+        <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i> إعدادات النظام/a>
+    </div>
+
+    <div class="main">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+            <div>
+                <h1 style="margin:0">إدارة المواطنين 👥</h1>
+                <p style="color:#777; margin:5px 0 0">متابعة حسابات العملاء وتقييماتهم</p>
+            </div>
+            <button onclick="openAddModal()" style="background:var(--info); color:white; padding:12px 25px; border-radius:15px; font-weight:bold; border:none; cursor:pointer;">
+                <i class="fas fa-user-plus"></i> إضافة مواطن جديد
+            </button>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-card total"><small>إجمالي المواطنين</small><h3 id="stat-total">0</h3></div>
+            <div class="stat-card active"><small>أونلاين الآن</small><h3 id="stat-active" style="color:var(--success)">0</h3></div>
+            <div class="stat-card blocked"><small>حسابات محظورة</small><h3 id="stat-blocked" style="color:var(--danger)">0</h3></div>
+        </div>
+        
+        <div class="control-panel">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="search-input" onkeyup="filterUsers()" placeholder="بحث باسم المواطن أو رقم الجوال...">
+            </div>
+
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th>المواطن</th>
+                        <th>التقييم</th>
+                        <th>الحالة</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody id="users-list">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <h2 id="modalTitle">إضافة مواطن</h2>
+            <input type="hidden" id="edit-user-id">
+            <input type="text" id="user-name" placeholder="الاسم الكامل">
+            <input type="text" id="user-phone" placeholder="رقم الجوال">
+            <button onclick="processUser()" style="width:100%; background:var(--info); color:white; padding:15px; border-radius:15px; border:none; font-weight:bold; cursor:pointer;">حفظ</button>
+            <button onclick="closeModal()" style="width:100%; margin-top:10px; background:none; color:#888; border:none; cursor:pointer;">إلغاء</button>
+        </div>
+    </div>
+
+    <script>
+        let allUsers = [];
+
+        function getStars(rating) {
+            const val = parseFloat(rating) || 0;
+            const r = Math.round(val);
+            return '⭐'.repeat(r) + `<span class="gray-stars">${'⭐'.repeat(5-r)}</span>`;
+        }
+
+        async function loadUsers() {
+            const { data, error } = await _supabase.from('users').select('*').eq('type', 'user').order('created_at', { ascending: false });
+            if (error) return;
+            allUsers = data;
+            document.getElementById('stat-total').innerText = data.length;
+            document.getElementById('stat-blocked').innerText = data.filter(u => u.status === 'blocked').length;
+            renderUsers(data);
+        }
+
+        function renderUsers(list) {
+            const container = document.getElementById('users-list');
+            container.innerHTML = list.map(u => {
+                const isActive = u.status === 'active';
+                return `
+                <tr>
+                    <td>
+                        <b style="display:block">${u.name}</b>
+                        <small style="color:#888">${u.phone || '---'}</small>
+                    </td>
+                    <td>
+                        <div class="rating-stars">
+                            ${getStars(u.rating)} 
+                            <small style="color:#888">(${parseFloat(u.rating || 0).toFixed(1)})</small>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge ${isActive ? 'status-active' : 'status-blocked'}">${isActive ? 'نشط' : 'محظور'}</span>
+                    </td>
+                    <td>
+                        <button class="btn-action ${isActive ? 'btn-block' : 'btn-activate'}" onclick="toggleStatus('${u.id}', '${u.status}')">
+                            ${isActive ? 'حظر' : 'تفعيل'}
+                        </button>
+                        <button class="btn-action btn-edit" onclick="openEditModal('${u.id}', '${u.name}', '${u.phone}')">تعديل</button>
+                        <button class="btn-action btn-delete" onclick="deleteUser('${u.id}')"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        function filterUsers() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const filtered = allUsers.filter(u => u.name.toLowerCase().includes(query) || (u.phone && u.phone.includes(query)));
+            renderUsers(filtered);
+        }
+
+        async function toggleStatus(id, current) {
+            const next = current === 'active' ? 'blocked' : 'active';
+            await _supabase.from('users').update({ status: next }).eq('id', id);
+            loadUsers();
+        }
+
+        async function processUser() {
+            const id = document.getElementById('edit-user-id').value;
+            const name = document.getElementById('user-name').value;
+            const phone = document.getElementById('user-phone').value;
+            if (id) {
+                await _supabase.from('users').update({ name, phone }).eq('id', id);
+            } else {
+                await _supabase.from('users').insert([{ name, phone, type: 'user', status: 'active', rating: 0 }]);
+            }
+            closeModal(); loadUsers();
+        }
+
+        function openAddModal() {
+            document.getElementById('edit-user-id').value = '';
+            document.getElementById('modalTitle').innerText = 'إضافة مواطن جديد';
+            document.getElementById('user-name').value = '';
+            document.getElementById('user-phone').value = '';
+            document.getElementById('userModal').style.display = 'flex';
+        }
+
+        function openEditModal(id, name, phone) {
+            document.getElementById('edit-user-id').value = id;
+            document.getElementById('modalTitle').innerText = 'تعديل البيانات';
+            document.getElementById('user-name').value = name;
+            document.getElementById('user-phone').value = phone;
+            document.getElementById('userModal').style.display = 'flex';
+        }
+
+        function closeModal() { document.getElementById('userModal').style.display = 'none'; }
+
+        async function deleteUser(id) {
+            if (confirm("هل تريد حذف حساب المواطن نهائياً؟")) {
+                await _supabase.from('users').delete().eq('id', id);
+                loadUsers();
+            }
+        }
+
+        // تتبع المتصلين للمواطنين
+        const channel = _supabase.channel('online-clients');
+        channel.on('presence', { event: 'sync' }, () => {
+            const state = channel.presenceState();
+            document.getElementById('stat-active').innerText = Object.keys(state).length;
+        }).subscribe();
+
+        window.onload = loadUsers;
+    </script>
+</body>
+</html>

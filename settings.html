@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>توصيلو PRO | إعدادات النظام</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --primary: #6B2E82; --secondary: #FF6B35; --dark: #1a1a1a; }
+        body { font-family: 'Cairo', sans-serif; background: #f4f7f6; margin: 0; display: flex; }
+        .sidebar { width: 260px; background: var(--dark); height: 100vh; position: fixed; padding: 20px; color: white; }
+        .main-content { margin-right: 260px; width: calc(100% - 260px); padding: 40px; }
+        
+        .settings-card { background: white; border-radius: 20px; padding: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); max-width: 800px; }
+        .setting-group { margin-bottom: 25px; border-bottom: 1px solid #eee; padding-bottom: 20px; }
+        .setting-group:last-child { border: none; }
+        
+        label { display: block; font-weight: 800; margin-bottom: 10px; color: var(--dark); }
+        input, select { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 12px; font-family: 'Cairo'; font-size: 16px; transition: 0.3s; }
+        input:focus { border-color: var(--primary); outline: none; }
+        
+        .btn-save { background: var(--primary); color: white; border: none; padding: 15px 40px; border-radius: 12px; cursor: pointer; font-weight: 800; font-size: 16px; width: 100%; transition: 0.3s; }
+        .btn-save:hover { background: #562469; transform: translateY(-2px); }
+        
+        .hint { font-size: 12px; color: #888; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2 style="color: var(--secondary); text-align: center;">توصيلو 🛵</h2>
+
+        <a href="index.html" class="nav-item active"><i class="fas fa-chart-line"></i> الإحصائيات العامة</a>
+        <a href="users_admin.html" class="nav-item"><i class="fas fa-user-friends"></i> عرض المواطنين</a>
+        <a href="drivers_admin.html" class="nav-item"><i class="fas fa-id-card"></i> إدارة السائقين</a>
+        <a href="users.html" class="nav-item"><i class="fas fa-users-cog"></i> الكل (سائقين ومواطنين)</a>
+        <a href="requests.html" class="nav-item"><i class="fas fa-user-plus"></i> طلبات التسجيل</a>
+        <a href="trips.html" class="nav-item"><i class="fas fa-route"></i> سجل الرحلات</a>
+        <a href="audit.html" class="nav-item"><i class="fas fa-file-invoice-dollar"></i> الجرد المالي</a>
+                        <a href="report.html" class="nav-item"><i class="fas fa-route"></i> التقارير<
+        <a href="complaints.html" class="nav-item"><i class="fas fa-exclamation-triangle"></i> الشكاوى والاقتراحات</a>
+                       <a href="report.html" class="nav-item"><i class="fas fa-route"></i> التقارير<
+    </div>
+
+    <div class="main-content">
+        <h1>إعدادات المنصة الاحترافية ⚙️</h1>
+        
+        <div class="settings-card">
+            <div class="setting-group">
+                <label>نسبة عمولة التطبيق (%)</label>
+                <input type="number" id="app_commission" placeholder="مثلاً: 15">
+                <p class="hint">هذه النسبة تُخصم تلقائياً من كل رحلة وتُضاف لديون السائق.</p>
+            </div>
+
+            <div class="setting-group">
+                <label>حد المديونية الأقصى (ر.س)</label>
+                <input type="number" id="debt_limit" placeholder="مثلاً: 200">
+                <p class="hint">عندما يصل دين السائق لهذا المبلغ، سيتم إيقافه عن العمل تلقائياً حتى يسدد.</p>
+            </div>
+
+            <div class="setting-group">
+                <label>حالة النظام العامة</label>
+                <select id="system_status">
+                    <option value="active">نشط (استقبال طلبات)</option>
+                    <option value="maintenance">صيانة (إيقاف الطلبات مؤقتاً)</option>
+                </select>
+            </div>
+
+            <button class="btn-save" onclick="saveSettings()">حفظ كافة الإعدادات ✨</button>
+        </div>
+    </div>
+
+    <script>
+        async function loadSettings() {
+            const { data } = await _supabase.from('settings').select('*');
+            if (data) {
+                data.forEach(s => {
+                    const el = document.getElementById(s.setting_key);
+                    if (el) el.value = s.setting_value;
+                });
+            }
+        }
+
+        async function saveSettings() {
+            const settings = [
+                { setting_key: 'app_commission', setting_value: document.getElementById('app_commission').value },
+                { setting_key: 'debt_limit', setting_value: document.getElementById('debt_limit').value },
+                { setting_key: 'system_status', setting_value: document.getElementById('system_status').value }
+            ];
+
+            const { error } = await _supabase.from('settings').upsert(settings);
+
+            if (!error) {
+                alert("تم حفظ الإعدادات بنجاح، النظام يعمل الآن بالقوانين الجديدة!");
+            } else {
+                alert("خطأ في الحفظ: " + error.message);
+            }
+        }
+
+        window.onload = loadSettings;
+    </script>
+</body>
+</html>
