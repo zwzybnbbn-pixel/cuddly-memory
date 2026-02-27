@@ -20,29 +20,47 @@
         .nav-item { padding: 15px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; color: #ccc; text-decoration: none; margin-bottom: 5px; transition: 0.3s; }
         .nav-item.active { background: var(--primary); color: white; }
 
-        .main { margin-right: 260px; width: calc(100% - 260px); padding: 30px; box-sizing: border-box; }
+        .main { margin-right: 260px; width: calc(100% - 260px); padding: 30px; box-sizing: border-box; min-height: 100vh; display: flex; flex-direction: column; }
 
         /* Stats Bar */
         .stats-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 25px; }
-        .stat-card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; border-bottom: 4px solid transparent; }
+        .stat-card { background: white; padding: 15px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; border-bottom: 4px solid transparent; }
         .stat-card.total { border-color: var(--primary); }
         .stat-card.active { border-color: var(--success); }
         .stat-card.blocked { border-color: var(--danger); }
-        .stat-card h3 { margin: 10px 0 0; font-size: 32px; font-weight: 800; color: #333; }
+        .stat-card h3 { margin: 5px 0 0; font-size: 28px; font-weight: 800; color: #333; }
 
-        /* Layout */
-        .content-grid { display: grid; grid-template-columns: 1fr 420px; gap: 20px; }
-        #map { height: 550px; border-radius: 25px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); z-index: 1; border: 5px solid white; }
+        /* New Layout Hierarchy */
+        .content-container { display: flex; flex-direction: column; gap: 20px; flex: 1; }
         
-        .control-panel { background: white; padding: 25px; border-radius: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); height: 550px; display: flex; flex-direction: column; }
-        .drivers-scroll { flex: 1; overflow-y: auto; margin-top: 10px; padding-left: 5px; }
+        .control-panel { background: white; padding: 20px; border-radius: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        
+        /* Horizontal Drivers List */
+        .drivers-scroll { 
+            display: flex; 
+            gap: 15px; 
+            overflow-x: auto; 
+            padding: 10px 5px; 
+            margin-top: 10px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary) #eee;
+        }
+        .drivers-scroll::-webkit-scrollbar { height: 6px; }
+        .drivers-scroll::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
 
-        /* User Card */
-        .user-card { background: #f9f9fb; border: 1px solid #eee; padding: 15px; border-radius: 15px; margin-bottom: 12px; transition: 0.3s; }
+        /* User Card Adjusted for Horizontal */
+        .user-card { 
+            min-width: 320px; 
+            background: #f9f9fb; 
+            border: 1px solid #eee; 
+            padding: 15px; 
+            border-radius: 15px; 
+            transition: 0.3s; 
+            flex-shrink: 0;
+        }
         .user-card:hover { transform: translateY(-3px); border-color: var(--primary); }
-        .driver-header { display: flex; justify-content: space-between; align-items: flex-start; }
         
-        /* التقييم */
+        .driver-header { display: flex; justify-content: space-between; align-items: flex-start; }
         .rating-stars { font-size: 13px; margin-top: 4px; display: flex; align-items: center; gap: 4px; }
         .gray-stars { opacity: 0.15; filter: grayscale(100%); }
 
@@ -50,41 +68,49 @@
         .status-active { background: #e8f5e9; color: var(--success); }
         .status-blocked { background: #ffebee; color: var(--danger); }
         
-        /* أزرار الإجراءات */
         .actions { margin-top: 12px; display: flex; gap: 8px; }
         button { cursor: pointer; border: none; font-family: 'Cairo'; font-weight: 600; border-radius: 8px; transition: 0.2s; }
         
-        .btn-status-toggle { padding: 8px; flex: 2; font-size: 12px; }
+        .btn-status-toggle { padding: 8px; flex: 2; font-size: 11px; }
         .btn-block { background: #fff1f1; color: var(--danger); border: 1px solid #ffcccc; }
         .btn-activate { background: #eefdf5; color: var(--success); border: 1px solid #ccffdd; }
         
-        .btn-edit { background: #e3f2fd; color: #1976d2; padding: 8px; flex: 1; font-size: 12px; }
+        .btn-edit { background: #e3f2fd; color: #1976d2; padding: 8px; flex: 1; font-size: 11px; }
         .btn-delete { background: #eee; color: #666; width: 35px; }
+
+        /* Wide Map at Bottom */
+        #map { 
+            width: 100%; 
+            height: 500px; 
+            border-radius: 25px; 
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08); 
+            border: 5px solid white; 
+            z-index: 1; 
+        }
         
+        /* Modal Styles */
         .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2000; align-items:center; justify-content:center; backdrop-filter: blur(5px); }
-        .modal-content { background:white; padding:40px; border-radius:30px; width:380px; box-shadow: 0 20px 50px rgba(0,0,0,0.2); }
-        .modal-content input { width:100%; margin-bottom:15px; padding:15px; border-radius:12px; border: 1.5px solid #eee; font-family: 'Cairo'; outline: none; box-sizing: border-box; }
+        .modal-content { background:white; padding:40px; border-radius:30px; width:380px; }
+        .modal-content input { width:100%; margin-bottom:15px; padding:15px; border-radius:12px; border: 1.5px solid #eee; font-family: 'Cairo'; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
         <h2 style="color: var(--secondary); text-align: center; margin-bottom: 40px;">توصيلو 🛵</h2>
-
         <a href="index.html" class="nav-item active"><i class="fas fa-chart-line"></i> الإحصائيات العامة</a>
         <a href="users_admin.html" class="nav-item"><i class="fas fa-user-friends"></i> عرض المواطنين</a>
-
         <a href="users.html" class="nav-item"><i class="fas fa-users-cog"></i> الكل (سائقين ومواطنين)</a>
         <a href="requests.html" class="nav-item"><i class="fas fa-user-plus"></i> طلبات التسجيل</a>
         <a href="trips.html" class="nav-item"><i class="fas fa-route"></i> سجل الرحلات</a>
         <a href="audit.html" class="nav-item"><i class="fas fa-file-invoice-dollar"></i> الجرد المالي</a>
-                        <a href="report.html" class="nav-item"><i class="fas fa-route"></i> التقارير </a>
+        <a href="report.html" class="nav-item"><i class="fas fa-file-alt"></i> التقارير</a>
         <a href="complaints.html" class="nav-item"><i class="fas fa-exclamation-triangle"></i> الشكاوى والاقتراحات</a>
-        <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i> اعدادات النظام </a>
+        <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i> إعدادات النظام</a>
     </div>
 
     <div class="main">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
             <div>
                 <h1 style="margin:0">إدارة الأسطول 🚛</h1>
                 <p style="color:#777; margin:5px 0 0">مراقبة التقييمات والحالة التشغيلية</p>
@@ -95,21 +121,22 @@
         </div>
 
         <div class="stats-bar">
-            <div class="stat-card total"><small>الإجمالي</small><h3 id="stat-total">0</h3></div>
+            <div class="stat-card total"><small>إجمالي الكباتن</small><h3 id="stat-total">0</h3></div>
             <div class="stat-card active"><small>متصل الآن</small><h3 id="stat-active" style="color:var(--success)">0</h3></div>
             <div class="stat-card blocked"><small>محظورين</small><h3 id="stat-blocked" style="color:var(--danger)">0</h3></div>
         </div>
         
-        <div class="content-grid">
-            <div id="map"></div>
+        <div class="content-container">
             <div class="control-panel">
-                <div style="position: relative; margin-bottom: 15px;">
-                    <i class="fas fa-search" style="position: absolute; right: 15px; top: 15px; color: #aaa;"></i>
+                <div style="position: relative;">
+                    <i class="fas fa-search" style="position: absolute; right: 15px; top: 12px; color: #aaa;"></i>
                     <input type="text" id="search-input" onkeyup="filterDrivers()" placeholder="بحث بالاسم أو رقم الجوال..." 
-                           style="width: 100%; padding: 12px 40px 12px 15px; border-radius: 12px; border: 1.5px solid #eee; font-family: 'Cairo'; outline: none; box-sizing: border-box;">
+                           style="width: 100%; padding: 10px 40px 10px 15px; border-radius: 12px; border: 1.5px solid #eee; font-family: 'Cairo'; outline: none; box-sizing: border-box;">
                 </div>
                 <div class="drivers-scroll" id="drivers-list">جاري المزامنة...</div>
             </div>
+
+            <div id="map"></div>
         </div>
     </div>
 
@@ -130,22 +157,24 @@
         let markers = {};
         let allDrivers = [];
 
-        // دالة التقييم الحقيقي: النجوم تكون شفافة تماماً عند 0
         function getStars(rating) {
             const val = parseFloat(rating) || 0;
             const r = Math.round(val);
-            const yellowStars = '⭐'.repeat(r);
-            const grayStars = `<span class="gray-stars">${'⭐'.repeat(5 - r)}</span>`;
-            return yellowStars + grayStars;
+            return '⭐'.repeat(r) + `<span class="gray-stars">${'⭐'.repeat(5 - r)}</span>`;
         }
 
         async function loadDrivers() {
             const { data, error } = await _supabase.from('users').select('*').eq('type', 'driver').order('created_at', { ascending: false });
             if (error) return;
             allDrivers = data;
-            document.getElementById('stat-total').innerText = data.length;
-            document.getElementById('stat-blocked').innerText = data.filter(d => d.status === 'blocked').length;
+            updateStats(data);
             renderDrivers(data);
+            setTimeout(() => { map.invalidateSize(); }, 500);
+        }
+
+        function updateStats(list) {
+            document.getElementById('stat-total').innerText = list.length;
+            document.getElementById('stat-blocked').innerText = list.filter(d => d.status === 'blocked').length;
         }
 
         function renderDrivers(list) {
@@ -157,18 +186,14 @@
                     <div class="driver-header">
                         <div>
                             <b style="font-size:15px;">${d.name}</b>
-                            <div class="rating-stars">
-                                ${getStars(d.rating)} 
-                                <span style="color:#888; font-size:11px;">(${parseFloat(d.rating || 0).toFixed(1)})</span>
-                            </div>
+                            <div class="rating-stars">${getStars(d.rating)} <span style="color:#888; font-size:11px;">(${parseFloat(d.rating || 0).toFixed(1)})</span></div>
                         </div>
                         <span class="badge ${isActive ? 'status-active' : 'status-blocked'}">${isActive ? 'نشط' : 'محظور'}</span>
                     </div>
                     <div style="margin-top:8px; font-size:12px; color:#666;"><i class="fas fa-phone-alt"></i> ${d.phone || '---'}</div>
                     <div class="actions">
                         <button class="btn-status-toggle ${isActive ? 'btn-block' : 'btn-activate'}" onclick="toggleStatus('${d.id}', '${d.status}')">
-                            <i class="fas ${isActive ? 'fa-user-slash' : 'fa-check-circle'}"></i> 
-                            ${isActive ? 'حظر السائق' : 'تفعيل الحساب'}
+                            <i class="fas ${isActive ? 'fa-user-slash' : 'fa-check-circle'}"></i> ${isActive ? 'حظر' : 'تفعيل'}
                         </button>
                         <button class="btn-edit" onclick="openEditModal('${d.id}', '${d.name}', '${d.phone}')">تعديل</button>
                         <button class="btn-delete" onclick="deleteUser('${d.id}')"><i class="fas fa-trash-alt"></i></button>
@@ -177,16 +202,20 @@
             }).join('');
         }
 
+        async function toggleStatus(id, current) {
+            const next = current === 'active' ? 'blocked' : 'active';
+            const { error } = await _supabase.from('users').update({ status: next }).eq('id', id);
+            if (!error) {
+                allDrivers = allDrivers.map(d => d.id === id ? {...d, status: next} : d);
+                updateStats(allDrivers);
+                renderDrivers(allDrivers);
+            }
+        }
+
         function filterDrivers() {
             const query = document.getElementById('search-input').value.toLowerCase();
             const filtered = allDrivers.filter(d => d.name.toLowerCase().includes(query) || (d.phone && d.phone.includes(query)));
             renderDrivers(filtered);
-        }
-
-        async function toggleStatus(id, current) {
-            const next = current === 'active' ? 'blocked' : 'active';
-            const { error } = await _supabase.from('users').update({ status: next }).eq('id', id);
-            if (!error) loadDrivers();
         }
 
         async function processUser() {
@@ -196,7 +225,6 @@
             if (id) {
                 await _supabase.from('users').update({ name, phone }).eq('id', id);
             } else {
-                // يبدأ التقييم من 0 للسائق الجديد
                 await _supabase.from('users').insert([{ name, phone, type: 'driver', status: 'active', rating: 0 }]);
             }
             closeModal(); loadDrivers();
@@ -205,8 +233,6 @@
         function openAddModal() {
             document.getElementById('edit-user-id').value = '';
             document.getElementById('modalTitle').innerText = 'إضافة كابتن جديد';
-            document.getElementById('user-name').value = '';
-            document.getElementById('user-phone').value = '';
             document.getElementById('userModal').style.display = 'flex';
         }
 
@@ -227,18 +253,10 @@
             }
         }
 
-        // تتبع المتصلين بالوقت الحقيقي
         const channel = _supabase.channel('online-drivers');
         channel.on('presence', { event: 'sync' }, () => {
             const state = channel.presenceState();
             document.getElementById('stat-active').innerText = Object.keys(state).length;
-            Object.values(state).forEach(p => {
-                const d = p[0];
-                if (d.lat && d.lng) {
-                    if (markers[d.id]) markers[d.id].setLatLng([d.lat, d.lng]);
-                    else markers[d.id] = L.marker([d.lat, d.lng]).addTo(map).bindPopup(d.name);
-                }
-            });
         }).subscribe();
 
         window.onload = loadDrivers;
