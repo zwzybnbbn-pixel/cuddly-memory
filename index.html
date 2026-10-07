@@ -1,228 +1,1264 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <title>توصيلو PRO | الإحصائيات العامة</title>
-    
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="config.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style>
-        :root { --primary: #6B2E82; --secondary: #FF6B35; --success: #27AE60; --danger: #EB5757; --bg: #f4f7f6; }
-        body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; display: flex; overflow-x: hidden; }
-        
-        /* شاشة الترحيب (Welcome Overlay) */
-        #welcome-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(26, 26, 26, 0.98); /* لون داكن فخم */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            transition: opacity 0.5s ease;
-        }
-        .welcome-card {
-            background: white;
-            padding: 40px;
-            border-radius: 30px;
-            text-align: center;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-            max-width: 450px;
-            width: 90%;
-            border-top: 8px solid var(--secondary);
-            animation: slideUp 0.6s ease-out;
-        }
-        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        
-        .welcome-card i { font-size: 60px; color: var(--primary); margin-bottom: 20px; }
-        .welcome-card h2 { color: #1a1a1a; margin-bottom: 10px; font-weight: 800; }
-        .welcome-card p { color: #666; margin-bottom: 30px; line-height: 1.6; }
-        
-        .btn-enter {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 15px 50px;
-            border-radius: 15px;
-            font-size: 18px;
-            font-weight: 700;
-            cursor: pointer;
-            font-family: 'Cairo';
-            transition: 0.3s;
-            box-shadow: 0 10px 20px rgba(107, 46, 130, 0.3);
-        }
-        .btn-enter:hover { background: var(--secondary); transform: scale(1.05); }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TechMentor AI — Premium Prolog Expert System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/tau-prolog@0.3.4/modules/core.min.js"></script>
+<style>
+:root{
+  --bg:#040a13;
+  --bg-2:#08111e;
+  --card:#0b1828;
+  --card-2:#0f2137;
+  --card-3:#122a44;
+  --border:#1a3350;
+  --border-2:#25486c;
+  --text:#e9f2fb;
+  --muted:#8aa6c2;
+  --muted-2:#5f7b96;
+  --accent:#3ee0ff;
+  --accent-2:#7c5cff;
+  --accent-3:#22e0a7;
+  --accent-4:#ffb547;
+  --danger:#ff6b7a;
+  --glow:0 0 40px rgba(62,224,255,.18);
+  --shadow:0 24px 60px -20px rgba(0,0,0,.7);
+  --radius:18px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:'IBM Plex Sans Arabic',Tahoma,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+body::before{
+  content:"";
+  position:fixed;inset:0;
+  background:
+    radial-gradient(1200px 600px at 85% -10%, rgba(124,92,255,.18), transparent 60%),
+    radial-gradient(900px 500px at 10% 110%, rgba(62,224,255,.15), transparent 60%),
+    radial-gradient(700px 400px at 50% 50%, rgba(34,224,167,.05), transparent 70%);
+  pointer-events:none;
+  z-index:0;
+}
+body::after{
+  content:"";
+  position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(62,224,255,.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(62,224,255,.035) 1px, transparent 1px);
+  background-size:48px 48px;
+  mask-image:radial-gradient(ellipse at center, black 20%, transparent 80%);
+  -webkit-mask-image:radial-gradient(ellipse at center, black 20%, transparent 80%);
+  pointer-events:none;
+  z-index:0;
+}
+.app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column}
 
-        /* Sidebar */
-        .sidebar { width: 260px; background: #1a1a1a; color: white; height: 100vh; position: fixed; padding: 20px; box-sizing: border-box; z-index: 1000; }
-        .nav-item { padding: 12px 15px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; color: #ccc; text-decoration: none; margin-bottom: 5px; transition: 0.3s; font-size: 14px; }
-        .nav-item:hover, .nav-item.active { background: var(--primary); color: white; }
+/* ========== HEADER ========== */
+.top{
+  position:sticky;top:0;z-index:50;
+  padding:20px 4% 18px;
+  background:rgba(4,10,19,.75);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--border);
+}
+.top-inner{max-width:1350px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-start;gap:24px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:14px}
+.brand-mark{
+  width:48px;height:48px;border-radius:14px;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  display:grid;place-items:center;font-size:24px;
+  box-shadow:0 0 30px rgba(62,224,255,.4), inset 0 0 20px rgba(255,255,255,.15);
+  position:relative;
+}
+.brand-mark::after{
+  content:"";position:absolute;inset:-3px;border-radius:17px;
+  background:conic-gradient(from 0deg,var(--accent),var(--accent-2),var(--accent-3),var(--accent));
+  z-index:-1;filter:blur(10px);opacity:.5;animation:spin 8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.logo{font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:700;letter-spacing:-.3px;line-height:1.1}
+.logo span{background:linear-gradient(135deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--muted);font-size:13px;margin-top:3px}
+.badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}
+.badge{
+  font-size:11px;padding:5px 10px;border-radius:999px;
+  background:rgba(62,224,255,.08);border:1px solid rgba(62,224,255,.25);
+  color:var(--accent);font-weight:500;
+}
+.badge.v{background:rgba(124,92,255,.08);border-color:rgba(124,92,255,.25);color:#b6a4ff}
+.badge.g{background:rgba(34,224,167,.08);border-color:rgba(34,224,167,.25);color:var(--accent-3)}
 
-        .main { margin-right: 260px; width: calc(100% - 260px); padding: 40px; box-sizing: border-box; }
-        
-        /* Stats & Grid */
-        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 25px; }
-        .stat-card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-right: 5px solid transparent; }
-        .stat-card h2 { margin: 10px 0 0 0; font-size: 24px; font-weight: 800; }
-        .stat-card small { color: #888; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-        
-        .table-card { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th { text-align: right; color: #666; border-bottom: 2px solid #eee; padding: 12px; }
-        td { padding: 15px; border-bottom: 1px solid #f9f9f9; font-size: 14px; }
-        
-        .badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
-        .badge-success { background: #e8f5e9; color: var(--success); }
-        .badge-danger { background: #ffebee; color: var(--danger); }
-        .badge-ongoing { background: #fff8e1; color: #f2994a; }
-        
-        .btn-refresh { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-family: 'Cairo'; }
-    </style>
+.tabs{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap}
+.tab{
+  font-family:inherit;font-size:14px;font-weight:500;
+  border:1px solid var(--border-2);background:rgba(11,24,40,.6);color:#c9def1;
+  padding:11px 18px;border-radius:12px;cursor:pointer;
+  transition:all .25s ease;display:flex;align-items:center;gap:8px;
+}
+.tab:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-1px)}
+.tab.active{
+  background:linear-gradient(135deg,rgba(62,224,255,.2),rgba(124,92,255,.2));
+  border-color:var(--accent);color:#fff;
+  box-shadow:0 0 24px rgba(62,224,255,.25), inset 0 1px 0 rgba(255,255,255,.1);
+}
+.tab .dot{width:6px;height:6px;border-radius:50%;background:var(--accent-3);box-shadow:0 0 8px var(--accent-3)}
+
+/* ========== LAYOUT ========== */
+.layout{width:min(1350px,94%);margin:26px auto;display:grid;grid-template-columns:300px 1fr;gap:20px;flex:1;align-items:start}
+.card{
+  background:linear-gradient(180deg,rgba(15,33,55,.85),rgba(11,24,40,.95));
+  border:1px solid var(--border);border-radius:var(--radius);
+  box-shadow:var(--shadow);position:relative;overflow:hidden;
+}
+.card::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(62,224,255,.5),transparent);
+}
+
+/* ========== SIDEBAR ========== */
+.side{padding:22px}
+.side h3{margin:0 0 16px;font-size:15px;color:var(--muted);font-weight:600;letter-spacing:.5px;text-transform:uppercase}
+.stat{
+  padding:14px 16px;border-radius:14px;
+  background:linear-gradient(135deg,rgba(62,224,255,.05),rgba(124,92,255,.05));
+  margin:9px 0;border:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+  transition:all .25s ease;
+}
+.stat:hover{border-color:var(--border-2);transform:translateX(-3px)}
+.stat b{font-family:'Space Grotesk',sans-serif;font-size:22px;color:var(--accent);font-weight:700;line-height:1}
+.stat-label{font-size:12px;color:var(--muted)}
+.side h4{font-size:13px;color:var(--muted);margin:22px 0 10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase}
+.quick{display:flex;flex-direction:column;gap:6px}
+.quick button{
+  font-family:inherit;font-size:13px;text-align:right;
+  background:rgba(15,33,55,.6);border:1px solid var(--border);
+  color:#c9def1;padding:9px 12px;border-radius:10px;cursor:pointer;
+  transition:all .2s ease;
+}
+.quick button:hover{background:rgba(62,224,255,.08);border-color:var(--accent);color:var(--accent)}
+.hint{font-size:12px;line-height:1.9;color:var(--muted-2);margin:10px 0}
+.plog{
+  font-family:'Space Grotesk',monospace;font-size:11px;
+  background:#050d18;border:1px solid var(--border);border-radius:10px;
+  padding:10px;max-height:150px;overflow:auto;color:var(--accent-3);
+  direction:ltr;text-align:left;
+}
+.plog div{padding:2px 0;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.plog .q{color:var(--accent-4)}
+
+/* ========== CHAT ========== */
+.chat{display:flex;flex-direction:column;height:calc(100vh - 240px);min-height:600px;max-height:840px}
+.messages{padding:24px;overflow-y:auto;flex:1;scroll-behavior:smooth}
+.messages::-webkit-scrollbar{width:8px}
+.messages::-webkit-scrollbar-track{background:transparent}
+.messages::-webkit-scrollbar-thumb{background:var(--border-2);border-radius:4px}
+.msg{display:flex;margin:14px 0;animation:slideIn .35s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.bubble{
+  max-width:78%;padding:14px 18px;border-radius:18px;line-height:1.8;
+  font-size:14.5px;position:relative;
+}
+.bubble p{margin:0 0 8px}
+.bubble p:last-child{margin-bottom:0}
+.bubble ul{margin:6px 0;padding-inline-start:20px}
+.bubble li{margin:3px 0}
+.bubble strong{color:var(--accent);font-weight:600}
+.bubble code{
+  font-family:'Space Grotesk',monospace;font-size:12.5px;
+  background:rgba(62,224,255,.1);padding:1px 6px;border-radius:5px;
+  color:var(--accent);border:1px solid rgba(62,224,255,.2);
+}
+.bubble .sp{height:8px}
+.bot .bubble{
+  background:linear-gradient(135deg,rgba(18,42,68,.9),rgba(15,33,55,.95));
+  border:1px solid var(--border-2);
+  border-bottom-right-radius:6px;
+  box-shadow:0 4px 20px rgba(0,0,0,.25);
+}
+.bot .bubble::before{
+  content:"";position:absolute;top:12px;right:-7px;width:12px;height:12px;
+  background:inherit;border-right:1px solid var(--border-2);border-bottom:1px solid var(--border-2);
+  transform:rotate(-45deg);
+}
+.user{justify-content:flex-start}
+.user .bubble{
+  background:linear-gradient(135deg,var(--accent),#1aa6cc);
+  color:#04121e;font-weight:500;
+  border-bottom-left-radius:6px;
+  box-shadow:0 6px 24px rgba(62,224,255,.3);
+}
+.typing{display:flex;gap:4px;padding:14px 18px}
+.typing span{
+  width:7px;height:7px;border-radius:50%;background:var(--accent);
+  animation:bounce 1.4s infinite ease-in-out;
+}
+.typing span:nth-child(2){animation-delay:.2s}
+.typing span:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,80%,100%{transform:scale(.6);opacity:.4}40%{transform:scale(1);opacity:1}}
+
+.chips{display:flex;gap:8px;flex-wrap:wrap;padding:0 22px 14px}
+.chip{
+  font-family:inherit;font-size:12.5px;cursor:pointer;
+  border:1px solid var(--border-2);background:rgba(15,33,55,.7);color:#c9def1;
+  padding:8px 14px;border-radius:999px;transition:all .2s ease;
+}
+.chip:hover{border-color:var(--accent);color:var(--accent);background:rgba(62,224,255,.08);transform:translateY(-1px)}
+
+.inputbar{position:relative;display:flex;gap:10px;padding:16px;border-top:1px solid var(--border);background:rgba(4,10,19,.4)}
+.inputbar input{
+  flex:1;font-family:inherit;font-size:15px;
+  background:#050d18;border:1px solid var(--border-2);color:#fff;
+  border-radius:14px;padding:15px 18px;outline:none;
+  transition:all .25s ease;
+}
+.inputbar input::placeholder{color:var(--muted-2)}
+.inputbar input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(62,224,255,.12)}
+.send{
+  font-family:inherit;font-weight:600;font-size:14px;
+  background:linear-gradient(135deg,var(--accent),#1aa6cc);
+  border:0;color:#04121e;border-radius:14px;padding:0 26px;cursor:pointer;
+  transition:all .25s ease;display:flex;align-items:center;gap:8px;
+}
+.send:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(62,224,255,.35)}
+.send:active{transform:translateY(0)}
+.suggestions{
+  position:absolute;right:16px;left:110px;bottom:76px;
+  background:linear-gradient(180deg,#0b1828,#0a1420);
+  border:1px solid var(--border-2);border-radius:14px;
+  overflow:hidden;z-index:5;box-shadow:0 -20px 50px rgba(0,0,0,.6);
+  max-height:260px;overflow-y:auto;
+}
+.suggestion{padding:11px 16px;cursor:pointer;border-bottom:1px solid var(--border);font-size:13.5px;transition:all .15s}
+.suggestion:last-child{border-bottom:0}
+.suggestion:hover{background:rgba(62,224,255,.09);color:var(--accent);padding-inline-start:20px}
+
+/* ========== RECOMMEND PANEL ========== */
+.recommend{padding:30px 32px;display:none}
+.rec-head{margin-bottom:6px}
+.rec-head h2{margin:0;font-size:22px;font-weight:700;letter-spacing:-.3px}
+.rec-head p{margin:6px 0 0;color:var(--muted);font-size:14px}
+.rec-progress{margin:22px 0 26px}
+.step-dots{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.step-dot{
+  flex:1;min-width:20px;height:5px;border-radius:99px;
+  background:var(--border);transition:all .35s ease;
+}
+.step-dot.done{background:linear-gradient(90deg,var(--accent),var(--accent-2));box-shadow:0 0 12px rgba(62,224,255,.5)}
+.step-dot.current{background:var(--accent-4);box-shadow:0 0 12px rgba(255,181,71,.5)}
+.q-meta{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;color:var(--muted);margin-bottom:6px}
+.bar{height:5px;background:#07121f;border-radius:99px;overflow:hidden;display:none}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));width:0;transition:width .4s ease}
+.question{font-size:20px;font-weight:600;margin:8px 0 20px;letter-spacing:-.2px}
+.question .qn{color:var(--accent);font-family:'Space Grotesk',sans-serif;margin-inline-end:8px}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.opt{
+  font-family:inherit;text-align:right;font-size:14.5px;font-weight:500;
+  padding:18px 20px;background:linear-gradient(135deg,rgba(15,33,55,.9),rgba(11,24,40,.9));
+  border:1px solid var(--border-2);border-radius:15px;cursor:pointer;color:#dceeff;
+  transition:all .25s cubic-bezier(.2,.9,.3,1.2);position:relative;overflow:hidden;
+}
+.opt::before{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(62,224,255,.15),transparent);
+  opacity:0;transition:opacity .25s;
+}
+.opt:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:0 12px 30px rgba(62,224,255,.15)}
+.opt:hover::before{opacity:1}
+.opt span{position:relative;z-index:1}
+
+.result{margin-top:26px;display:flex;flex-direction:column;gap:20px}
+.result-hero{
+  padding:26px;border-radius:20px;
+  background:linear-gradient(135deg,rgba(62,224,255,.1),rgba(124,92,255,.1));
+  border:1px solid var(--border-2);position:relative;overflow:hidden;
+}
+.result-hero::before{
+  content:"";position:absolute;top:-50%;right:-10%;width:300px;height:300px;
+  background:radial-gradient(circle,rgba(62,224,255,.25),transparent 60%);
+  pointer-events:none;
+}
+.result-hero .tag{font-size:12px;color:var(--accent);letter-spacing:2px;font-weight:600;text-transform:uppercase}
+.result-hero h3{margin:8px 0 6px;font-size:26px;font-weight:700;letter-spacing:-.5px}
+.result-hero p{margin:0;color:var(--muted);font-size:14px}
+.rank-list{display:flex;flex-direction:column;gap:10px}
+.rank-item{
+  padding:16px 18px;border-radius:14px;
+  background:linear-gradient(135deg,rgba(15,33,55,.7),rgba(11,24,40,.7));
+  border:1px solid var(--border);display:flex;flex-direction:column;gap:8px;
+  transition:all .25s ease;
+}
+.rank-item:hover{border-color:var(--border-2);transform:translateX(-3px)}
+.rank-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.rank-name{font-weight:600;font-size:15px;display:flex;align-items:center;gap:10px}
+.rank-name .num{
+  font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;
+  width:26px;height:26px;border-radius:8px;display:grid;place-items:center;
+  background:rgba(62,224,255,.12);color:var(--accent);border:1px solid rgba(62,224,255,.3);
+}
+.rank-item:first-child .rank-name .num{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#04121e;border:0;box-shadow:0 0 16px rgba(62,224,255,.5)}
+.rank-score{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;color:var(--accent)}
+.rank-bar{height:6px;background:#07121f;border-radius:99px;overflow:hidden}
+.rank-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));border-radius:99px;transition:width .8s cubic-bezier(.2,.9,.3,1.2)}
+.rank-desc{font-size:12.5px;color:var(--muted);margin-top:2px}
+
+.roadmap-block{
+  padding:24px;border-radius:18px;
+  background:linear-gradient(135deg,rgba(15,33,55,.6),rgba(11,24,40,.85));
+  border:1px solid var(--border);
+}
+.roadmap-block h4{margin:0 0 4px;font-size:18px;font-weight:700;display:flex;align-items:center;gap:10px}
+.roadmap-block .rsub{color:var(--muted);font-size:13px;margin:0 0 20px}
+.phase{
+  padding:16px 18px;margin:10px 0;border-radius:13px;
+  background:rgba(7,18,31,.7);border:1px solid var(--border);
+  border-inline-start:3px solid var(--accent);
+  transition:all .25s ease;
+}
+.phase:hover{border-inline-start-color:var(--accent-3);transform:translateX(-3px)}
+.phase h5{margin:0 0 8px;font-size:14px;font-weight:600;color:var(--accent)}
+.phase ul{margin:0;padding-inline-start:18px;color:#c9def1;font-size:13.5px;line-height:1.9}
+.phase li::marker{color:var(--accent-2)}
+
+.restart{
+  font-family:inherit;font-weight:600;font-size:14px;
+  margin-top:6px;padding:13px 24px;border:0;border-radius:12px;
+  background:linear-gradient(135deg,var(--accent-2),#5a3fd6);color:#fff;cursor:pointer;
+  transition:all .25s ease;align-self:flex-start;
+}
+.restart:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(124,92,255,.35)}
+
+/* ========== LIBRARY ========== */
+.library{padding:30px 32px;display:none}
+.library h2{margin:0 0 6px;font-size:22px;font-weight:700}
+.library>p{color:var(--muted);font-size:14px;margin:0 0 24px}
+.lib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.lib-card{
+  padding:22px;border-radius:18px;cursor:pointer;
+  background:linear-gradient(160deg,rgba(15,33,55,.85),rgba(11,24,40,.95));
+  border:1px solid var(--border);transition:all .3s cubic-bezier(.2,.9,.3,1.2);
+  position:relative;overflow:hidden;
+}
+.lib-card::after{
+  content:"";position:absolute;top:0;right:0;width:120px;height:120px;
+  background:radial-gradient(circle,rgba(62,224,255,.18),transparent 70%);
+  transform:translate(30%,-30%);transition:all .4s;opacity:.5;
+}
+.lib-card:hover{border-color:var(--accent);transform:translateY(-5px);box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.lib-card:hover::after{opacity:1;transform:translate(10%,-10%) scale(1.3)}
+.lib-icon{font-size:32px;margin-bottom:10px;display:block}
+.lib-card h3{margin:0 0 6px;font-size:17px;font-weight:700}
+.lib-card p{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.7}
+.lib-meta{display:flex;gap:8px;flex-wrap:wrap;font-size:11px}
+.lib-meta span{padding:4px 10px;border-radius:99px;background:rgba(62,224,255,.08);border:1px solid rgba(62,224,255,.2);color:var(--accent)}
+.lib-meta span.p{background:rgba(124,92,255,.08);border-color:rgba(124,92,255,.2);color:#b6a4ff}
+
+.modal{
+  position:fixed;inset:0;background:rgba(2,6,12,.85);backdrop-filter:blur(8px);
+  z-index:200;display:none;align-items:center;justify-content:center;padding:20px;
+  animation:fadeIn .25s;
+}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal.open{display:flex}
+.modal-inner{
+  width:min(720px,100%);max-height:85vh;overflow-y:auto;
+  background:linear-gradient(180deg,#0f2137,#0a1420);
+  border:1px solid var(--border-2);border-radius:22px;padding:30px 32px;
+  box-shadow:0 40px 100px rgba(0,0,0,.8);position:relative;
+}
+.modal-inner::-webkit-scrollbar{width:8px}
+.modal-inner::-webkit-scrollbar-thumb{background:var(--border-2);border-radius:4px}
+.modal-close{
+  position:absolute;top:16px;left:16px;width:34px;height:34px;border-radius:10px;
+  background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--muted);
+  cursor:pointer;font-size:16px;display:grid;place-items:center;transition:all .2s;
+}
+.modal-close:hover{background:rgba(255,107,122,.15);color:var(--danger);border-color:var(--danger)}
+.modal-inner h2{margin:0 0 8px;font-size:24px;display:flex;align-items:center;gap:12px}
+.modal-inner>p{color:var(--muted);font-size:14px;margin:0 0 22px}
+
+/* ========== FOOTER ========== */
+.foot{
+  text-align:center;padding:30px 20px 40px;color:var(--muted-2);font-size:12.5px;
+  border-top:1px solid var(--border);margin-top:20px;
+}
+.foot b{color:var(--accent)}
+
+/* ========== RESPONSIVE ========== */
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr;width:94%;margin:16px auto}
+  .side{display:none}
+  .chat{height:auto;min-height:70vh;max-height:none}
+  .messages{max-height:60vh}
+  .top-inner{flex-direction:column;gap:10px}
+  .recommend,.library{padding:22px 18px}
+  .bubble{max-width:92%}
+  .question{font-size:17px}
+  .result-hero h3{font-size:20px}
+  .opts{grid-template-columns:1fr}
+}
+@media(max-width:520px){
+  .brand-mark{width:42px;height:42px;font-size:20px}
+  .logo{font-size:19px}
+  .tab{padding:9px 13px;font-size:12.5px}
+  .inputbar{padding:12px}
+  .send{padding:0 18px}
+}
+</style>
 </head>
 <body>
+<div class="app">
 
-    <div id="welcome-screen">
-        <div class="welcome-card">
-            <i class="fas fa-user-shield"></i>
-            <h2>مرحباً بك أيها المدير</h2>
-            <p>أهلاً بك في لوحة تحكم تطبيق <b>توصيلو PRO</b>. يمكنك الآن متابعة الإحصائيات، إدارة الرحلات، ومراقبة أداء النظام بالكامل.</p>
-            <button class="btn-enter" onclick="hideWelcome()">دخول النظام</button>
+<!-- ================= HEADER ================= -->
+<header class="top">
+  <div class="top-inner">
+    <div>
+      <div class="brand">
+        <div class="brand-mark">🧠</div>
+        <div>
+          <div class="logo">TechMentor <span>AI</span></div>
+          <div class="sub">نظام خبير تقني عربي • محرك استدلال Prolog داخل المتصفح</div>
         </div>
+      </div>
+      <div class="badges" style="margin-top:12px">
+        <span class="badge">Tau Prolog</span>
+        <span class="badge v">Arabic NLP</span>
+        <span class="badge g" id="liveBadge">● Live</span>
+      </div>
+    </div>
+    <div class="tabs">
+      <button class="tab active" id="chatTab" onclick="switchMode('chat')"><span class="dot"></span>💬 الشات الاستشاري</button>
+      <button class="tab" id="recTab" onclick="switchMode('recommend')">🎯 مستشار المسار</button>
+      <button class="tab" id="libTab" onclick="switchMode('library')">📚 مكتبة المسارات</button>
+    </div>
+  </div>
+</header>
+
+<!-- ================= LAYOUT ================= -->
+<div class="layout">
+
+<!-- ============ SIDEBAR ============ -->
+<aside class="card side">
+  <h3>لوحة النظام</h3>
+  <div class="stat"><div><b id="ruleCount">0</b><div class="stat-label">نمط لغوي</div></div><div style="font-size:22px">🧩</div></div>
+  <div class="stat"><div><b id="intentCount">0</b><div class="stat-label">نية تقنية</div></div><div style="font-size:22px">🎯</div></div>
+  <div class="stat"><div><b id="roadmapCount">0</b><div class="stat-label">مسار تعلم</div></div><div style="font-size:22px">🗺️</div></div>
+  <div class="stat"><div><b>Prolog</b><div class="stat-label">محرك الاستدلال</div></div><div style="font-size:22px">⚡</div></div>
+
+  <h4>مواضيع سريعة</h4>
+  <div class="quick" id="quickTopics"></div>
+
+  <h4>سجل استعلامات Prolog</h4>
+  <div class="plog" id="prologLog"><div>% في انتظار الاستعلام...</div></div>
+
+  <p class="hint">💡 النص يُطبَّع عربيًا، تُستخرج المفاهيم، ثم تُستدعى قواعد Prolog للاستدلال على النية.</p>
+</aside>
+
+<!-- ============ CHAT PANEL ============ -->
+<main class="card chat" id="chatPanel">
+  <div class="messages" id="messages"></div>
+  <div class="chips" id="chips"></div>
+  <div class="inputbar">
+    <div class="suggestions" id="suggestions" style="display:none"></div>
+    <input id="input" autocomplete="off" placeholder="اكتب سؤالك بالعربية أو بالمصطلح الإنجليزي..." oninput="showSuggestions()" onkeydown="if(event.key==='Enter')submitText()">
+    <button class="send" onclick="submitText()">إرسال <span style="font-size:16px">↩</span></button>
+  </div>
+</main>
+
+<!-- ============ RECOMMEND PANEL ============ -->
+<section class="card recommend" id="recommendPanel">
+  <div class="rec-head">
+    <h2>🎯 مستشار المسار التقني</h2>
+    <p>أجب على 8 أسئلة سريعة، وسيبني النظام ملفك التقني ويقترح أنسب المسارات لك.</p>
+  </div>
+  <div class="rec-progress">
+    <div class="step-dots" id="stepDots"></div>
+    <div class="q-meta"><span id="qCounter">السؤال 1 من 8</span><span id="qPercent">0%</span></div>
+  </div>
+  <div id="questionArea"></div>
+  <div id="recommendResult"></div>
+</section>
+
+<!-- ============ LIBRARY PANEL ============ -->
+<section class="card library" id="libraryPanel">
+  <h2>📚 مكتبة المسارات التقنية</h2>
+  <p>مسارات تعلم مُهيكَلة خطوة بخطوة لكل تخصص — اضغط أي بطاقة لعرض التفاصيل.</p>
+  <div class="lib-grid" id="libGrid"></div>
+</section>
+
+</div>
+
+<div class="foot">
+  صُنع بـ <b>Prolog</b> + <b>JavaScript</b> • TechMentor AI © 2025 • نظام خبير تعليمي
+</div>
+</div>
+
+<!-- ============ MODAL ============ -->
+<div class="modal" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-inner" id="modalInner"></div>
+</div>
+
+<script>
+/* =========================================================
+   1) KNOWLEDGE BASE — Intents & Linguistic Patterns
+   ========================================================= */
+const intentDefs = [
+{id:"greeting",label:"التحية",icon:"👋",reply:"**وعليكم السلام ورحمة الله وبركاته** 🌷\nأهلًا وسهلًا! أنا **TechMentor AI**، نظام خبير تقني.\n\nيمكنني مساعدتك في:\n• اختيار مسار تعلم مناسب\n• فهم الفروق بين التقنيات\n• تصميم خطة دراسية\n• حل مشاكل تقنية\n\nماذا تريد أن تتعلم اليوم؟",
+p:["السلام عليكم","السلام عليكم ورحمة الله","سلام عليكم","وعليكم السلام","سلام","اهلا","أهلا","أهلاً","اهلين","أهلين","هلا","هلا والله","يا هلا","مرحبا","مرحباً","مرحبا بك","يا مرحبا","اهلا وسهلا","أهلا وسهلا","حياك","حياك الله","هلا فيك","صباح الخير","مساء الخير","hi","hello","hey"]},
+
+{id:"thanks",label:"الشكر",icon:"🙏",reply:"**العفو** 🙌 يسعدني أساعدك دائمًا.\nإذا عندك سؤال تقني آخر اطرحه مباشرة — أنا جاهز.",
+p:["شكرا","شكرًا","شكراً","مشكور","مشكورة","يعطيك العافية","يعطيك العافيه","تسلم","تسلمين","الله يعطيك العافية","ممتاز شكرا","اشكرك","أشكرك","ممنون","ممتن لك","بارك الله فيك","جزاك الله خير","جزاك الله خيرا","thanks","thank you"]},
+
+{id:"how_are_you",label:"كيف حالك",icon:"😊",reply:"**بخير والحمد لله** 😄 جاهز لمساعدتك.\nقل لي: ما المجال التقني الذي تفكر فيه؟ أو ما المشكلة التي تواجهها؟",
+p:["كيفك","كيف حالك","كيفك اليوم","كيف امورك","كيف أمورك","شلونك","شخبارك","اخبارك","أخبارك","كيفك انت","تمام","انت تمام","كيفك يا","كيف وضعك","how are you"]},
+
+{id:"goodbye",label:"وداع",icon:"👋",reply:"**في أمان الله** 👋\nإذا احتجت مساعدة تقنية في أي وقت، أنا موجود هنا.\nبالتوفيق في رحلتك! 🌟",
+p:["مع السلامة","باي","باي باي","اشوفك","أشوفك","الى اللقاء","إلى اللقاء","نشوفك لاحقا","نشوفك لاحقاً","تصبح على خير","في امان الله","bye","goodbye"]},
+
+{id:"identity",label:"هوية النظام",icon:"🤖",reply:"أنا **TechMentor AI** 🤖 — نظام خبير تعليمي تقني.\n\n**كيف أعمل؟**\n1. أستقبل سؤالك بنص عربي أو إنجليزي\n2. أُطبّع النص (إزالة التشكيل، توحيد الحروف)\n3. أُحوّل المصطلحات إلى مفاهيم (canonical form)\n4. أستدعي قواعد **Prolog** للاستدلال على النية\n5. أُعيد الإجابة من قاعدة المعرفة\n\nقاعدتي تحتوي على أكثر من **500 نمط لغوي** و**40 نية تقنية**.",
+p:["من انت","من أنت","وش انت","ما انت","ماذا انت","من تكون","ايش تقدر تسوي","ماذا تستطيع","وش تقدر تسوي","ما الذي تستطيع فعله","هل انت ذكاء اصطناعي","هل أنت ذكاء اصطناعي","هل تفهم العربي","who are you","كيف تشتغل","كيف تعمل"]},
+
+{id:"learn_programming",label:"تعلم البرمجة",icon:"💻",reply:"**خطة تعلم البرمجة من الصفر** 🚀\n\n**المرحلة 1 — الأساسيات (1-2 شهر)**\n• اختر لغة واحدة (Python / JavaScript / C#)\n• المتغيرات، الشروط، الحلقات، الدوال\n• حل تمارين صغيرة يوميًا\n\n**المرحلة 2 — التفكير البرمجي (شهر)**\n• هياكل البيانات (Arrays, Lists, Maps)\n• OOP: Classes, Inheritance, Polymorphism\n• Git وGitHub\n\n**المرحلة 3 — التخصص (2-4 أشهر)**\n• Backend أو Frontend أو Mobile أو AI\n• قواعد البيانات SQL\n• بناء 3-5 مشاريع حقيقية\n\n**نصيحة ذهبية:** لا تُشاهد فقط — **اكتب كودًا كل يوم** حتى لو 30 دقيقة.",
+p:["اريد ان اتعلم برمجة","أريد أن أتعلم برمجة","اريد اتعلم برمجة","أريد اتعلم برمجة","ابغى اتعلم برمجة","أبغى أتعلم برمجة","ابي اتعلم برمجة","أبي أتعلم برمجة","نفسي اتعلم برمجة","حاب اتعلم برمجة","حابب اتعلم برمجة","ودي اتعلم برمجة","كيف اتعلم البرمجة","كيف أتعلم البرمجة","كيف ابدأ برمجة","كيف أبدأ برمجة","من اين ابدأ البرمجة","من أين أبدأ البرمجة","تعلم البرمجة","تعلم برمجه","برمجة","برمجه","مجال البرمجة","ابغى اصير مبرمج","أريد أن أصبح مبرمج","أريد دخول البرمجة","learn programming","start programming"]},
+
+{id:"beginner",label:"مبتدئ",icon:"🌱",reply:"لو أنت **مبتدئ تمامًا**، اتبع هذه القواعد:\n\n**✅ افعل:**\n• اختر لغة واحدة فقط في البداية\n• اكتب كودًا بيدك ولا تنسخ فقط\n• ابنِ مشاريع صغيرة (آلة حاسبة، To-Do، طقس)\n• تعلم Git من الأسبوع الأول\n\n**❌ تجنّب:**\n• التنقل بين 5 لغات في شهر\n• مشاهدة كورسات بلا تطبيق\n• محاولة تعلم AI قبل الأساسيات\n\n**التوصية:** ابدأ بـ **Python** أو **JavaScript** حسب هدفك.",
+p:["انا مبتدئ","أنا مبتدئ","مبتدئ في البرمجة","ما اعرف برمجة","لا اعرف برمجة","ما أعرف برمجة","ما عندي خبرة","بدون خبرة","من الصفر","ابدأ من الصفر","انا جديد","أنا جديد","اول مرة اتعلم برمجة","أول مرة أتعلم برمجة","مبتدئ تماما","مبتدئ تمامًا"]},
+
+{id:"backend",label:"Backend",icon:"⚙️",reply:"**Backend** = الجزء الذي يعمل على الخادم.\n\n**يشمل:**\n• بناء الـAPIs\n• منطق الأعمال (Business Logic)\n• قواعد البيانات\n• المصادقة والأمان\n• الأداء والتوسع\n\n**المسار المقترح:**\n1. لغة برمجة (C# / Java / Python / Go)\n2. أساسيات HTTP و REST\n3. SQL وقواعد البيانات\n4. إطار عمل (ASP.NET Core / Spring Boot / FastAPI)\n5. ORM (EF Core / Hibernate)\n6. Authentication (JWT / OAuth)\n7. Testing + Docker\n\n**لغات ممتازة للبدء:** C# (.NET) أو Java (Spring) أو Python (FastAPI).",
+p:["باكند","باك اند","باك-اند","باك ايند","باك إند","backend","back end","back-end","backend development","server side","server-side","برمجة الخوادم","برمجة السيرفر","تطوير السيرفر","تطوير الخادم","الجانب الخلفي","الجزء الخلفي","ابي باكند","أريد باكند","تعلم باكند","تعلم الباك اند","backend developer"]},
+
+{id:"frontend",label:"Frontend",icon:"🎨",reply:"**Frontend** = ما يراه المستخدم ويتفاعل معه.\n\n**المسار المقترح:**\n1. HTML + CSS (أساس الويب)\n2. JavaScript (المتغيرات، DOM، async/await)\n3. TypeScript (للمشاريع الكبيرة)\n4. إطار عمل: **React** (الأكثر طلبًا)\n5. إدارة الحالة (Redux / Zustand)\n6. Routing + Forms + API integration\n7. Testing (Jest / React Testing Library)\n8. Build tools (Vite / Webpack)\n\n**نصيحة:** لا تبدأ بـReact مباشرة — تعلم JavaScript أولًا.",
+p:["فرونت اند","فرونتاند","فرونت-اند","فرونت إند","frontend","front end","front-end","frontend development","client side","client-side","واجهة المستخدم","واجهات المستخدم","تطوير الواجهات","تطوير الواجهة","الجانب الامامي","الجانب الأمامي","ابي فرونت اند","أريد فرونت اند","تعلم فرونت اند","frontend developer"]},
+
+{id:"fullstack",label:"Full Stack",icon:"🔗",reply:"**Full Stack** = Frontend + Backend + قواعد بيانات.\n\n**لا تحاول تعلم الاثنين معًا من البداية!**\n\n**المسار الذكي:**\n1. أتقن جانبًا واحدًا أولًا (Frontend أو Backend)\n2. تعلم أساسيات الجانب الآخر\n3. تعلم تكامل API بينهما\n4. تعلم النشر (Deployment)\n\n**المسار الشائع:**\nJavaScript/TypeScript → React → Node.js → PostgreSQL → Docker\n\nأو: C# → ASP.NET Core → SQL → React/Angular",
+p:["فل ستاك","فلستاك","فل ستاك","full stack","full-stack","fullstack","full stack developer","مطوّر فل ستاك","مطور فل ستاك","تطوير شامل","فرونت وباكند","frontend و backend","backend و frontend"]},
+
+{id:"api",label:"APIs",icon:"🔌",reply:"**API** = واجهة برمجية تسمح للأنظمة بالتواصل.\n\n**REST API أساسيات:**\n• **HTTP Methods:** GET, POST, PUT, PATCH, DELETE\n• **Status Codes:** 200, 201, 400, 401, 403, 404, 500\n• **JSON** كصيغة البيانات\n• **Endpoints** منظمة\n\n**مفاهيم مهمة:**\n• Authentication (JWT / OAuth2)\n• Validation للمدخلات\n• Error Handling واضح\n• Rate Limiting\n• Versioning (v1, v2)\n\n**بدائل:** GraphQL, gRPC, WebSockets.",
+p:["api","apis","اي بي اي","إيه بي آي","واجهات برمجية","واجهة برمجية","rest api","restful","rest","graphql","كيف اسوي api","كيف أعمل api","تعلم api","تعلم rest","web api","webapi"]},
+
+{id:"database",label:"قواعد البيانات",icon:"🗄️",reply:"**قواعد البيانات — الأساسيات:**\n\n**SQL (العلائقية):**\n• الجداول والعلاقات (1-1, 1-N, N-N)\n• المفاتيح (Primary / Foreign Keys)\n• الاستعلامات: SELECT, JOIN, GROUP BY\n• الفهارس (Indexes) للأداء\n• المعاملات (Transactions) و ACID\n\n**قواعد شائعة:** PostgreSQL, MySQL, SQL Server\n\n**NoSQL:** MongoDB, Redis, Cassandra\n\n**متى تستخدم NoSQL؟**\n• بيانات غير منظمة أو سريعة التغير\n• حمل ضخم موزع\n• Cache (Redis)\n\n**المسار:** SQL أولًا، ثم ORM (EF Core / Hibernate / Prisma).",
+p:["قاعدة البيانات","قواعد البيانات","database","databases","db","sql","mysql","postgres","postgresql","sql server","سكل","استعلامات","جداول","علاقات قاعدة البيانات","فهرسة","indexes","nosql","mongo","mongodb","قواعد بيانات"]},
+
+{id:"csharp",label:"C#",icon:"🔷",reply:"**C#** لغة قوية من Microsoft ممتازة للـBackend والأنظمة المؤسسية.\n\n**المسار الكامل:**\n1. أساسيات C# (Variables, Loops, Methods)\n2. OOP (Classes, Interfaces, Inheritance)\n3. Collections & Generics\n4. LINQ (قوي جدًا)\n5. Async/Await\n6. SQL\n7. Entity Framework Core\n8. ASP.NET Core Web API\n9. Authentication (JWT / Identity)\n10. Testing (xUnit)\n11. Docker + CI/CD\n\n**لمن؟** من يريد وظيفة Backend مؤسسية أو العمل في بيئة .NET.",
+p:["سي شارب","سي#","c#","شارب","دوت نت","dotnet",".net","net","asp net","asp.net","aspnet","asp net core","asp.net core","aspnet core","ef core","entity framework","entityframework","linq","لينك","مايكروسوفت دوت نت","csharp"]},
+
+{id:"java",label:"Java",icon:"☕",reply:"**Java** لغة مستقرة وقوية، والخيار الأول في كثير من البنوك والشركات الكبرى.\n\n**المسار الكامل:**\n1. أساسيات Java\n2. OOP بعمق\n3. Collections Framework\n4. Exceptions & Generics\n5. Streams API\n6. SQL + JDBC\n7. JPA / Hibernate\n8. Spring Boot\n9. Spring Security (JWT)\n10. Testing (JUnit + Mockito)\n11. Docker + Kubernetes\n\n**لمن؟** وظائف Backend مؤسسية، Android (تاريخيًا)، أنظمة كبيرة.",
+p:["جافا","java","سبرنق","spring","spring boot","springboot","جافا سبرينغ","java backend","تعلم جافا"]},
+
+{id:"python",label:"Python",icon:"🐍",reply:"**Python** سهلة نسبيًا كبداية، وممتازة في AI والبيانات والأتمتة.\n\n**المسار حسب الهدف:**\n\n**🐍 Backend:**\nFastAPI / Django → SQL → Auth → Docker\n\n**🤖 AI/Data:**\nNumPy → Pandas → Matplotlib → Scikit-learn → PyTorch/TensorFlow → LLMs\n\n**⚙️ Automation:**\nScripts → Web Scraping → Automation Tools\n\n**نصيحة:** اختر مسارًا واحدًا ولا تتنقل.",
+p:["بايثون","python","بايثون برمجة","تعلم بايثون","python backend","فاست اي بي","fastapi","django","جانغو","flask","بايثون ai"]},
+
+{id:"ai",label:"الذكاء الاصطناعي",icon:"🤖",reply:"**الدخول إلى AI — خارطة الطريق:**\n\n**المرحلة 1 — الأساسيات:**\n• Python باحتراف\n• رياضيات: Linear Algebra, Calculus, Probability\n• NumPy + Pandas\n\n**المرحلة 2 — Machine Learning:**\n• Supervised / Unsupervised Learning\n• Regression, Classification, Clustering\n• تقييم النماذج (Accuracy, Precision, Recall, F1)\n• Scikit-learn\n\n**المرحلة 3 — Deep Learning:**\n• Neural Networks\n• PyTorch (الأفضل للبحث)\n• CNNs (Computer Vision)\n• RNNs / Transformers (NLP)\n\n**المرحلة 4 — التخصص:**\n• LLMs & Fine-tuning\n• RAG Systems\n• Computer Vision\n• MLOps\n\n**⚠️ خطأ شائع:** البدء بـPyTorch قبل فهم أساسيات ML.",
+p:["ذكاء اصطناعي","الذكاء الاصطناعي","ai","artificial intelligence","machine learning","تعلم الآلة","تعلم الاله","deep learning","التعلم العميق","llm","نماذج اللغة","روبوتات الذكاء","ذكاء اصطناعي للمبتدئين","كيف اتعلم ai","كيف أتعلم ai","مجال الذكاء الاصطناعي"]},
+
+{id:"javascript",label:"JavaScript",icon:"🟨",reply:"**JavaScript** لغة الويب بلا منافس.\n\n**المسار:**\n1. المتغيرات، الأنواع، الدوال\n2. DOM Manipulation\n3. Events + Fetch API\n4. Async/Await و Promises\n5. ES6+ (Destructuring, Spread, Modules)\n6. TypeScript (موصى به بشدة)\n7. React / Vue / Svelte\n8. Node.js للـBackend\n\n**مهم:** تعلم اللغة نفسها قبل أي إطار.",
+p:["جافاسكربت","جافا سكربت","javascript","js","نود","node","nodejs","node.js","برمجة الويب","لغة الويب"]},
+
+{id:"typescript",label:"TypeScript",icon:"🟦",reply:"**TypeScript** = JavaScript + أنواع قوية.\n\n**لماذا؟**\n• اكتشاف الأخطاء قبل التشغيل\n• Autocomplete أفضل\n• مناسب للمشاريع الكبيرة\n• مطلوب في معظم وظائف الويب الحديثة\n\n**المسار:**\nJavaScript → TypeScript Basics → Interfaces & Generics → React+TS أو Node+TS\n\n**الوقت المناسب للبدء:** بعد إتقان أساسيات JavaScript.",
+p:["تايب سكربت","تايبسكريبت","typescript","ts","ts"]},
+
+{id:"react",label:"React",icon:"⚛️",reply:"**React** مكتبة واجهات من Meta.\n\n**المسار:**\n1. JavaScript + TypeScript\n2. Components & JSX\n3. Props & State\n4. Hooks (useState, useEffect, useContext)\n5. Forms & Validation\n6. Routing (React Router)\n7. API Integration (React Query / SWR)\n8. State Management (Zustand / Redux Toolkit)\n9. Testing (Jest + RTL)\n10. Next.js (SSR/SSG)\n\n**بدائل:** Vue.js, Angular, Svelte.",
+p:["رياكت","react","reactjs","react.js","واجهات رياكت","تعلم react"]},
+
+{id:"cpp",label:"C++",icon:"⚡",reply:"**C++** لغة قوية للأداء العالي والتحكم الكامل.\n\n**استخدامات:**\n• محركات الألعاب (Unreal)\n• أنظمة التشغيل\n• Embedded Systems\n• التطبيقات عالية الأداء\n• Competitive Programming\n\n**المسار:**\nأساسيات → Pointers & References → Memory Management → OOP → STL → Templates → Concurrency\n\n**⚠️ ليست الأفضل للبدء** إلا إذا كان هدفك محددًا (ألعاب / أنظمة).",
+p:["سي بلس بلس","سي بلس","c++","cpp","++c","لغة c++","تعلم c++","برمجة منخفضة المستوى"]},
+
+{id:"rust",label:"Rust",icon:"🦀",reply:"**Rust** = أداء C++ مع أمان ذاكرة.\n\n**الميزات:**\n• Memory Safety بدون Garbage Collector\n• Concurrency آمنة\n• Ownership & Borrowing\n• سريعة كـ C++\n\n**استخدامات:** أنظمة، WebAssembly، Blockchain، خدمات عالية الأداء.\n\n**المسار:**\nBasics → Ownership → Borrowing & Lifetimes → Traits → Async → Tokio\n\n**منحنى التعلم حاد** — يُفضل بعد إتقان لغة أخرى.",
+p:["رست","rust","لغة rust","تعلم rust","systems programming","برمجة الأنظمة"]},
+
+{id:"go",label:"Go",icon:"🐹",reply:"**Go** لغة من Google — بسيطة وقوية في التزامن.\n\n**الميزات:**\n• سريعة التعلّم\n• Goroutines & Channels (تزامن ممتاز)\n• Tooling مدمج ممتاز\n• Binary واحد بدون dependencies\n\n**استخدامات:** Backend, Microservices, DevOps, Cloud (Docker & Kubernetes مكتوبان بها)\n\n**المسار:**\nBasics → Structs & Interfaces → Goroutines → HTTP + SQL → APIs",
+p:["جو","غو","go","golang","go lang","تعلم go","backend go"]},
+
+{id:"kotlin",label:"Kotlin",icon:"📱",reply:"**Kotlin** اللغة الحديثة لتطوير Android.\n\n**المسار:**\n1. أساسيات Kotlin\n2. OOP + Functional Programming\n3. Android SDK\n4. Jetpack Compose (الحديث)\n5. Networking (Retrofit / Ktor)\n6. Storage (Room)\n7. Architecture (MVVM)\n8. Testing\n\n**ميزة:** متوافقة 100% مع Java، وأقل تعقيدًا منها.",
+p:["كوتلن","kotlin","اندرويد كوتلن","android kotlin","برمجة اندرويد"]},
+
+{id:"swift",label:"Swift",icon:"🍎",reply:"**Swift** لغة Apple الرسمية.\n\n**المسار:**\n1. أساسيات Swift\n2. OOP + Protocols\n3. SwiftUI (الحديث) أو UIKit\n4. Networking (URLSession / Alamofire)\n5. Storage (CoreData / SwiftData)\n6. Architecture (MVVM)\n7. Testing\n8. App Store Publishing\n\n**مطلوب:** جهاز Mac + Xcode.",
+p:["سويفت","swift","ios","اي او اس","آيفون","ايفون","برمجة ايفون","تطوير ios"]},
+
+{id:"dart_flutter",label:"Dart/Flutter",icon:"💙",reply:"**Flutter** لبناء تطبيقات iOS و Android بكود واحد.\n\n**المسار:**\n1. Dart Basics\n2. Widgets (Stateless / Stateful)\n3. Layout & Styling\n4. Navigation & Routing\n5. State Management (Provider / Riverpod / Bloc)\n6. Networking (Dio / http)\n7. Local Storage (Hive / SQLite)\n8. Architecture\n9. Testing & Publishing\n\n**مناسب إذا:** أردت تطبيقات متعددة المنصات بسرعة.",
+p:["دارت","dart","فلاتر","flutter","flutter mobile","تطبيقات flutter","برمجة تطبيقات الجوال","تطبيقات متعددة المنصات"]},
+
+{id:"oop",label:"OOP",icon:"🧩",reply:"**OOP — البرمجة كائنية التوجه:**\n\n**المفاهيم الأربعة:**\n1. **Encapsulation** — إخفاء التفاصيل الداخلية\n2. **Inheritance** — الوراثة بين الكلاسات\n3. **Polymorphism** — تعدد الأشكال\n4. **Abstraction** — التجريد\n\n**مبادئ SOLID:**\n• S: Single Responsibility\n• O: Open/Closed\n• L: Liskov Substitution\n• I: Interface Segregation\n• D: Dependency Inversion\n\n**نصيحة:** افهم **متى تستخدم Composition بدل Inheritance** — هذا ما يميّز المحترف.",
+p:["البرمجة كائنية التوجه","البرمجة كائنية","oop","object oriented","object-oriented","كلاسات","classes","كلاس","class","solid","مبادئ solid"]},
+
+{id:"ds_algo",label:"هياكل البيانات والخوارزميات",icon:"📊",reply:"**هياكل البيانات والخوارزميات**\n\n**هياكل أساسية:**\n• Array / List\n• Stack / Queue\n• Hash Table / Dictionary\n• Linked List\n• Tree / Binary Search Tree\n• Graph\n• Heap\n\n**خوارزميات:**\n• Sorting (Quick, Merge)\n• Binary Search\n• BFS / DFS\n• Dynamic Programming\n• Greedy\n\n**Big-O:** فهم التعقيد الزمني والمكاني.\n\n**مصادر:** LeetCode, HackerRank للتدريب.",
+p:["هياكل البيانات","هياكل البيانات والخوارزميات","data structures","algorithms","الخوارزميات","خوارزميات","داتا ستراكشر","data structure","big o","تعقيد زمني","queue","stack","tree","graph"]},
+
+{id:"git",label:"Git",icon:"🔀",reply:"**Git** — إدارة الإصدارات (لا غنى عنه).\n\n**الأساسيات:**\n• `git init` / `git clone`\n• `git add` / `git commit`\n• `git status` / `git log`\n• `git branch` / `git checkout`\n• `git merge` / `git rebase`\n• `git pull` / `git push`\n\n**مفاهيم مهمة:**\n• Branches (main, develop, feature/*)\n• Pull Requests / Merge Requests\n• Resolving Conflicts\n\n**منصات:** GitHub, GitLab, Bitbucket.",
+p:["جت","git","جيت هب","github","نسخ الكود","version control","اصدار الكود","إدارة الإصدارات"]},
+
+{id:"docker",label:"Docker",icon:"🐳",reply:"**Docker** — حاويات لعزل التطبيقات.\n\n**المفاهيم:**\n• **Image** — قالب ثابت\n• **Container** — نسخة تعمل من الـImage\n• **Dockerfile** — وصف البناء\n• **Volumes** — تخزين دائم\n• **Networks** — شبكات بين الحاويات\n\n**المسار:**\nDocker Basics → Dockerfile → Volumes & Networks → Docker Compose → Registry (Docker Hub) → CI/CD\n\n**بعدها:** Kubernetes للتوسع في الإنتاج.",
+p:["دوكر","docker","كونتينر","container","containers","حاويات","docker compose","compose","kubernetes","k8s","كيبرنيتس"]},
+
+{id:"cloud",label:"Cloud",icon:"☁️",reply:"**الحوسبة السحابية**\n\n**المزودون:** AWS, Azure, GCP\n\n**الأساسيات المشتركة:**\n• Compute (VMs, Serverless)\n• Storage (S3, Blob)\n• Databases (Managed SQL, NoSQL)\n• IAM (Users, Roles, Policies)\n• Networking (VPC, Load Balancers)\n• Monitoring & Logging\n\n**المسار:**\nLinux → Networking → Docker → مزود واحد → IaC (Terraform) → CI/CD",
+p:["كلاود","cloud","السحابة","الحوسبة السحابية","aws","azure","gcp","اماكن استضافة","استضافة التطبيقات"]},
+
+{id:"security",label:"الأمن",icon:"🔐",reply:"**الأمن السيبراني — الأساسيات:**\n\n**المبادئ:**\n• التحقق من المدخلات (Input Validation)\n• مبدأ أقل صلاحية (Least Privilege)\n• تشفير البيانات أثناء النقل والتخزين\n• إدارة الأسرار (Secrets)\n\n**المفاهيم الأساسية:**\n• **Authentication** — من أنت؟\n• **Authorization** — ما المسموح لك؟\n• **JWT** — ليس حلًا سحريًا\n• **HttpOnly Cookies** — تقلل سرقة التوكن عبر JavaScript\n• **CSRF / XSS / SQL Injection**\n• **OWASP Top 10**\n\n**⚠️ تنبيه:** لا تعتمد على JWT في localStorage للإنتاج الحساس.",
+p:["امن المعلومات","الأمن السيبراني","cybersecurity","security","حماية النظام","authentication","authorization","مصادقة","صلاحيات","jwt","httponly","http only","csrf","xss","oauth","oauth2"]},
+
+{id:"architecture",label:"الهندسة المعمارية",icon:"🏗️",reply:"**هندسة الأنظمة الكبيرة:**\n\n**المبادئ:**\n• تصميم البيانات أولًا\n• حدود المعاملات الواضحة\n• الفهارس والأداء\n• Idempotency للعمليات\n• Queues للمهام غير الحرجة\n• Caching ذكي\n• Observability (Logs, Metrics, Traces)\n\n**الأنماط:**\n• Monolith\n• Modular Monolith\n• Microservices\n• Event-Driven\n\n**تحذير:** لا تبدأ بـMicroservices — ابدأ Monolith نظيف.",
+p:["هندسة البرمجيات","معمارية النظام","software architecture","architecture","تصميم النظام","system design","سيستم ديزاين","scalability","قابلية التوسع","توسع النظام","مشاكل التوسع","نظام كبير"]},
+
+{id:"performance",label:"الأداء",icon:"🚀",reply:"**تحسين الأداء — منهجية:**\n\n1. **قِس أولًا** — لا تحسّن بلا بيانات (Profiler)\n2. **حدد Bottleneck** — قاعدة البيانات؟ الشبكة؟ CPU؟\n3. **حسّن الاستعلامات والفهارس**\n4. **أضف Caching** حيث يناسب\n5. **استخدم Queues** للمهام الثقيلة\n6. **راقب** بعد التحسين\n\n**أخطاء شائعة:**\n• إضافة Redis بلا سبب\n• N+1 Queries\n• فهارس زائدة\n• عدم استخدام Pagination\n\n**قاعدة:** القياس قبل التحسين.",
+p:["تحسين الاداء","تحسين الأداء","performance","سرعة النظام","النظام بطيء","السيرفر ينهار","server crash","load","حمل كبير","عدد مستخدمين كبير","queue","طوابير","caching","cache","اختناق السيرفر"]},
+
+{id:"career",label:"المهنة",icon:"💼",reply:"**للوظيفة التقنية — ما يهم فعلًا:**\n\n**الأساسيات:**\n• لغة برمجة قوية (واحدة)\n• قواعد بيانات SQL\n• Git وGitHub\n• فهم HTTP وAPIs\n• OOP والتصميم\n\n**ما يميّزك:**\n• 3-5 مشاريع حقيقية على GitHub\n• README احترافي لكل مشروع\n• القدرة على شرح قراراتك التقنية\n• Testing\n• Docker\n\n**نصائح:**\n• لا تجمع 10 تقنيات سطحية\n• اختر تخصصًا واعمق فيه\n• تدرب على المقابلات التقنية",
+p:["وظيفة برمجة","وظائف البرمجة","كيف اتوظف","كيف أحصل على وظيفة","career","مهنة البرمجة","سوق العمل","مبرمج محترف","كيف اصير مبرمج","كيف أصبح مبرمج","وظيفة backend","وظيفة frontend"]},
+
+{id:"freelance",label:"العمل الحر",icon:"💸",reply:"**العمل الحر (Freelance):**\n\n**قبل البدء:**\n• تخصص واضح (مثلًا: متخصص React فقط)\n• معرض أعمال حقيقي\n• مهارات تواصل جيدة\n\n**أساسيات:**\n• تسعير واضح بالساعة أو بالمشروع\n• عقد يحدد النطاق والتسليمات\n• دفعة مقدمة (30-50%)\n• لا تبدأ بمشاريع ضخمة\n\n**منصات:** Upwork, Freelancer, مستقل, خمسات\n\n**نصيحة:** ابدأ بمشاريع صغيرة لبناء التقييمات.",
+p:["فريلانس","freelance","عمل حر","العمل الحر","مستقل","مستقلين","كيف ابدأ فريلانس","كيف أبدأ فريلانس","دخل من البرمجة","اكسب من البرمجة"]},
+
+{id:"roadmap",label:"خارطة طريق",icon:"🗺️",reply:"**أستطيع بناء Roadmap مخصص لك** 🎯\n\nلكن أحتاج منك:\n1. **مستواك الحالي** (مبتدئ / متوسط / متقدم)\n2. **هدفك** (وظيفة / مشروع / بحث)\n3. **المجال** (Backend / Frontend / AI / Mobile / ...)\n4. **الوقت الأسبوعي** المتاح\n\n**أو** استخدم تبويب **«مستشار المسار»** أعلاه — سيطرح عليك 8 أسئلة ويبني توصية مخصصة.",
+p:["خارطة طريق","خطة تعلم","خطة دراسة","roadmap","study plan","خطة البرمجة","مسار تعلم","مسار برمجي","ماذا اتعلم","ماذا أتعلم","ترتيب تعلم البرمجة","من اين ابدأ"]},
+
+{id:"comparison",label:"مقارنة لغات",icon:"⚖️",reply:"**لا توجد «أفضل لغة» مطلقًا** — الأفضل يعتمد على هدفك:\n\n• **Backend مؤسسي** → C#/.NET أو Java/Spring\n• **AI وبيانات** → Python\n• **Web Frontend** → JavaScript/TypeScript\n• **أنظمة وأداء** → C++ / Rust\n• **خدمات سحابية وتزامن** → Go\n• **Mobile** → Swift (iOS) / Kotlin (Android) / Flutter (متعدد)\n\n**نصيحة:** اختر لغة تناسب سوق العمل الذي تستهدفه + مشاريع تحبها.",
+p:["افضل لغة","أفضل لغة","اي لغة افضل","أي لغة أفضل","وش افضل لغة","ما هي افضل لغة","لغة البرمجة الافضل","لغة البرمجة الأفضل","c# ولا java","c# او java","java ولا c#","python ولا c#","c++ ولا rust","rust ولا c++","مقارنة لغات","اي لغة اتعلم"]},
+
+{id:"sql_vs_nosql",label:"SQL وNoSQL",icon:"🗃️",reply:"**SQL vs NoSQL — القرار:**\n\n**اختر SQL عندما:**\n• البيانات علائقية ومنظمة\n• تحتاج معاملات ACID\n• استعلامات معقدة بـJOINs\n• سلامة البيانات حرجة (بنوك، ERP)\n\n**اختر NoSQL عندما:**\n• بيانات غير منظمة أو متغيرة\n• حمل ضخم موزع\n• Cache (Redis)\n• Document store (MongoDB)\n\n**الحقيقة:** كثير من الأنظمة تستخدم **الاثنين معًا** (Polyglot Persistence).",
+p:["sql ولا nosql","sql او nosql","sql vs nosql","قواعد بيانات sql","قواعد بيانات nosql","متى استخدم nosql","متى استخدم sql","الفرق بين sql وnosql"]},
+
+{id:"prolog",label:"Prolog",icon:"🔮",reply:"**Prolog** لغة برمجة منطقية (Logic Programming).\n\n**المكونات:**\n• **Facts** — حقائق: `intent(backend).`\n• **Rules** — قواعد: `related(X,Y) :- ...`\n• **Queries** — استعلامات: `intent(backend).`\n\n**في هذا الموقع:**\nأستخدم **Tau Prolog** داخل المتصفح لتحويل النص المُطبَّع إلى حقائق ثم الاستدلال عليها بقواعد Prolog.\n\n**استخدامات Prolog:** أنظمة خبيرة، AI رمزي، معالجة اللغة، حل المسائل المنطقية.",
+p:["برولوج","prolog","tau prolog","لغة prolog","تعلم prolog","كيف يعمل prolog"]},
+
+{id:"praise",label:"إطراء",icon:"✨",reply:"**يسعدني ذلك** 😄 المهم أن يكون الشرح واضحًا ومفيدًا.\nاسألني عن أي مسار تقني أو أي مفهوم تريد التعمق فيه.",
+p:["ممتاز","رائع","جميل","حلو","كفو","كفو عليك","احسنت","أحسنت","مبدع","ممتاز جدا","رهيب","فنان"]}
+];
+
+/* Auto-generate additional natural patterns */
+const prefixVariants=["اريد","أريد","ابغى","أبغى","ابي","أبي","نفسي","حاب","حابب","ودي","كيف","هل يمكنني","هل اقدر","هل أقدر","ممكن","وش","ايش","ما هو","ما هي"];
+const techSubjectMap={
+  backend:["backend","باكند","باك اند","الباك اند","الباكند","back end","server side"],
+  frontend:["frontend","فرونت اند","فرونتاند","الفرونت اند","front end"],
+  learn_programming:["البرمجة","برمجة","البرمجه","برمجه"],
+  ai:["الذكاء الاصطناعي","ذكاء اصطناعي","AI","ai"],
+  database:["قواعد البيانات","قاعدة البيانات","database","databases"],
+  security:["الأمن السيبراني","الأمن","security","cybersecurity"],
+  roadmap:["خارطة طريق","خطة تعلم","roadmap","مسار تعلم"]
+};
+Object.entries(techSubjectMap).forEach(([id,subs])=>{
+  const d=intentDefs.find(x=>x.id===id);
+  if(d) subs.forEach(s=>prefixVariants.forEach(p=>d.p.push(p+" "+s)));
+});
+function addVariants(id,subs,ends){
+  const d=intentDefs.find(x=>x.id===id); if(!d)return;
+  subs.forEach(s=>ends.forEach(e=>d.p.push(s+" "+e)));
+}
+addVariants("learn_programming",["برمجة","البرمجة","تعلم البرمجة"],["من الصفر","للمبتدئين","من البداية","بشكل صحيح","بطريقة صحيحة","للوظيفة"]);
+addVariants("backend",["باكند","باك اند","backend"],["من الصفر","للمبتدئين","للوظيفة","للمشاريع","كيف اتعلم","كيف أتعلم"]);
+addVariants("frontend",["فرونت اند","frontend"],["من الصفر","للمبتدئين","للوظيفة","للمشاريع","كيف اتعلم","كيف أتعلم"]);
+addVariants("ai",["AI","ذكاء اصطناعي","الذكاء الاصطناعي"],["من الصفر","للمبتدئين","للوظيفة","كيف اتعلم","كيف أتعلم"]);
+addVariants("database",["قواعد البيانات","database","SQL"],["من الصفر","للمبتدئين","للباكند","كيف اتعلم","كيف أتعلم"]);
+
+/* =========================================================
+   2) NORMALIZATION + CANONICALIZATION
+   ========================================================= */
+function normalize(s){
+  return String(s||"").toLowerCase()
+   .replace(/[\u064B-\u065F\u0670]/g,"")
+   .replace(/[أإآٱ]/g,"ا").replace(/ى/g,"ي").replace(/ؤ/g,"و").replace(/ئ/g,"ي")
+   .replace(/ـ/g,"")
+   .replace(/[؟?!.,،؛:;()[\]{}"'`~_+=/*\\|<>]/g," ")
+   .replace(/-/g," ")
+   .replace(/\s+/g," ").trim();
+}
+const canonicalAliases=[
+  [/\bback\s*end\b/g," backend "],[/باك\s*اند/g," backend "],[/باكند/g," backend "],
+  [/\bfront\s*end\b/g," frontend "],[/فرونت\s*اند/g," frontend "],[/فرونتاند/g," frontend "],
+  [/\bfull\s*stack\b/g," fullstack "],[/فل\s*ستاك/g," fullstack "],
+  [/سي\s*شارب/g," csharp "],[/دوت\s*نت/g," dotnet "],[/asp\s*net/g," aspnet "],
+  [/سي\s*بلس\s*بلس/g," cpp "],[/جافا\s*سكربت/g," javascript "],
+  [/تايب\s*سكربت/g," typescript "],[/بايثون/g," python "],[/برولو[جچ]/g," prolog "],
+  [/ذكاء\s*اصطناعي/g," ai "],[/قواعد\s*البيانات/g," database "],
+  [/الامن\s*السيبراني/g," security "],[/خارطة\s*طريق/g," roadmap "],[/خطة\s*تعلم/g," roadmap "]
+];
+function canon(s){
+  let x=normalize(s);
+  canonicalAliases.forEach(([re,v])=>x=x.replace(re,v));
+  return x.replace(/\s+/g," ").trim();
+}
+function tokens(s){return canon(s).split(/\s+/).filter(Boolean)}
+
+/* =========================================================
+   3) PROLOG ENGINE
+   ========================================================= */
+let session=null;
+const prologFacts=intentDefs.map(d=>`intent(${d.id}).`).join("\n");
+const prologRuleText=`
+${prologFacts}
+technical(backend). technical(frontend). technical(database). technical(api).
+technical(csharp). technical(java). technical(python). technical(ai).
+technical(javascript). technical(typescript). technical(cpp). technical(rust).
+technical(go). technical(kotlin). technical(swift). technical(dart_flutter).
+technical(oop). technical(ds_algo). technical(security). technical(architecture).
+technical(performance). technical(cloud). technical(docker). technical(git).
+learn_path(learn_programming, beginner).
+learn_path(backend, professional).
+learn_path(frontend, professional).
+learn_path(ai, advanced).
+learn_path(database, professional).
+learn_path(security, professional).
+related(backend, api). related(backend, database). related(backend, security).
+related(frontend, api). related(ai, python). related(csharp, dotnet).
+related(java, spring). related(dart_flutter, mobile).
+good_for(csharp, backend). good_for(java, backend). good_for(python, ai).
+good_for(javascript, frontend). good_for(typescript, frontend).
+good_for(cpp, systems). good_for(rust, systems). good_for(go, backend).
+`;
+function initProlog(){
+  try{ session=pl.create(3000); session.consult(prologRuleText); }
+  catch(e){ console.warn("Prolog init failed:",e); }
+}
+function prologQuery(q){
+  return new Promise(resolve=>{
+    if(!session)return resolve([]);
+    const out=[];
+    try{
+      session.query(q,()=>{
+        session.answers(x=>{ if(x===false){resolve(out);return} out.push(x); },300);
+      });
+    }catch(e){ resolve(out); }
+  });
+}
+function logProlog(q,ok){
+  const log=document.getElementById("prologLog");
+  const el=document.createElement("div");
+  el.className="q";
+  el.textContent="?- "+q;
+  log.prepend(el);
+  const el2=document.createElement("div");
+  el2.textContent=ok?"   ✓ true":"   ✗ false";
+  log.prepend(el2);
+  while(log.children.length>14)log.removeChild(log.lastChild);
+}
+
+/* =========================================================
+   4) INTENT INFERENCE
+   ========================================================= */
+function scoreIntent(text,d){
+  const raw=canon(text), tt=tokens(raw);
+  let best=0;
+  for(const p of d.p){
+    const q=canon(p);
+    if(raw===q) best=Math.max(best,100);
+    else if(q.length>=3 && raw.includes(q)) best=Math.max(best,75+Math.min(18,q.length/6));
+    else {
+      const qt=tokens(q);
+      if(qt.length>1 && qt.every(t=>tt.includes(t))) best=Math.max(best,58+qt.length*3);
+    }
+  }
+  const keyTokens=[d.id,...d.label.split(/\s+/)].map(canon).filter(x=>x.length>2);
+  let overlap=0;
+  for(const k of keyTokens) if(tt.includes(k)) overlap++;
+  best+=overlap*7;
+  return best;
+}
+async function inferIntent(text){
+  const ranked=intentDefs.map(d=>({d,s:scoreIntent(text,d)})).sort((a,b)=>b.s-a.s);
+  const top=ranked.filter(x=>x.s>=42).slice(0,3);
+  if(!top.length)return null;
+  const id=top[0].d.id;
+  const p=await prologQuery(`intent(${id}).`);
+  logProlog(`intent(${id})`, p.length>0);
+  return {intent:top[0].d,score:top[0].s,alternatives:top.slice(1)};
+}
+
+/* =========================================================
+   5) MARKDOWN-LITE FORMATTER
+   ========================================================= */
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function inline(s){
+  return escapeHtml(s)
+   .replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>")
+   .replace(/`(.+?)`/g,"<code>$1</code>");
+}
+function md(text){
+  const lines=String(text).split("\n");
+  const out=[];let inList=false;
+  for(const line of lines){
+    const li=line.match(/^\s*[•\-\*]\s+(.+)/);
+    if(li){
+      if(!inList){out.push("<ul>");inList=true}
+      out.push("<li>"+inline(li[1])+"</li>");
+    } else {
+      if(inList){out.push("</ul>");inList=false}
+      if(line.trim())out.push("<p>"+inline(line)+"</p>");
+      else out.push('<div class="sp"></div>');
+    }
+  }
+  if(inList)out.push("</ul>");
+  return out.join("");
+}
+
+/* =========================================================
+   6) CHAT
+   ========================================================= */
+let chatContext={lastIntent:null,history:[]};
+function addMsg(text,who="bot"){
+  const box=document.getElementById("messages");
+  const row=document.createElement("div");
+  row.className="msg "+(who==="user"?"user":"bot");
+  const b=document.createElement("div");
+  b.className="bubble";
+  if(who==="user") b.textContent=text;
+  else b.innerHTML=md(text);
+  row.appendChild(b);box.appendChild(row);
+  box.scrollTop=box.scrollHeight;
+}
+function addTyping(){
+  const box=document.getElementById("messages");
+  const row=document.createElement("div");
+  row.className="msg bot";row.id="typingRow";
+  row.innerHTML='<div class="bubble typing"><span></span><span></span><span></span></div>';
+  box.appendChild(row);box.scrollTop=box.scrollHeight;
+}
+function removeTyping(){const t=document.getElementById("typingRow");if(t)t.remove()}
+function quickChips(items){
+  const c=document.getElementById("chips");c.innerHTML="";
+  items.forEach(x=>{
+    const b=document.createElement("button");b.className="chip";b.textContent=x;
+    b.onclick=()=>{document.getElementById("input").value=x;submitText()};
+    c.appendChild(b);
+  });
+}
+function welcome(){
+  addMsg("**أهلًا بك في TechMentor AI** 👋\n\nأنا نظام خبير تقني يستخدم **Prolog** للاستدلال على النوايا، وأفهم صيغًا عربية ولهجية مختلفة والمصطلحات الإنجليزية.\n\n**جرّب:**\n• «هلا والله ابغى اتعلم برمجه»\n• «كيف أبدأ Backend؟»\n• «C# ولا Java؟»\n• «كيف أتعلم AI؟»");
+  quickChips(["السلام عليكم","أريد أن أتعلم برمجة","أريد Backend","أريد Frontend","كيف أتعلم AI؟","C# ولا Java؟","خارطة طريق للبرمجة"]);
+}
+async function chatResponse(text){
+  const norm=canon(text);
+  if(!norm)return "اكتب سؤالك وسأحاول تحديد المجال أو النية المناسبة.";
+
+  if(/^(نعم|اي|ايوه|ايوا|تمام|صح|صحيح)$/.test(norm) && chatContext.lastIntent){
+    const d=intentDefs.find(x=>x.id===chatContext.lastIntent);
+    return `ممتاز 👍 نكمل على موضوع **${d?d.label:"السؤال السابق"}**.\nاذكر مستواك الحالي وهدفك، وسأرتب لك المسار خطوة بخطوة.\n\nأو استخدم تبويب **«مستشار المسار»** للحصول على توصية مبنية على 8 أسئلة.`;
+  }
+
+  const result=await inferIntent(norm);
+  if(!result || result.score<42){
+    return "**لم أحدد مقصدك بدقة** 🤔\n\nجرّب كتابة المجال بكلمة واضحة مثل:\n• برمجة، Backend، Frontend، AI\n• C#، Java، Python، JavaScript\n• قواعد بيانات، أمن، Docker\n\n**أمثلة:**\n• «أريد أن أتعلم برمجة من الصفر»\n• «كيف أبدأ Backend؟»\n• «هل C# أفضل من Java للـBackend؟»";
+  }
+  chatContext.lastIntent=result.intent.id;
+  chatContext.history.push({text,intent:result.intent.id});
+
+  let reply=result.intent.reply;
+
+  /* Contextual overrides */
+  if(result.intent.id==="comparison"){
+    if(/csharp|سي شارب/.test(norm)&&/java|جافا/.test(norm))
+      reply="**بين C# وJava للـBackend المؤسسي:**\n\n**C# / .NET:**\n• تكامل ممتاز مع بيئة Microsoft\n• ASP.NET Core سريع جدًا\n• LINQ وEF Core أدوات قوية\n• سوق جيد في الخليج والشركات المؤسسية\n\n**Java / Spring Boot:**\n• انتشار أوسع عالميًا\n• بيئة ضخمة ومكتبات لا تنتهي\n• قوي في البنوك والأنظمة الكبيرة\n• Android (تاريخيًا)\n\n**الخلاصة:** كلاهما ممتاز. اختر حسب سوق العمل المستهدف + الإطار الذي ترتاح له. لا تُضيع وقتك في «أيهما أفضل» — ابدأ بأحدهما بعمق.";
+    else if(/cpp|c\+\+|rust/.test(norm))
+      reply="**بين C++ وRust:**\n\n**C++:**\n• أوسع انتشارًا ونضجًا\n• محركات الألعاب والأنظمة المدمجة\n• مكتبات ضخمة\n• منحنى تعلم صعب\n\n**Rust:**\n• Memory safety بدون GC\n• Concurrency آمنة\n• Tooling حديث (Cargo)\n• سوق أصغر لكن متنامٍ\n\n**القرار:** مشروع موجود بـC++ → C++. مشروع جديد يريد أمان ذاكرة → Rust.";
+    else if(/python|بايثون/.test(norm)&&/csharp|سي شارب/.test(norm))
+      reply="**Python vs C#:**\n\n**Python:**\n• سهولة بدء عالية\n• ممتازة في AI والبيانات\n• بطيئة نسبيًا في الأداء الخام\n\n**C#:**\n• أداء أعلى\n• بيئة .NET متكاملة\n• ممتازة للـBackend المؤسسي\n\n**القرار:** AI/بيانات → Python. Backend مؤسسي/أداء → C#.";
+    else if(/javascript|js/.test(norm)&&/typescript|ts/.test(norm))
+      reply="**JavaScript vs TypeScript:**\n\n**JavaScript:** أسرع للبدء، مرونة أعلى، لكن أخطاء وقت التشغيل.\n**TypeScript:** أنواع قوية، اكتشاف مبكر للأخطاء، مطلوب في المشاريع الكبيرة.\n\n**القرار:** تعلم JavaScript أولًا ثم انتقل إلى TypeScript — وهي ما ستستخدمه فعليًا في العمل الجدي.";
+  }
+
+  if(result.intent.id==="roadmap" && /backend|frontend|ai|برمجة|mobile/i.test(norm)){
+    reply+="\n\n**💡 نصيحة:** استخدم تبويب **«مستشار المسار»** — سيطرح عليك 8 أسئلة ويبني لك توصية مخصصة مع Roadmap تفصيلي.";
+  }
+
+  return reply;
+}
+function submitText(){
+  const inp=document.getElementById("input"), text=inp.value.trim();
+  if(!text)return;
+  document.getElementById("suggestions").style.display="none";
+  addMsg(text,"user");inp.value="";
+  addTyping();
+  chatResponse(text).then(r=>{
+    setTimeout(()=>{ removeTyping(); addMsg(r,"bot"); },420);
+  });
+}
+
+/* =========================================================
+   7) AUTOCOMPLETE
+   ========================================================= */
+const suggestionPhrases=[
+"السلام عليكم","أهلاً وسهلاً","كيفك؟","أريد أن أتعلم برمجة","أريد أن أتعلم البرمجة من الصفر",
+"أريد أن أتعلم Backend","أريد أن أتعلم Frontend","أريد أن أتعلم Full Stack","كيف أتعلم الذكاء الاصطناعي؟",
+"كيف أتعلم C#؟","كيف أتعلم Java؟","كيف أتعلم Python؟","C# ولا Java؟","Python ولا C#؟","JavaScript ولا TypeScript؟",
+"ما الفرق بين Backend وFrontend؟","ما هي API؟","أريد تعلم قواعد البيانات","SQL ولا NoSQL؟",
+"أريد تعلم OOP","أريد تعلم هياكل البيانات","ما هي أفضل لغة؟","أريد خارطة طريق للبرمجة",
+"أريد تعلم Git وGitHub","ما هو Docker؟","كيف أبدأ الأمن السيبراني؟","كيف أصمم نظامًا قابلًا للتوسع؟",
+"ما الفرق بين C++ وRust؟","أريد تطوير Android","أريد تطوير iOS","أريد تعلم Flutter","أريد العمل فريلانس"
+].concat(intentDefs.flatMap(d=>d.p.slice(0,6)));
+
+function showSuggestions(){
+  const val=canon(document.getElementById("input").value);
+  const box=document.getElementById("suggestions");
+  if(!val){box.style.display="none";return}
+  const arr=suggestionPhrases
+    .filter(x=>canon(x).includes(val)||val.includes(canon(x)))
+    .slice(0,7);
+  box.innerHTML="";
+  arr.forEach(x=>{
+    const d=document.createElement("div");
+    d.className="suggestion";d.textContent=x;
+    d.onclick=()=>{
+      document.getElementById("input").value=x;
+      box.style.display="none";
+      document.getElementById("input").focus();
+    };
+    box.appendChild(d);
+  });
+  box.style.display=arr.length?"block":"none";
+}
+
+/* =========================================================
+   8) ROADMAPS LIBRARY
+   ========================================================= */
+const ROADMAPS={
+  backend:{icon:"⚙️",title:"Backend Developer",tag:"وظيفة مرغوبة",color:"#3ee0ff",
+    summary:"بناء الخوادم، APIs، قواعد البيانات، والأمان.",
+    phases:[
+      {n:"الأساسيات",items:["لغة برمجة (C# / Java / Python / Go)","المتغيرات، الشروط، الحلقات، الدوال","OOP ومبادئ SOLID","هياكل البيانات الأساسية","Git و GitHub"]},
+      {n:"قواعد البيانات",items:["SQL والعلاقات (1-1, 1-N, N-N)","الفهارس والأداء","المعاملات Transactions","ORM مثل EF Core / Hibernate"]},
+      {n:"الويب و APIs",items:["HTTP و REST","ASP.NET Core / Spring Boot / FastAPI","المصادقة JWT و OAuth2","Validation و Error Handling","Swagger / OpenAPI"]},
+      {n:"الاحتراف",items:["Testing (xUnit / JUnit / Pytest)","Docker و Docker Compose","CI/CD","Redis و Caching","Message Queues (RabbitMQ / Kafka)","Observability (Logs, Metrics, Traces)"]}
+    ]},
+  frontend:{icon:"🎨",title:"Frontend Developer",tag:"سوق ضخم",color:"#7c5cff",
+    summary:"بناء واجهات المستخدم الحديثة والتفاعلية.",
+    phases:[
+      {n:"أساسيات الويب",items:["HTML5 الدلالي","CSS3 (Flexbox, Grid)","التصميم المتجاوب","أساسيات UX/UI"]},
+      {n:"JavaScript",items:["المتغيرات والأنواع","DOM Manipulation","Events و Fetch API","Async/Await و Promises","ES6+ Features"]},
+      {n:"TypeScript + إطار عمل",items:["TypeScript Basics","React / Vue / Svelte","Hooks و State Management","Routing","API Integration"]},
+      {n:"الاحتراف",items:["Testing (Jest, RTL, Playwright)","Build Tools (Vite)","Performance Optimization","Next.js (SSR/SSG)","Accessibility (a11y)"]}
+    ]},
+  fullstack:{icon:"🔗",title:"Full Stack Developer",tag:"شامل",color:"#22e0a7",
+    summary:"إتقان الواجهة والخادم وقواعد البيانات معًا.",
+    phases:[
+      {n:"اختر جانبًا أولًا",items:["أتقن Frontend أو Backend","بناء 2-3 مشاريع فيه"]},
+      {n:"الجانب الآخر",items:["تعلم أساسيات الجانب الثاني","فهم تكامل API","CORS و Authentication"]},
+      {n:"التكامل",items:["بناء تطبيق كامل من الصفر","ربط الواجهة بالـAPI","إدارة الحالة","Deployment"]},
+      {n:"الاحتراف",items:["Docker","CI/CD","Monitoring","Testing على الجانبين","System Design"]}
+    ]},
+  ai:{icon:"🤖",title:"AI / Machine Learning",tag:"متقدم",color:"#ffb547",
+    summary:"من أساسيات Python إلى نماذج التعلم العميق.",
+    phases:[
+      {n:"الرياضيات والبرمجة",items:["Python باحتراف","Linear Algebra","Calculus","Probability & Statistics","NumPy و Pandas"]},
+      {n:"Machine Learning",items:["Supervised Learning","Unsupervised Learning","Regression & Classification","Model Evaluation","Scikit-learn"]},
+      {n:"Deep Learning",items:["Neural Networks","PyTorch","CNNs (Computer Vision)","RNNs & Transformers","Transfer Learning"]},
+      {n:"التخصص",items:["LLMs & Fine-tuning","RAG Systems","MLOps","Model Deployment","Responsible AI"]}
+    ]},
+  mobile:{icon:"📱",title:"Mobile Developer",tag:"طلب مرتفع",color:"#3ee0ff",
+    summary:"تطبيقات iOS و Android — Native أو Cross-platform.",
+    phases:[
+      {n:"اختر المسار",items:["iOS → Swift + SwiftUI","Android → Kotlin + Compose","Cross → Flutter أو React Native"]},
+      {n:"الأساسيات",items:["لغة البرمجة","OOP و Functional","UI Fundamentals","State Management"]},
+      {n:"المتقدم",items:["Networking (REST / GraphQL)","Local Storage","Push Notifications","Offline Support"]},
+      {n:"الإطلاق",items:["Testing","App Store / Play Store","Analytics","Crash Reporting","CI/CD (Fastlane)"]}
+    ]},
+  devops:{icon:"🐳",title:"DevOps / Cloud",tag:"نمو سريع",color:"#22e0a7",
+    summary:"Linux، Docker، Kubernetes، CI/CD، وأتمتة البنية.",
+    phases:[
+      {n:"الأساسيات",items:["Linux Command Line","Networking","Bash Scripting","Git"]},
+      {n:"Containerization",items:["Docker","Docker Compose","Container Registries","Best Practices"]},
+      {n:"Orchestration",items:["Kubernetes","Helm","Service Mesh","Ingress"]},
+      {n:"السحابة و CI/CD",items:["AWS / Azure / GCP","Terraform (IaC)","GitHub Actions / GitLab CI","Monitoring (Prometheus, Grafana)"]}
+    ]},
+  data:{icon:"📊",title:"Data Science",tag:"متعدد المجالات",color:"#7c5cff",
+    summary:"تحليل البيانات، الإحصاء، والتصور البصري.",
+    phases:[
+      {n:"الأساسيات",items:["Python / R","Statistics","Probability","Excel / SQL"]},
+      {n:"تحليل البيانات",items:["Pandas","NumPy","Data Cleaning","EDA"]},
+      {n:"التصور",items:["Matplotlib","Seaborn","Plotly","Dashboarding (Tableau / Power BI)"]},
+      {n:"الاحتراف",items:["Feature Engineering","A/B Testing","Storytelling with Data","Domain Knowledge"]}
+    ]},
+  security:{icon:"🔐",title:"Cybersecurity",tag:"حساس",color:"#ff6b7a",
+    summary:"حماية الأنظمة، الشبكات، والتطبيقات.",
+    phases:[
+      {n:"الأساسيات",items:["Networking (TCP/IP, DNS, HTTP)","Linux","Windows Server","Python Scripting"]},
+      {n:"المفاهيم",items:["Cryptography","Authentication & Authorization","OWASP Top 10","Threat Modeling"]},
+      {n:"المسارات",items:["Penetration Testing","Blue Team / SOC","Application Security","Cloud Security"]},
+      {n:"الاحتراف",items:["Certifications (CEH, OSCP, CISSP)","SIEM Tools","Incident Response","Forensics"]}
+    ]},
+  gamedev:{icon:"🎮",title:"Game Development",tag:"إبداعي",color:"#ffb547",
+    summary:"بناء الألعاب باستخدام محركات حديثة.",
+    phases:[
+      {n:"اختر المحرك",items:["Unity (C#)","Unreal (C++ / Blueprints)","Godot (GDScript)"]},
+      {n:"الأساسيات",items:["Game Loop","Physics & Collision","Input Handling","Scene Management"]},
+      {n:"المتقدم",items:["Graphics (Shaders)","Animation Systems","AI في الألعاب","Networking (Multiplayer)"]},
+      {n:"الإطلاق",items:["Optimization","Publishing (Steam / Mobile)","Monetization","Community"]}
+    ]}
+};
+
+/* =========================================================
+   9) RECOMMENDATION ENGINE — TRAIT-BASED
+   ========================================================= */
+const LANGS={
+  "C#":{icon:"🔷",desc:"Backend مؤسسي، .NET، أداء عالي",traits:{backend:9,enterprise:9,web:7,jobs:8,db:7,performance:6,cloud:8,ai:3,mobile:2,systems:5,ease:6,freelance:5,data:5}},
+  "Java":{icon:"☕",desc:"Backend مؤسسي، Spring، انتشار عالمي",traits:{backend:9,enterprise:9,web:7,jobs:8,db:7,performance:6,cloud:8,ai:4,mobile:3,systems:5,ease:5,freelance:5,data:5}},
+  "Python":{icon:"🐍",desc:"AI، بيانات، أتمتة، Backend سريع",traits:{backend:7,enterprise:6,web:6,jobs:7,db:6,performance:4,cloud:7,ai:10,mobile:2,systems:4,ease:9,freelance:8,data:10}},
+  "JavaScript":{icon:"🟨",desc:"Frontend، Full Stack، Node.js",traits:{backend:6,enterprise:6,web:10,jobs:7,db:4,performance:5,cloud:6,ai:3,mobile:4,systems:3,ease:9,freelance:9,data:4,frontend:10}},
+  "TypeScript":{icon:"🟦",desc:"Frontend احترافي، مشاريع كبيرة",traits:{backend:7,enterprise:8,web:10,jobs:8,db:5,performance:6,cloud:7,ai:3,mobile:5,systems:3,ease:6,freelance:8,data:4,frontend:10}},
+  "C++":{icon:"⚡",desc:"أنظمة، ألعاب، أداء منخفض المستوى",traits:{backend:4,enterprise:5,web:2,jobs:6,db:4,performance:10,cloud:4,ai:5,mobile:3,systems:10,ease:2,freelance:4,data:4}},
+  "Rust":{icon:"🦀",desc:"أنظمة آمنة، أداء عالي، WebAssembly",traits:{backend:6,enterprise:5,web:3,jobs:5,db:4,performance:10,cloud:6,ai:4,mobile:2,systems:10,ease:2,freelance:5,data:3}},
+  "Go":{icon:"🐹",desc:"Microservices، Cloud، DevOps",traits:{backend:9,enterprise:7,web:7,jobs:7,db:6,performance:8,cloud:9,ai:3,mobile:2,systems:7,ease:6,freelance:6,data:4}},
+  "Dart/Flutter":{icon:"💙",desc:"تطبيقات iOS+Android بكود واحد",traits:{backend:4,enterprise:5,web:4,jobs:5,db:4,performance:6,cloud:5,ai:2,mobile:10,systems:3,ease:7,freelance:8,data:3,frontend:6}},
+  "Kotlin":{icon:"📱",desc:"Android حديث، Backend JVM",traits:{backend:7,enterprise:7,web:5,jobs:6,db:6,performance:6,cloud:6,ai:3,mobile:10,systems:4,ease:7,freelance:6,data:4}},
+  "Swift":{icon:"🍎",desc:"iOS و iPadOS و macOS",traits:{backend:4,enterprise:5,web:4,jobs:6,db:4,performance:7,cloud:5,ai:3,mobile:10,systems:4,ease:6,freelance:7,data:3,frontend:5}},
+  "C++ Games":{icon:"🎮",desc:"تطوير الألعاب (Unity/Unreal)",traits:{backend:3,enterprise:4,web:2,jobs:6,db:3,performance:10,cloud:4,ai:6,mobile:4,systems:9,ease:3,freelance:5,data:3}}
+};
+
+const QUESTIONS=[
+  {key:"goal",q:"ما هدفك الأساسي؟",opts:[
+    {t:"وظيفة Backend",w:{backend:10,enterprise:4}},
+    {t:"وظيفة Frontend",w:{frontend:10,web:6}},
+    {t:"ذكاء اصطناعي وبيانات",w:{ai:10,data:8}},
+    {t:"تطبيقات جوال",w:{mobile:10}},
+    {t:"أنظمة وأداء منخفض المستوى",w:{systems:10,performance:8}},
+    {t:"تعلم عام",w:{ease:5,web:3,backend:3}}
+  ]},
+  {key:"level",q:"ما مستواك الحالي؟",opts:[
+    {t:"مبتدئ",w:{ease:8}},
+    {t:"متوسط",w:{ease:3,performance:2}},
+    {t:"متقدم",w:{performance:4,systems:2}}
+  ]},
+  {key:"environment",q:"أين تريد أن تعمل؟",opts:[
+    {t:"شركة ومؤسسات",w:{enterprise:10,jobs:5}},
+    {t:"شركات ناشئة",w:{web:4,backend:3,freelance:4}},
+    {t:"فريلانس",w:{freelance:10,web:4}},
+    {t:"بحث وAI",w:{ai:8,data:5}},
+    {t:"أنظمة وأجهزة",w:{systems:8,performance:5}}
+  ]},
+  {key:"preference",q:"ما الذي يهمك أكثر؟",opts:[
+    {t:"سهولة البداية",w:{ease:9}},
+    {t:"أداء وتحكم",w:{performance:9,systems:5}},
+    {t:"تطوير ويب",w:{web:10,frontend:6,backend:5}},
+    {t:"بيانات وAI",w:{data:9,ai:9}},
+    {t:"تطبيقات متعددة المنصات",w:{mobile:10}}
+  ]},
+  {key:"database",q:"ما مدى اهتمامك بقواعد البيانات؟",opts:[
+    {t:"عالي جدًا",w:{db:8,data:5,backend:4}},
+    {t:"متوسط",w:{db:4}},
+    {t:"قليل",w:{ease:2,frontend:3}}
+  ]},
+  {key:"cloud",q:"هل تريد العمل مع Cloud؟",opts:[
+    {t:"نعم، أساسي",w:{cloud:9,backend:4}},
+    {t:"لاحقًا",w:{cloud:3}},
+    {t:"لا يهم",w:{}}
+  ]},
+  {key:"mobile",q:"هل تهتم بتطوير الجوال؟",opts:[
+    {t:"Android",w:{mobile:9,enterprise:3}},
+    {t:"iOS",w:{mobile:9}},
+    {t:"متعدد المنصات",w:{mobile:8,ease:3}},
+    {t:"لا",w:{}}
+  ]},
+  {key:"strict",q:"هل يهمك التحكم في الذاكرة والأداء المنخفض؟",opts:[
+    {t:"نعم، بشدة",w:{systems:8,performance:8}},
+    {t:"نوعًا ما",w:{systems:4,performance:3}},
+    {t:"لا، أفضّل البساطة",w:{ease:6}}
+  ]}
+];
+
+let answers={},qi=0;
+
+function renderDots(){
+  const c=document.getElementById("stepDots");c.innerHTML="";
+  for(let i=0;i<QUESTIONS.length;i++){
+    const d=document.createElement("div");
+    d.className="step-dot"+(i<qi?" done":i===qi?" current":"");
+    c.appendChild(d);
+  }
+  const pct=Math.round(qi/QUESTIONS.length*100);
+  document.getElementById("qCounter").textContent=qi>=QUESTIONS.length?"اكتمل":"السؤال "+(qi+1)+" من "+QUESTIONS.length;
+  document.getElementById("qPercent").textContent=pct+"%";
+}
+function renderQuestion(){
+  const area=document.getElementById("questionArea");
+  if(qi>=QUESTIONS.length){showResult();return}
+  const q=QUESTIONS[qi];
+  renderDots();
+  area.innerHTML=`<div class="question"><span class="qn">${String(qi+1).padStart(2,'0')}</span>${q.q}</div>
+    <div class="opts">${q.opts.map((o,i)=>`<button class="opt" onclick='answer(${i})'><span>${o.t}</span></button>`).join("")}</div>`;
+}
+function answer(i){
+  const q=QUESTIONS[qi];
+  answers[q.key]=q.opts[i].t;
+  qi++;
+  renderQuestion();
+}
+function computeProfile(){
+  const profile={backend:0,frontend:0,ai:0,data:0,mobile:0,systems:0,web:0,enterprise:0,freelance:0,ease:0,performance:0,cloud:0,db:0,jobs:0};
+  QUESTIONS.forEach(q=>{
+    const chosen=answers[q.key];
+    if(!chosen)return;
+    const opt=q.opts.find(o=>o.t===chosen);
+    if(!opt)return;
+    Object.entries(opt.w).forEach(([k,v])=>profile[k]=(profile[k]||0)+v);
+  });
+  return profile;
+}
+function scoreLang(traits,profile){
+  let s=0;
+  Object.entries(profile).forEach(([k,v])=>{ if(traits[k])s+=traits[k]*v; });
+  return s;
+}
+function showResult(){
+  const profile=computeProfile();
+  const scored=Object.entries(LANGS).map(([name,info])=>({
+    name,info,score:scoreLang(info.traits,profile)
+  })).sort((a,b)=>b.score-a.score);
+
+  const max=scored[0].score||1;
+  const top=scored.slice(0,4);
+
+  const roadmapKey=detectRoadmapKey(top[0].name);
+
+  const html=`
+    <div class="result-hero">
+      <div class="tag">🎯 التوصية المخصصة</div>
+      <h3>${top[0].info.icon} ${top[0].name}</h3>
+      <p>${top[0].info.desc} — هذه أنسب خيار بناءً على إجاباتك.</p>
     </div>
 
-    <div class="sidebar">
-        <h2 style="color: var(--secondary); text-align: center; margin-bottom: 30px;">توصيلو 🛵</h2>
-        <a href="index.html" class="nav-item active"><i class="fas fa-chart-line"></i> الإحصائيات العامة</a>
-        <a href="users_admin.html" class="nav-item"><i class="fas fa-user-friends"></i> عرض المواطنين</a>
-        <a href="drivers_admin.html" class="nav-item"><i class="fas fa-id-card"></i> إدارة السائقين</a>
-        <a href="users.html" class="nav-item"><i class="fas fa-users-cog"></i> الكل (سائقين ومواطنين)</a>
-        <a href="requests.html" class="nav-item"><i class="fas fa-user-plus"></i> طلبات التسجيل</a>
-        <a href="trips.html" class="nav-item"><i class="fas fa-route"></i> سجل الرحلات</a>
-        <a href="audit.html" class="nav-item"><i class="fas fa-file-invoice-dollar"></i> الجرد المالي</a>
-        <a href="report.html" class="nav-item"><i class="fas fa-route"></i> التقارير </a>
-        <a href="complaints.html" class="nav-item"><i class="fas fa-exclamation-triangle"></i> الشكاوى والاقتراحات</a>
-        <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i> إعدادات النظام</a>
+    <div class="rank-list">
+      ${top.map((x,i)=>`
+        <div class="rank-item">
+          <div class="rank-head">
+            <div class="rank-name"><span class="num">${i+1}</span>${x.info.icon} ${x.name}</div>
+            <div class="rank-score">${Math.round(x.score/max*100)}%</div>
+          </div>
+          <div class="rank-bar"><i style="width:${Math.round(x.score/max*100)}%"></i></div>
+          <div class="rank-desc">${x.info.desc}</div>
+        </div>
+      `).join("")}
     </div>
 
-    <div class="main">
-        <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-            <div>
-                <h1 style="margin:0">نظرة عامة للنظام 📈</h1>
-                <p style="color:#777; margin:5px 0 0 0">متابعة إحصائيات المنصة</p>
-            </div>
-            <button class="btn-refresh" onclick="fetchAnalytics()">
-                <i class="fas fa-sync-alt"></i> تحديث البيانات
-            </button>
-        </header>
-
-        <div class="grid">
-            <div class="stat-card" style="border-right-color: var(--primary)">
-                <small><i class="fas fa-shopping-basket"></i> إجمالي الطلبات</small>
-                <h2 id="total-trips">0</h2>
-            </div>
-            <div class="stat-card" style="border-right-color: var(--success)">
-                <small><i class="fas fa-check-double"></i> رحلات مكتملة</small>
-                <h2 id="completed-trips" style="color: var(--success);">0</h2>
-            </div>
-            <div class="stat-card" style="border-right-color: var(--secondary)">
-                <small><i class="fas fa-spinner"></i> قيد التقدم</small>
-                <h2 id="ongoing-trips" style="color: var(--secondary);">0</h2>
-            </div>
-            <div class="stat-card" style="border-right-color: var(--danger)">
-                <small><i class="fas fa-ban"></i> رحلات ملغاة</small>
-                <h2 id="cancelled-trips" style="color: var(--danger);">0</h2>
-            </div>
+    <div class="roadmap-block">
+      <h4>${ROADMAPS[roadmapKey].icon} خارطة طريق مقترحة: ${ROADMAPS[roadmapKey].title}</h4>
+      <p class="rsub">${ROADMAPS[roadmapKey].summary}</p>
+      ${ROADMAPS[roadmapKey].phases.map(p=>`
+        <div class="phase">
+          <h5>${p.n}</h5>
+          <ul>${p.items.map(it=>`<li>${it}</li>`).join("")}</ul>
         </div>
-
-        <div class="grid">
-            <div class="stat-card">
-                <small><i class="fas fa-users"></i> إجمالي المسجلين</small>
-                <h2 id="total-users">0</h2>
-            </div>
-            <div class="stat-card" style="background: var(--primary); color: white;">
-                <small style="color: #ccc;"><i class="fas fa-wallet"></i> صافي الأرباح</small>
-                <h2 id="total-revenue">0 ر.س</h2>
-            </div>
-        </div>
-
-        <div class="table-card">
-            <h3>أحدث الرحلات</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>الرقم</th>
-                        <th>العميل</th>
-                        <th>السائق</th>
-                        <th>التكلفة</th>
-                        <th>الحالة</th>
-                        <th>التوقيت</th>
-                    </tr>
-                </thead>
-                <tbody id="activity-table">
-                    <tr><td colspan="6" style="text-align:center;">جاري جلب البيانات...</td></tr>
-                </tbody>
-            </table>
-        </div>
+      `).join("")}
     </div>
 
-    <script>
-        // دالة إخفاء شاشة الترحيب
-        function hideWelcome() {
-            const welcomeScreen = document.getElementById('welcome-screen');
-            welcomeScreen.style.opacity = '0';
-            setTimeout(() => {
-                welcomeScreen.style.display = 'none';
-            }, 500);
-        }
+    <div class="roadmap-block">
+      <h4>💡 ملاحظات مهمة</h4>
+      <ul style="padding-inline-start:18px;color:#c9def1;line-height:2;margin:0">
+        <li>هذه توصية استدلالية بناءً على إجاباتك، وليست حكمًا مطلقًا.</li>
+        <li>القرار النهائي يعتمد على سوق العمل المستهدف ومشاريعك.</li>
+        <li>لا تُضيع الوقت في «أيهما أفضل» — اختر مسارًا واعمق فيه 6 أشهر.</li>
+        <li>ابنِ <strong>3-5 مشاريع حقيقية</strong> على GitHub — أهم من الشهادات.</li>
+      </ul>
+      <button class="restart" onclick="restartRec()">🔄 إعادة الاختبار</button>
+    </div>
+  `;
 
-        async function fetchAnalytics() {
-            try {
-                const { data: trips } = await _supabase.from('trips').select('*, passenger:user_id(name), driver:driver_id(name)');
-                const { data: users } = await _supabase.from('users').select('*');
+  document.getElementById("questionArea").innerHTML="";
+  document.getElementById("recommendResult").innerHTML=html;
+  renderDots();
+  document.getElementById("qCounter").textContent="اكتمل ✓";
+  document.getElementById("qPercent").textContent="100%";
+}
 
-                if (!trips || !users) return;
+function detectRoadmapKey(lang){
+  const map={
+    "C#":"backend","Java":"backend","Python":"ai","JavaScript":"frontend",
+    "TypeScript":"frontend","C++":"gamedev","Rust":"backend","Go":"backend",
+    "Dart/Flutter":"mobile","Kotlin":"mobile","Swift":"mobile","C++ Games":"gamedev"
+  };
+  return map[lang]||"backend";
+}
+function restartRec(){
+  answers={};qi=0;
+  document.getElementById("recommendResult").innerHTML="";
+  renderQuestion();
+}
 
-                const completed = trips.filter(t => t.status === 'completed');
-                const ongoing = trips.filter(t => t.status === 'ongoing');
-                const cancelled = trips.filter(t => t.status === 'cancelled');
-                const revenue = completed.reduce((sum, t) => sum + (t.price || 0), 0);
+/* =========================================================
+   10) LIBRARY
+   ========================================================= */
+function renderLibrary(){
+  const grid=document.getElementById("libGrid");
+  grid.innerHTML=Object.entries(ROADMAPS).map(([k,r])=>`
+    <div class="lib-card" onclick="openModal('${k}')">
+      <span class="lib-icon">${r.icon}</span>
+      <h3>${r.title}</h3>
+      <p>${r.summary}</p>
+      <div class="lib-meta">
+        <span>${r.phases.length} مراحل</span>
+        <span class="p">${r.tag}</span>
+      </div>
+    </div>
+  `).join("");
+}
+function openModal(key){
+  const r=ROADMAPS[key];
+  document.getElementById("modalInner").innerHTML=`
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h2>${r.icon} ${r.title}</h2>
+    <p>${r.summary}</p>
+    ${r.phases.map(p=>`
+      <div class="phase">
+        <h5>${p.n}</h5>
+        <ul>${p.items.map(it=>`<li>${it}</li>`).join("")}</ul>
+      </div>
+    `).join("")}
+  `;
+  document.getElementById("modal").classList.add("open");
+}
+function closeModal(){document.getElementById("modal").classList.remove("open")}
 
-                document.getElementById('total-trips').innerText = trips.length;
-                document.getElementById('completed-trips').innerText = completed.length;
-                document.getElementById('ongoing-trips').innerText = ongoing.length;
-                document.getElementById('cancelled-trips').innerText = cancelled.length;
-                document.getElementById('total-revenue').innerText = revenue + " ر.س";
-                document.getElementById('total-users').innerText = users.length;
+/* =========================================================
+   11) UI / MODE SWITCHING
+   ========================================================= */
+function switchMode(mode){
+  const chat=mode==="chat";
+  const rec=mode==="recommend";
+  const lib=mode==="library";
+  document.getElementById("chatPanel").style.display=chat?"flex":"none";
+  document.getElementById("recommendPanel").style.display=rec?"block":"none";
+  document.getElementById("libraryPanel").style.display=lib?"block":"none";
+  document.getElementById("chatTab").classList.toggle("active",chat);
+  document.getElementById("recTab").classList.toggle("active",rec);
+  document.getElementById("libTab").classList.toggle("active",lib);
+  if(rec) renderQuestion();
+  if(lib) renderLibrary();
+}
 
-                const tableBody = document.getElementById('activity-table');
-                tableBody.innerHTML = trips.slice(0, 8).map(trip => `
-                    <tr>
-                        <td><b>#${trip.id.slice(0,5)}</b></td>
-                        <td>${trip.passenger?.name || '---'}</td>
-                        <td>${trip.driver?.name || 'قيد البحث'}</td>
-                        <td>${trip.price} ر.س</td>
-                        <td><span class="badge ${trip.status === 'completed' ? 'badge-success' : trip.status === 'cancelled' ? 'badge-danger' : 'badge-ongoing'}">${translateStatus(trip.status)}</span></td>
-                        <td>${new Date(trip.created_at).toLocaleTimeString('ar-SA')}</td>
-                    </tr>
-                `).join('');
+function renderQuickTopics(){
+  const q=document.getElementById("quickTopics");
+  const topics=[
+    "أريد أن أتعلم برمجة",
+    "أريد Backend",
+    "أريد Frontend",
+    "كيف أتعلم AI؟",
+    "C# ولا Java؟",
+    "خارطة طريق للبرمجة"
+  ];
+  q.innerHTML=topics.map(t=>`<button onclick="document.getElementById('input').value='${t}';switchMode('chat');submitText()">${t}</button>`).join("");
+}
 
-            } catch (err) {
-                console.error(err);
-            }
-        }
-
-        function translateStatus(s) {
-            const m = { 'completed': 'مكتملة', 'ongoing': 'قيد التقدم', 'cancelled': 'ملغاة', 'pending': 'معلقة' };
-            return m[s] || s;
-        }
-
-        window.onload = fetchAnalytics;
-    </script>
+/* =========================================================
+   12) BOOT
+   ========================================================= */
+function boot(){
+  initProlog();
+  const count=intentDefs.reduce((n,d)=>n+d.p.length,0);
+  document.getElementById("ruleCount").textContent=count+"+";
+  document.getElementById("intentCount").textContent=intentDefs.length;
+  document.getElementById("roadmapCount").textContent=Object.keys(ROADMAPS).length;
+  renderQuickTopics();
+  welcome();
+}
+boot();
+</script>
 </body>
 </html>
